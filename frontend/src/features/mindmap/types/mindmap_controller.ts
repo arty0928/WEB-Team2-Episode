@@ -12,6 +12,7 @@ export type IMindmapController = {
     detachCanvas(): void;
     destroy(): void;
 
+    isDestroyed(): boolean;
     getStore(): MindmapStore;
     getState(): MindmapStoreState;
     getCanvas(): SVGSVGElement | null;

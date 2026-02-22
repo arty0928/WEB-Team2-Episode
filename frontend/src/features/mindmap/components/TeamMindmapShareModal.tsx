@@ -55,7 +55,7 @@ export function TeamMindmapShareModal({ collaborators }: Props) {
 
                     <Modal.Body className="">
                         <section className="rounded-2xl bg-gray-100 py-3.75 px-5.75">
-                            <h3 className="typo-body-18-semibold text-text-main1">링크 엑세스</h3>
+                            <h3 className="typo-body-18-semibold text-text-main1">링크 액세스</h3>
                             <p className="typo-body-14-reg text-text-main2 mt-2">
                                 링크가 있는 누구나 내용을 볼 수 있고 로그인 시 편집할 수 있어요.
                             </p>

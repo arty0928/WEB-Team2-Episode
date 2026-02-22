@@ -87,8 +87,11 @@ export function MindmapProvider({
 
     useEffect(() => {
         if (!awareness || !user) return;
+        if (!engine || engine.isDestroyed()) {
+            return;
+        }
 
-        engine?.attachPresence({ awareness, user });
+        engine.attachPresence({ awareness, user });
 
         return () => {
             engine?.detachPresence();

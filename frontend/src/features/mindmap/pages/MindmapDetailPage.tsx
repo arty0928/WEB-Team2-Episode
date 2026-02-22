@@ -28,9 +28,8 @@ export default function MindmapDetailPage() {
         throw new BadRequestError("올바른 마인드맵이 아닙니다.");
     }
 
-    const { doc, provider, isSynced } = useMindmapSession({
+    const { doc, provider, isSynced, error } = useMindmapSession({
         mindmapId,
-        enableAwareness: true,
     });
 
     const config = useMemo(
@@ -40,6 +39,10 @@ export default function MindmapDetailPage() {
         }),
         [],
     );
+
+    if (error) {
+        throw error;
+    }
 
     if (!isSynced) {
         return (

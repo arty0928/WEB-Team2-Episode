@@ -220,6 +220,10 @@ export class MindmapController implements IMindmapController {
         );
     }
 
+    isDestroyed() {
+        return this.destroyed;
+    }
+
     detachPresence() {
         if (!this.presenceManager) return;
 
