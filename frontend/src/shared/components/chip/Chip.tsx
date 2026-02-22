@@ -35,7 +35,7 @@ const Chip = <T extends AllowedElementType = "button">({
 
 export default Chip;
 
-const variants = cva("rounded-4xl flex flex-row items-center transition-colors", {
+const variants = cva(" rounded-4xl flex flex-row items-center transition-colors", {
     variants: {
         variant: COLOR_SET,
         size: {

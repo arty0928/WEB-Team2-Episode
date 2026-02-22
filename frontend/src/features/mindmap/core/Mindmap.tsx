@@ -9,6 +9,10 @@ import CollaborationList from "@/features/mindmap/core/CollaborationList";
 import { MindmapProvider } from "@/features/mindmap/core/MindmapProvider";
 import MindmapRenderer from "@/features/mindmap/core/MindmapRenderer";
 import { useMindmapDetail } from "@/features/mindmap/hooks/useMindmapDetail";
+import StarEpisodeHeaderIndicator from "@/features/mindmap/star/components/StarEpisodeHeaderIndicator";
+import StarEpisodePanelOverlay from "@/features/mindmap/star/StarEpisodePanelOverlay";
+import { StarEpisodePanelProvider } from "@/features/mindmap/star/StarEpisodePanelProvider";
+import StarEpisodeTargetSync from "@/features/mindmap/star/StarEpisodeTargetSync";
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmap_collaboration";
 import HeaderToolBar from "@/shared/components/HeaderToolBar/HeaderToolBar";
 import { BaseError } from "@/shared/utils/errors";
@@ -66,34 +70,43 @@ const Mindmap = ({
     const { data: mindmapData } = useMindmapDetail(mindmapId ?? "");
 
     return (
-        <>
-            <HeaderToolBar
-                title={mindmapData.mindmapName}
-                rightSlot={
-                    mindmapData.isShared ? <TeamMindmapShareModal collaborators={mindmapData.participants} /> : null
-                }
-            />
-            <MindmapProvider
-                doc={doc}
-                roomId={mindmapId}
-                canvasRef={canvasRef}
-                awareness={provider?.awareness ?? null}
-                user={user}
-                config={resolvedConfig}
-                onError={handleMindmapError}
-            >
-                <div className="flex flex-col w-full h-full bg-slate-100 overflow-hidden relative">
-                    {mindmapData.isShared && <CollaborationList />}
-                    <ControllerSideBar />
+        <StarEpisodePanelProvider>
+            <>
+                <HeaderToolBar
+                    title={mindmapData.mindmapName}
+                    rightSlot={
+                        <>
+                            <StarEpisodeHeaderIndicator />
+                            {mindmapData.isShared ? (
+                                <TeamMindmapShareModal collaborators={mindmapData.participants} />
+                            ) : null}
+                        </>
+                    }
+                />
+                <MindmapProvider
+                    doc={doc}
+                    roomId={mindmapId}
+                    canvasRef={canvasRef}
+                    awareness={provider?.awareness ?? null}
+                    user={user}
+                    config={resolvedConfig}
+                    onError={handleMindmapError}
+                >
+                    <div className="flex flex-col w-full h-full bg-slate-100 overflow-hidden relative">
+                        {mindmapData.isShared && <CollaborationList />}
+                        <ControllerSideBar />
 
-                    <div className="flex-1 relative min-h-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[20px_20px]">
-                        <svg ref={canvasRef} className="w-full h-full block">
-                            <MindmapRenderer isShared={mindmapData.isShared} />
-                        </svg>
+                        <div className="flex-1 relative min-h-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[20px_20px]">
+                            <StarEpisodeTargetSync />
+                            <svg ref={canvasRef} className="w-full h-full block">
+                                <MindmapRenderer isShared={mindmapData.isShared} />
+                            </svg>
+                            <StarEpisodePanelOverlay />
+                        </div>
                     </div>
-                </div>
-            </MindmapProvider>
-        </>
+                </MindmapProvider>
+            </>
+        </StarEpisodePanelProvider>
     );
 };
 

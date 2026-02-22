@@ -2,6 +2,14 @@
 @import "./styles/typography_token.css";
 
 @theme {
+    --width-star-sheet: 30rem;
+    --max-height-star-sheet: 77rem;
+    --height-star-sheet-header: 3.75rem;
+
+    --shadow-star-sheet: 0 0.75rem 1.5625rem 0 rgba(94, 96, 103, 0.15);
+
+    --z-index-star-sheet: 60;
+
     --color-cobalt-100: #dee5ff;
     --color-cobalt-200: #bdcbff;
     --color-cobalt-300: #96abff;

@@ -6,6 +6,7 @@ import AddChildNodeButton from "@/features/mindmap/node/components/addNode/AddCh
 import { NodeColor } from "@/features/mindmap/node/constants/colors";
 import { NodeVariant } from "@/features/mindmap/node/types/node";
 import { colorBySize, shadowClass } from "@/features/mindmap/node/utils/style";
+import { useStarEpisodePanelActions } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import { NodeId } from "@/features/mindmap/types/node";
 import Icon from "@/shared/components/icon/Icon";
 import List from "@/shared/components/list/List";
@@ -61,51 +62,76 @@ type NodeContentProps = ComponentPropsWithoutRef<"div"> &
     NonNullableVariantProps<typeof nodeVariants> & {
         color: NodeColor;
         highlight?: boolean;
-        children: ReactNode;
         nodeId: NodeId;
+        contents: string; // 원본 텍스트
+        isEditing: boolean; // 편집 모드 여부
+        renderEditor: () => ReactNode; // 에디터 렌더링 함수
     };
+
 function NodeContent({
     size = "sm",
     color,
+    contents,
+    isEditing,
+    renderEditor,
     highlight = false,
     className,
-    children,
     nodeId,
     ...rest
 }: NodeContentProps) {
     const [isMenuOpened, setMenuIsOpened] = useState(false);
     const [isHover, setIsHover] = useState(false);
 
-    const variant: NodeVariant = isHover || isMenuOpened ? "interactive" : highlight ? "highlighted" : "idle";
+    // 실제 값이 있는지 확인 (공백 제외)
+    const hasContent = contents.trim().length > 0;
 
+    // 인터랙티브 상태 판단: 호버 중이거나 메뉴가 열려있을 때
+    const variant: NodeVariant = isHover || isMenuOpened ? "interactive" : highlight ? "highlighted" : "idle";
     const colorClass = colorBySize({ size, color, variant: variant });
 
-    const { deleteNode } = useMindmapActions();
+    const { deleteNode, selectNode } = useMindmapActions();
+    const { openFromMenu } = useStarEpisodePanelActions();
 
-    const handleDelete = () => {
-        deleteNode(nodeId);
+    const nodeText = (contents ?? "").trim();
+    const hasText = nodeText.length > 0;
+    const isRoot = nodeId === "root";
+
+    const handleOpenStarFromMenu = () => {
+        if (!hasText) return;
+        if (isRoot) return;
+
+        selectNode(nodeId);
+        openFromMenu(nodeId);
+        setMenuIsOpened(false);
     };
 
     return (
         <div
-            className={cn(
-                nodeVariants({ size }),
-                colorClass,
-                variant,
-                className,
-                variant !== "idle" ? shadowClass(color) : "",
-            )}
+            className={cn(nodeVariants({ size }), colorClass, className, variant !== "idle" ? shadowClass(color) : "")}
             onPointerEnter={() => setIsHover(true)}
             onPointerLeave={() => setIsHover(false)}
             {...rest}
         >
-            {children}
+            {/* 1. 편집 중일 때는 에디터(textarea) 표시 */}
+            {isEditing ? (
+                renderEditor()
+            ) : (
+                /* 2. 편집 중이 아닐 때: 내용 유무에 따른 텍스트 표시 */
+                <div
+                    className={cn(
+                        "whitespace-pre-wrap break-all w-full text-center select-none",
+                        !hasContent && "text-gray-500",
+                    )}
+                >
+                    {hasContent ? contents : "빈 칸"}
+                </div>
+            )}
+
+            {/* 3. 메뉴: 인터랙티브 상태일 때만 노출 */}
             {variant === "interactive" && (
                 <button
-                    className={cn(
-                        nodeMenuVariants({ color }),
-                        "absolute top-0 right-0 transition-opacity duration-300",
-                    )}
+                    className={cn(nodeMenuVariants({ color }), "absolute top-0 right-0 transition-opacity")}
+                    onClick={(e) => e.stopPropagation()} // 노드 클릭 이벤트 전파 방지
                 >
                     <Popover
                         isOnOpenChange={(v) => setMenuIsOpened(v)}
@@ -113,11 +139,20 @@ function NodeContent({
                         contents={
                             <List className="w-40">
                                 <ListRow
-                                    contents={"삭제하기"}
-                                    className="text-red-300 typo-body-14-medium w-full text-left"
+                                    contents="삭제하기"
+                                    className="text-red-300 typo-body-14-medium"
                                     leftSlot={<Icon name="ic_nodemenu_delete" size={16} />}
-                                    onClick={handleDelete}
+                                    onClick={() => deleteNode(nodeId)}
                                 />
+                                {/* 내용이 있을 때만 STAR 작성하기 메뉴 표시 */}
+                                {hasContent && !isRoot && (
+                                    <ListRow
+                                        contents="STAR 작성하기"
+                                        className="text-text-main2 typo-body-14-medium"
+                                        leftSlot={<Icon name="ic_star" size={16} />}
+                                        onClick={handleOpenStarFromMenu}
+                                    />
+                                )}
                             </List>
                         }
                     >
@@ -128,6 +163,7 @@ function NodeContent({
         </div>
     );
 }
+
 export const Node = Object.assign(NodeComponent, {
     AddNode: AddChildNodeButton,
     Content: NodeContent,

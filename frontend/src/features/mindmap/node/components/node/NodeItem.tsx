@@ -11,6 +11,7 @@ import {
 import { useMindmapActions, useMindmapNode, useMindmapNodeLock } from "@/features/mindmap/hooks/useMindmapStoreState";
 import { Node } from "@/features/mindmap/node/components/node/Node";
 import NodeCenter from "@/features/mindmap/node/components/nodeCenter/NodeCenter";
+import { useIsStarTargetNode } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import type { NodeId } from "@/features/mindmap/types/node";
 import { cn } from "@/utils/cn";
 
@@ -75,6 +76,8 @@ function NodeItem({ nodeId, measure = true }: Props) {
     const [draft, setDraft] = useState<string>(contents ?? "");
     const pendingContentsRef = useRef<string | null>(null);
     const rafIdRef = useRef<number | null>(null);
+
+    const isStarTarget = useIsStarTargetNode(nodeId);
 
     useEffect(() => {
         if (lockedByMe) {
@@ -297,42 +300,44 @@ function NodeItem({ nodeId, measure = true }: Props) {
                         <Node.AddNode baseId={nodeId} side={addNodeDirection} color={nodeColor} />
                         <Node.Content
                             nodeId={nodeData.id}
-                            data-action="select"
+                            contents={contents ?? ""} // 원본 텍스트 전달 (내부에서 메뉴 노출/빈칸 스타일 판단)
+                            isEditing={lockedByMe} // 내가 편집 중인지 여부
                             size={nodeSize}
                             color={nodeColor}
-                            highlight={lockedByMe}
+                            // highlight={lockedByMe}
+                            highlight={isStarTarget || lockedByMe}
+                            data-action="select"
                             className={cn(
                                 isRoot ? "bg-primary text-white" : "",
-                                "min-w-40 max-w-40 min-h-20 h-auto p-4 flex items-center justify-center wrap-break-word overflow-wrap-anywhere",
+                                "min-h-20 h-auto p-4 flex items-center justify-center wrap-break-word overflow-wrap-anywhere",
                             )}
                             onClick={() => {
                                 if (lockedByOther) {
                                     toast.error("잠금 상태라 내용 수정이 불가합니다");
                                 }
                             }}
-                        >
-                            {lockedByMe ? (
+                            /* 편집 모드일 때 보여줄 textarea를 Render Prop으로 전달 */
+                            renderEditor={() => (
                                 <textarea
                                     ref={textareaRef}
                                     value={draft}
-                                    maxLength={MAX_CONTENTS_LENGTH} // 1. 네이티브 maxLength 속성 추가
+                                    maxLength={MAX_CONTENTS_LENGTH}
                                     placeholder="내용을 입력하세요"
                                     className="w-full bg-transparent outline-none resize-none overflow-hidden text-center leading-normal"
                                     style={{
                                         height: "auto",
-                                        minHeight: "1.5em", // 최소 한 줄 보장
-                                        display: "block", // inline-block보다 정렬에 유리
+                                        minHeight: "1.5rem", // 가이드라인 준수: 1.5em 대신 rem 권장
+                                        display: "block",
                                     }}
                                     rows={1}
                                     onChange={(e) => {
                                         let next = e.target.value;
-
                                         if (next.length > MAX_CONTENTS_LENGTH) {
                                             next = next.slice(0, MAX_CONTENTS_LENGTH);
                                             toast.warning(`${MAX_CONTENTS_LENGTH}자까지만 입력 가능합니다.`);
                                         }
-
                                         setDraft(next);
+                                        // 높이 자동 조절
                                         e.target.style.height = "auto";
                                         e.target.style.height = `${e.target.scrollHeight}px`;
                                         scheduleBroadcast(next);
@@ -353,19 +358,12 @@ function NodeItem({ nodeId, measure = true }: Props) {
                                         exitEdit();
                                     }}
                                 />
-                            ) : (
-                                <div
-                                    className={`whitespace-pre-wrap break-all w-full text-center select-none ${!contents ? "text-gray-400" : "text-text-main1"}`}
-                                >
-                                    {contents || "빈 칸"}
-                                </div>
                             )}
-                        </Node.Content>
+                        />
                     </Node>
                 </div>
             </div>
         </foreignObject>
     );
 }
-
 export default memo(NodeItem);

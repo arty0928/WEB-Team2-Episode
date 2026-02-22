@@ -1,5 +1,5 @@
 // frontend/src/features/mindmap/constants/root_node.ts
-export const ROOT_CONTENTS_MAX_LENGTH = 12;
+export const ROOT_CONTENTS_MAX_LENGTH = 20;
 
 // NodeCenter 구성(현재 Tailwind 기준)
 // - 중앙 원: w-40/h-40 => 160px

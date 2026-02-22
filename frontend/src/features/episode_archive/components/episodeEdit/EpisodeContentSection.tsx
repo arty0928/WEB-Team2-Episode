@@ -25,42 +25,51 @@ const fields: FieldConfig[] = [
     { id: "result", label: "결과", english: "Result", char: "R" },
 ];
 
-const handleResizeHeight = (e: React.FormEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    target.style.height = "auto";
-    target.style.height = `${target.scrollHeight}px`;
-};
-
 export default function EpisodeContentSection({ className }: EpisodeContentSectionProps) {
-    const { register } = useFormContext<EpisodeDetailResponse>();
+    const { register, watch } = useFormContext<EpisodeDetailResponse>();
 
     return (
         <div className={cn("flex flex-col gap-4", className)}>
-            {fields.map((field) => (
-                <div key={field.id} className="flex flex-col gap-2">
-                    <Row
-                        className="list-none"
-                        leftSlot={
-                            <div className="flex flex-row gap-2 items-center">
-                                <div className="flex flex-col justify-center items-center rounded-full bg-primary w-5.5 h-5.5 px-1.5 py-0.5">
-                                    <span className="text-white text-xs font-bold leading-none">{field.char}</span>
-                                </div>
-                                <span className="typo-body-16-semibold text-text-main1">{field.label}</span>
-                                <span className="typo-body-14-reg text-text-placeholder">{field.english}</span>
-                            </div>
-                        }
-                    />
+            {fields.map((field) => {
+                const content = (watch(field.id) as string) || "";
+                const isLimit = content.length >= 200;
 
-                    <div className="flex w-full min-h-30 px-5 pt-4 pb-3.5 items-start gap-2.5 rounded-xl border border-gray-300 bg-white shadow-none focus-within:border-primary transition-colors">
-                        <textarea
-                            {...register(field.id)}
-                            onInput={handleResizeHeight}
-                            placeholder={placeHolder.STAR[field.char]}
-                            className="w-full typo-body-14-reg text-text-main1 border-none outline-none resize-none overflow-hidden p-0 bg-transparent placeholder:text-text-placeholder"
+                return (
+                    <div key={field.id} className="flex flex-col gap-2">
+                        <Row
+                            className="list-none"
+                            leftSlot={
+                                <div className="flex flex-row gap-2 items-center">
+                                    <div className="flex flex-col justify-center items-center rounded-full bg-primary w-5.5 h-5.5 px-1.5 py-0.5">
+                                        <span className="text-white text-xs font-bold leading-none">{field.char}</span>
+                                    </div>
+                                    <span className="typo-body-16-semibold text-text-main1">{field.label}</span>
+                                    <span className="typo-body-14-reg text-text-placeholder">{field.english}</span>
+                                </div>
+                            }
                         />
+
+                        <div className="relative flex flex-col w-full h-32 rounded-xl border border-gray-300 bg-white shadow-none focus-within:border-primary transition-colors overflow-hidden">
+                            <textarea
+                                {...register(field.id)}
+                                maxLength={200}
+                                placeholder={placeHolder.STAR[field.char]}
+                                className="w-full h-full px-5 pt-4 pb-10 typo-body-14-reg text-text-main1 border-none outline-none resize-none overflow-y-auto bg-transparent placeholder:text-text-placeholder"
+                            />
+
+                            {isLimit && (
+                                <div
+                                    className="absolute bottom-3 right-4 
+                                               px-3 py-1.5 rounded-md bg-black/80 text-white typo-caption-11-reg  shadow-md
+                                               pointer-events-none select-none whitespace-nowrap z-10 animate-in fade-in slide-in-from-bottom-1 duration-200"
+                                >
+                                    최대 200자 제한입니다
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 }
