@@ -34,6 +34,8 @@
 ![freecompress-화면 기록 2026-02-23 오전 3 00 38](https://github.com/user-attachments/assets/58d75fcf-3b29-4d68-85d5-a5502d124835)
 
 ### 다 같이 정리하는 팀 마인드맵
+![Adobe Express - 화면 기록 2026-02-23 오전 4 05 40 (online-video-cutter com) (1)](https://github.com/user-attachments/assets/d7376794-7ee8-4ce6-840d-569dfb3c4fe2)
+
 
 ### 마인드맵 내 특정 역량에 대한 경험을 검색해보세요!
 
