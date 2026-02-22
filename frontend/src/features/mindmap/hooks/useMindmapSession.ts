@@ -32,16 +32,16 @@ export const fetchJoinSession = async (
         });
     } catch (e) {
         if (!(e instanceof ApiError)) {
-            throw new InternalServerError(
-                "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
-            );
+            throw new InternalServerError({
+                message: "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
+            });
         }
 
         // 개인마인드맵에 join하려하면 403 + MINDMAP_ACCESS_FORBIDDEN로 오류옵니다.
         // participants가 필요한거면 403 + MINDMAP_PARTICIPANT_NOT_FOUND 오류옵니다.
         if (e.status === 403) {
             if (e.code === "MINDMAP_ACCESS_FORBIDDEN") {
-                throw new BadRequestError("개인 마인드맵에는 참여할 수 없습니다.");
+                throw new BadRequestError({ message: "개인 마인드맵에는 참여할 수 없습니다." });
             }
 
             if (curRetryCount < maxRetryCount) {
@@ -107,7 +107,11 @@ export function useMindmapSession({ mindmapId }: Props) {
                 toast.error("네트워크 상태를 확인해주세요.");
                 setConnectionStatus("disconnected");
                 if (isInitialLoadRef.current) {
-                    setError(new BadRequestError("네트워크에 연결되어 있지 않습니다. 연결 확인 후 새로고침 해주세요."));
+                    setError(
+                        new BadRequestError({
+                            message: "네트워크에 연결되어 있지 않습니다. 연결 확인 후 새로고침 해주세요.",
+                        }),
+                    );
                 } else {
                     toast.error("네트워크 상태를 확인해주세요.");
                 }
@@ -123,7 +127,7 @@ export function useMindmapSession({ mindmapId }: Props) {
                 if (isUnmountedRef.current) return;
 
                 const res = await fetch(presignedUrl);
-                if (!res.ok) throw new InternalServerError(`Snapshot fetch failed: ${res.status}`);
+                if (!res.ok) throw new InternalServerError({ message: `Snapshot fetch failed: ${res.status}` });
 
                 const buffer = await res.arrayBuffer();
                 if (isUnmountedRef.current) return;
@@ -186,9 +190,10 @@ export function useMindmapSession({ mindmapId }: Props) {
 
                     if (isInitialLoadRef.current) {
                         setError(
-                            new BadRequestError(
-                                "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
-                            ),
+                            new BadRequestError({
+                                message:
+                                    "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
+                            }),
                         );
                     } else {
                         toast.error("세션이 만료되었거나 네트워크가 끊어졌습니다.");

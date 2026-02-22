@@ -25,7 +25,7 @@ export default function MindmapDetailPage() {
     }, [userInfo?.userId, userInfo?.nickname]);
 
     if (!mindmapId) {
-        throw new BadRequestError("올바른 마인드맵이 아닙니다.");
+        throw new BadRequestError({ message: "올바른 마인드맵이 아닙니다." });
     }
 
     const { doc, provider, isSynced, error } = useMindmapSession({

@@ -377,17 +377,61 @@ export class MindmapController implements IMindmapController {
         return info.user?.name ?? null;
     }
 
+    private findLockedNodeInSubtreeByOther(rootId: NodeId): { nodeId: NodeId; ownerName: string | null } | null {
+        const locks = this.store.getState().locks;
+        if (!locks.enabled) return null;
+
+        const selfId = locks.selfClientId;
+
+        const stack: NodeId[] = [rootId];
+        const visited = new Set<NodeId>();
+
+        while (stack.length > 0) {
+            const id = stack.pop()!;
+            if (visited.has(id)) continue;
+            visited.add(id);
+
+            const info = locks.byNodeId.get(id);
+            if (info) {
+                const lockedByMe = selfId != null && info.clientId === selfId;
+                if (!lockedByMe) {
+                    return { nodeId: id, ownerName: info.user?.name ?? null };
+                }
+            }
+
+            const children = this.tree.getChildIds(id);
+            for (let i = children.length - 1; i >= 0; i--) {
+                stack.push(children[i]!);
+            }
+        }
+
+        return null;
+    }
+
     private canApplySharedCommand(cmd: MindmapCommand): { ok: true } | { ok: false; reason: string } {
         const locks = this.store.getState().locks;
         if (!locks.enabled) return { ok: true };
 
         switch (cmd.type) {
-            case "NODE/DELETE":
+            case "NODE/DELETE": {
+                const nodeId = cmd.payload.nodeId;
+
+                const locked = this.findLockedNodeInSubtreeByOther(nodeId);
+                if (locked) {
+                    const who = locked.ownerName ?? "다른 사용자";
+                    return {
+                        ok: false,
+                        reason: `삭제할 수 없어요. 하위 노드 중 ${who}님이 편집 중인 노드가 있어요.`,
+                    };
+                }
+                return { ok: true };
+            }
+
             case "NODE/UPDATE_CONTENTS": {
                 const nodeId = cmd.payload.nodeId;
                 if (this.isNodeLockedByOther(nodeId)) {
-                    const owner = this.getLockOwnerName(nodeId);
-                    return { ok: false, reason: `UPDATE_CONTENTS blocked: ${nodeId} locked by ${owner ?? "someone"}` };
+                    const who = this.getLockOwnerName(nodeId) ?? "다른 사용자";
+                    return { ok: false, reason: `수정할 수 없어요. ${who}님이 편집 중인 노드예요.` };
                 }
                 return { ok: true };
             }
@@ -411,8 +455,9 @@ export class MindmapController implements IMindmapController {
             }
 
             const guard = this.canApplySharedCommand(cmd);
+
             if (!guard.ok) {
-                this.opts.onError?.(new BadRequestError(guard.reason));
+                this.opts.onError?.(new BadRequestError({ message: guard.reason, displayType: "alert" }));
                 if (this.opts.debug) console.warn("[LockGuard]", guard.reason, cmd);
                 return;
             }
@@ -456,7 +501,7 @@ export class MindmapController implements IMindmapController {
             if (c.scope !== "remote") continue;
             const guard = this.canApplySharedCommand(c);
             if (!guard.ok) {
-                this.opts.onError?.(new BadRequestError(guard.reason));
+                this.opts.onError?.(new BadRequestError({ message: guard.reason }));
                 if (this.opts.debug) console.warn("[LockGuard]", guard.reason, c);
                 return;
             }
@@ -481,37 +526,6 @@ export class MindmapController implements IMindmapController {
 
             transactionOrigin.mindmapCommandBatch(enriched, meta),
         );
-    }
-
-    private findLockedNodeInSubtreeByOther(rootId: NodeId): { nodeId: NodeId; ownerName: string | null } | null {
-        const locks = this.store.getState().locks;
-        if (!locks.enabled) return null;
-
-        const selfId = locks.selfClientId;
-
-        const stack: NodeId[] = [rootId];
-        const visited = new Set<NodeId>();
-
-        while (stack.length > 0) {
-            const id = stack.pop()!;
-            if (visited.has(id)) continue;
-            visited.add(id);
-
-            const info = locks.byNodeId.get(id);
-            if (info) {
-                const lockedByMe = selfId != null && info.clientId === selfId;
-                if (!lockedByMe) {
-                    return { nodeId: id, ownerName: info.user?.name ?? null };
-                }
-            }
-
-            const children = this.tree.getChildIds(id);
-            for (let i = children.length - 1; i >= 0; i--) {
-                stack.push(children[i]!);
-            }
-        }
-
-        return null;
     }
 
     actions = {
@@ -801,7 +815,7 @@ export class MindmapController implements IMindmapController {
         }
     }
 
-    private applySharedCommand(cmd: MindmapCommand): { ok: true } | { ok: false; reason: string } {
+    private applySharedCommand(cmd: MindmapCommand) {
         switch (cmd.type) {
             case "NODE/ADD": {
                 const { baseId, direction, side, data } = cmd.payload;
@@ -811,56 +825,42 @@ export class MindmapController implements IMindmapController {
                 if (data?.contents !== undefined) {
                     this.tree.update(newId, { contents: data.contents });
                 }
-                return { ok: true };
+                return;
             }
 
             case "NODE/MOVE": {
                 const { targetId, movingId, direction, side } = cmd.payload;
                 this.tree.moveTo({ baseNodeId: targetId, movingNodeId: movingId, direction, addNodeDirection: side });
-                return { ok: true };
+                return;
             }
 
             case "NODE/DELETE": {
-                const nodeId = cmd.payload.nodeId;
-                const locked = this.findLockedNodeInSubtreeByOther(nodeId);
-                if (locked) {
-                    const who = locked.ownerName ?? "다른 사용자";
-                    return {
-                        ok: false,
-                        reason: `삭제할 수 없어요. 하위 노드 중 ${who}님이 편집 중인 노드가 있어요.`,
-                    };
-                }
+                const { nodeId } = cmd.payload;
                 this.tree.delete(nodeId);
-                return { ok: true };
+                return;
             }
 
             case "NODE/RESIZE": {
                 const { nodeId, width, height } = cmd.payload;
                 const cur = this.tree.safeGetNode(nodeId);
-                if (cur && cur.width === width && cur.height === height) return { ok: true };
+                if (cur && cur.width === width && cur.height === height) return;
                 this.tree.update(nodeId, { width, height });
-                return { ok: true };
+                return;
             }
 
             case "NODE/UPDATE_CONTENTS": {
                 const { nodeId, contents } = cmd.payload;
-
-                if (this.isNodeLockedByOther(nodeId)) {
-                    const who = this.getLockOwnerName(nodeId) ?? "다른 사용자";
-                    return { ok: false, reason: `수정할 수 없어요. ${who}님이 편집 중인 노드예요.` };
-                }
-
                 const cur = this.tree.safeGetNode(nodeId);
-                if (!cur) return { ok: true };
+                if (!cur) return;
 
                 const nextContents = cur.type === "root" ? normalizeRootContents(contents) : contents;
 
                 this.tree.update(nodeId, { contents: nextContents });
-                return { ok: true };
+                return;
             }
 
             default:
-                return { ok: true };
+                return;
         }
     }
 
