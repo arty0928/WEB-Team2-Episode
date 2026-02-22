@@ -5,6 +5,7 @@
 <a href="https://episode.io.kr">
   <img alt="image" src="https://github.com/user-attachments/assets/f0dc6923-5076-4981-b9cd-ba671313d250" />
 </a>
+
 <h6>흩어진 경험을 한 편의 이야기로 잇다.</h6>
 </div>
 
@@ -25,6 +26,19 @@
 </div>
 
 <br/>
+
+## 서비스 설명
+![화면 기록 2026-02-22 오후 5 19 59](https://github.com/user-attachments/assets/3f322076-0cb7-4690-a6c5-2d3573d892b3)
+
+### 나만의 경험을 모아 정리하는 개인 마인드맵
+
+### 다 같이 정리하는 팀 마인드맵
+
+### 마인드맵 내 특정 역량에 대한 경험을 검색해보세요!
+
+### 마인드맵의 노드와 연결되는 STAR 정리
+
+
 
 ## 🔧 기술 스택
 
