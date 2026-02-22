@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { TRANSACTION_TAG } from "@/features/mindmap/constants/transaction";
+import { ROOT_NODE_ID } from "@/features/mindmap/core/YjsAdaptor";
 import { useDeleteEpisodes } from "@/features/mindmap/hooks/useDeleteEpisodes";
 import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
 import type { IMindmapController } from "@/features/mindmap/types/mindmap_controller";
@@ -35,7 +36,10 @@ export function useMindmapServerSideEffects(args: {
                 const node = state.graph.nodes.get(prevEditing.id);
                 const currentContent = node?.contents ?? "";
 
-                if (prevEditing.content !== currentContent) {
+                const isNotRoot = prevEditing.id !== ROOT_NODE_ID;
+                const isContentChanged = prevEditing.content !== currentContent;
+
+                if (isNotRoot && isContentChanged) {
                     unlockMut.mutate({
                         mindmapId: mindmapId,
                         body: {
@@ -50,15 +54,20 @@ export function useMindmapServerSideEffects(args: {
                 }
             }
 
+            // 2. 새로운 편집 노드 정보로 Ref 갱신 (항상 실행)
             if (currentLockedId) {
                 const newNode = state.graph.nodes.get(currentLockedId);
-                editingNodeRef.current = { id: currentLockedId, content: newNode?.contents ?? "" };
+                editingNodeRef.current = {
+                    id: currentLockedId,
+                    content: newNode?.contents ?? "",
+                };
             } else {
                 editingNodeRef.current = null;
             }
         });
     }, [engine, canSendApi, mindmapId, unlockMut]);
 
+    // ... (하단 생략)
     // deletw
     useEffect(() => {
         if (!engine || !canSendApi) return;
@@ -76,7 +85,9 @@ export function useMindmapServerSideEffects(args: {
             if (!isLocalDeleteTx) return;
 
             const nodeMap = state.graph.nodes;
-            const deletedIds = Array.from(new Set(tx.changedIds.filter((id) => !nodeMap.has(id))));
+            const deletedIds = Array.from(
+                new Set(tx.changedIds.filter((id) => id !== ROOT_NODE_ID && !nodeMap.has(id))),
+            );
 
             if (deletedIds.length > 0) {
                 deleteMut.mutate({ nodeIds: deletedIds });
