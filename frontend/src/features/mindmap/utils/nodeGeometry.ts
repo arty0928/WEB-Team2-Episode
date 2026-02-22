@@ -5,7 +5,7 @@ import { NodeElement } from "@/features/mindmap/types/node";
 const DEFAULT_OUTER_W = 200; // 측정 전 fallback
 const DEFAULT_OUTER_H = 60;
 
-export const ADD_NODE_TOTAL_W = 55;
+export const ADD_NODE_TOTAL_W = 40;
 
 export function getOuterSize(node: NodeElement) {
     if (node.type === "root") {

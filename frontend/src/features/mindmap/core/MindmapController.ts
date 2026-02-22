@@ -27,7 +27,7 @@ import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/
 import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/native_like_event";
 import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
-import { NodeLimitExceededError } from "@/shared/utils/errors";
+import { BadRequestError, NodeLimitExceededError } from "@/shared/utils/errors";
 
 function cloneNodesMapForLayout(nodes: Map<NodeId, NodeElement>): Map<NodeId, NodeElement> {
     const out = new Map<NodeId, NodeElement>();
@@ -412,7 +412,7 @@ export class MindmapController implements IMindmapController {
 
             const guard = this.canApplySharedCommand(cmd);
             if (!guard.ok) {
-                this.opts.onError?.(new Error(guard.reason));
+                this.opts.onError?.(new BadRequestError(guard.reason));
                 if (this.opts.debug) console.warn("[LockGuard]", guard.reason, cmd);
                 return;
             }
@@ -452,6 +452,16 @@ export class MindmapController implements IMindmapController {
             return;
         }
 
+        for (const c of enriched) {
+            if (c.scope !== "remote") continue;
+            const guard = this.canApplySharedCommand(c);
+            if (!guard.ok) {
+                this.opts.onError?.(new BadRequestError(guard.reason));
+                if (this.opts.debug) console.warn("[LockGuard]", guard.reason, c);
+                return;
+            }
+        }
+
         this.adapter.transact(
             () => {
                 for (const c of enriched) {
@@ -471,6 +481,37 @@ export class MindmapController implements IMindmapController {
 
             transactionOrigin.mindmapCommandBatch(enriched, meta),
         );
+    }
+
+    private findLockedNodeInSubtreeByOther(rootId: NodeId): { nodeId: NodeId; ownerName: string | null } | null {
+        const locks = this.store.getState().locks;
+        if (!locks.enabled) return null;
+
+        const selfId = locks.selfClientId;
+
+        const stack: NodeId[] = [rootId];
+        const visited = new Set<NodeId>();
+
+        while (stack.length > 0) {
+            const id = stack.pop()!;
+            if (visited.has(id)) continue;
+            visited.add(id);
+
+            const info = locks.byNodeId.get(id);
+            if (info) {
+                const lockedByMe = selfId != null && info.clientId === selfId;
+                if (!lockedByMe) {
+                    return { nodeId: id, ownerName: info.user?.name ?? null };
+                }
+            }
+
+            const children = this.tree.getChildIds(id);
+            for (let i = children.length - 1; i >= 0; i--) {
+                stack.push(children[i]!);
+            }
+        }
+
+        return null;
     }
 
     actions = {
@@ -760,7 +801,7 @@ export class MindmapController implements IMindmapController {
         }
     }
 
-    private applySharedCommand(cmd: MindmapCommand) {
+    private applySharedCommand(cmd: MindmapCommand): { ok: true } | { ok: false; reason: string } {
         switch (cmd.type) {
             case "NODE/ADD": {
                 const { baseId, direction, side, data } = cmd.payload;
@@ -770,42 +811,56 @@ export class MindmapController implements IMindmapController {
                 if (data?.contents !== undefined) {
                     this.tree.update(newId, { contents: data.contents });
                 }
-                return;
+                return { ok: true };
             }
 
             case "NODE/MOVE": {
                 const { targetId, movingId, direction, side } = cmd.payload;
                 this.tree.moveTo({ baseNodeId: targetId, movingNodeId: movingId, direction, addNodeDirection: side });
-                return;
+                return { ok: true };
             }
 
             case "NODE/DELETE": {
-                const { nodeId } = cmd.payload;
+                const nodeId = cmd.payload.nodeId;
+                const locked = this.findLockedNodeInSubtreeByOther(nodeId);
+                if (locked) {
+                    const who = locked.ownerName ?? "다른 사용자";
+                    return {
+                        ok: false,
+                        reason: `삭제할 수 없어요. 하위 노드 중 ${who}님이 편집 중인 노드가 있어요.`,
+                    };
+                }
                 this.tree.delete(nodeId);
-                return;
+                return { ok: true };
             }
 
             case "NODE/RESIZE": {
                 const { nodeId, width, height } = cmd.payload;
                 const cur = this.tree.safeGetNode(nodeId);
-                if (cur && cur.width === width && cur.height === height) return;
+                if (cur && cur.width === width && cur.height === height) return { ok: true };
                 this.tree.update(nodeId, { width, height });
-                return;
+                return { ok: true };
             }
 
             case "NODE/UPDATE_CONTENTS": {
                 const { nodeId, contents } = cmd.payload;
+
+                if (this.isNodeLockedByOther(nodeId)) {
+                    const who = this.getLockOwnerName(nodeId) ?? "다른 사용자";
+                    return { ok: false, reason: `수정할 수 없어요. ${who}님이 편집 중인 노드예요.` };
+                }
+
                 const cur = this.tree.safeGetNode(nodeId);
-                if (!cur) return;
+                if (!cur) return { ok: true };
 
                 const nextContents = cur.type === "root" ? normalizeRootContents(contents) : contents;
 
                 this.tree.update(nodeId, { contents: nextContents });
-                return;
+                return { ok: true };
             }
 
             default:
-                return;
+                return { ok: true };
         }
     }
 

@@ -279,6 +279,7 @@ function NodeItem({ nodeId, measure = true }: Props) {
                     width: DEFAULT_NODE_WIDTH,
                     minHeight: DEFAULT_NODE_HEIGHT,
                     boxSizing: "border-box",
+                    height: "auto",
                 }}
             >
                 <div className="relative w-full h-full">
@@ -302,7 +303,7 @@ function NodeItem({ nodeId, measure = true }: Props) {
                             highlight={lockedByMe}
                             className={cn(
                                 isRoot ? "bg-primary text-white" : "",
-                                "min-h-20 h-auto p-4 flex items-center justify-center",
+                                "min-w-40 max-w-40 min-h-20 h-auto p-4 flex items-center justify-center wrap-break-word overflow-wrap-anywhere",
                             )}
                             onClick={() => {
                                 if (lockedByOther) {

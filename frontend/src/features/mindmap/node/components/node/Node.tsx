@@ -19,7 +19,7 @@ type Props = ComponentPropsWithoutRef<"div"> & {
 };
 
 export const nodeVariants = cva(
-    "relative flex w-40 px-4.5 py-5 justify-center items-center gap-2.5 rounded-xl transition-shadow cursor-pointer outline-none",
+    "relative flex px-4.5 py-5 justify-center items-center gap-2.5 rounded-xl transition-shadow cursor-pointer outline-none",
     {
         variants: {
             size: {
