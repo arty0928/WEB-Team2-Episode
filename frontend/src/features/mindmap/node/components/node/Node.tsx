@@ -2,7 +2,7 @@ import { cva } from "class-variance-authority";
 import { ComponentPropsWithoutRef, ReactNode, useState } from "react";
 
 import { useMindmapActions } from "@/features/mindmap/hooks/useMindmapStoreState";
-import AddNode from "@/features/mindmap/node/components/add_node/AddNode";
+import AddChildNodeButton from "@/features/mindmap/node/components/addNode/AddChildNodeButton";
 import { NodeColor } from "@/features/mindmap/node/constants/colors";
 import { NodeVariant } from "@/features/mindmap/node/types/node";
 import { colorBySize, shadowClass } from "@/features/mindmap/node/utils/style";
@@ -129,6 +129,6 @@ function NodeContent({
     );
 }
 export const Node = Object.assign(NodeComponent, {
-    AddNode: AddNode,
+    AddNode: AddChildNodeButton,
     Content: NodeContent,
 });

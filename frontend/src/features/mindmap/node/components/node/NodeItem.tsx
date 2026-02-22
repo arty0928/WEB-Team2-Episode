@@ -10,7 +10,7 @@ import {
 } from "@/features/mindmap/constants/rootNode";
 import { useMindmapActions, useMindmapNode, useMindmapNodeLock } from "@/features/mindmap/hooks/useMindmapStoreState";
 import { Node } from "@/features/mindmap/node/components/node/Node";
-import NodeCenter from "@/features/mindmap/node/components/node_center/NodeCenter";
+import NodeCenter from "@/features/mindmap/node/components/nodeCenter/NodeCenter";
 import type { NodeId } from "@/features/mindmap/types/node";
 import { cn } from "@/utils/cn";
 
@@ -64,6 +64,9 @@ function NodeItem({ nodeId, measure = true }: Props) {
     const { x, y, contents, width: nodeW, height: nodeH } = nodeData;
     const isRoot = nodeData.type === "root";
     const { addNodeDirection } = nodeData;
+
+    const nodeColor = nodeData.color ?? "violet";
+    const nodeSize = nodeData.size ?? "sm";
 
     const locked = lock.locked;
     const lockedByMe = locked && lock.lockedByMe;
@@ -290,18 +293,12 @@ function NodeItem({ nodeId, measure = true }: Props) {
                     )}
 
                     <Node>
-                        <Node.AddNode
-                            data-direction={addNodeDirection}
-                            data-action="add-child"
-                            direction={addNodeDirection}
-                            color={"violet"}
-                        />
-
+                        <Node.AddNode baseId={nodeId} side={addNodeDirection} color={nodeColor} />
                         <Node.Content
                             nodeId={nodeData.id}
                             data-action="select"
-                            size={"sm"}
-                            color={"violet"}
+                            size={nodeSize}
+                            color={nodeColor}
                             highlight={lockedByMe}
                             className={cn(
                                 isRoot ? "bg-primary text-white" : "",

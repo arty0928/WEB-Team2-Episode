@@ -49,17 +49,15 @@ function makeMeta(partial?: Partial<MindmapCommandMeta>): MindmapCommandMeta {
     };
 }
 
-function isAddNodeDirection(x: string | null): x is AddNodeDirection {
-    return x === "left" || x === "right";
-}
+// function isAddNodeDirection(x: string | null): x is AddNodeDirection {
+//     return x === "left" || x === "right";
+// }
 
 function isElement(x: unknown): x is Element {
     return typeof Element !== "undefined" && x instanceof Element;
 }
 
-function resolveHit(
-    target: EventTarget | null | undefined,
-): { kind: "node"; nodeId: NodeId; action?: { type: "add-child"; side: AddNodeDirection } } | { kind: "canvas" } {
+function resolveHit(target: EventTarget | null | undefined): { kind: "node"; nodeId: NodeId } | { kind: "canvas" } {
     if (!target || !isElement(target)) return { kind: "canvas" };
 
     const nodeEl = target.closest?.("[data-node-id]");
@@ -67,15 +65,8 @@ function resolveHit(
 
     const nodeIdAttr = nodeEl.getAttribute("data-node-id");
     if (!nodeIdAttr) return { kind: "canvas" };
-    const nodeId = nodeIdAttr as NodeId;
 
-    const actionEl = target.closest?.("[data-action]");
-    if (actionEl?.getAttribute("data-action") === "add-child") {
-        const dirAttr = actionEl.getAttribute("data-direction");
-        const side: AddNodeDirection = isAddNodeDirection(dirAttr) ? dirAttr : "right";
-        return { kind: "node", nodeId, action: { type: "add-child", side } };
-    }
-    return { kind: "node", nodeId };
+    return { kind: "node", nodeId: nodeIdAttr as NodeId };
 }
 
 export function createMindmapController(opts: MindmapOptions): MindmapController {
@@ -595,12 +586,7 @@ export class MindmapController implements IMindmapController {
                     this.presenceManager?.setLock(null);
                 }
             }
-
             if (hit.kind === "node") {
-                if (hit.action?.type === "add-child") {
-                    this.actions.addNode(hit.nodeId, "child", hit.action.side);
-                    return;
-                }
                 this.interaction.pointerDown({ kind: "node", nodeId: hit.nodeId }, e);
                 return;
             }

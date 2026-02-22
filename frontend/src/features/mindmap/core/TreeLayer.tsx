@@ -14,7 +14,7 @@ export default function TreeLayer({ nodeMap }: Props) {
 
     return (
         <g className="static-graph">
-            <EdgeLayer nodeMap={nodeMap} filterNode={allNodes} color="violet" />
+            <EdgeLayer nodeMap={nodeMap} filterNode={allNodes} />
             {allNodes.map((node) => (
                 <NodeItem key={node.id} nodeId={node.id} />
             ))}

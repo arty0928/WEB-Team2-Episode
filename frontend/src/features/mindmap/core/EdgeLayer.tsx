@@ -9,7 +9,6 @@ import { cn } from "@/utils/cn";
 type EdgeLayerProps = {
     nodeMap: Map<NodeId, NodeElement>;
     filterNode: NodeElement[]; //이번 레이어에서 그릴 노드 ID(선명하게, 투명하게 그려야 하는 경우가 나뉨)
-    color?: NodeColor;
     type?: "active" | "ghost";
 } & VariantProps<typeof edgeVariants>;
 
@@ -32,7 +31,7 @@ export const edgeVariants = cva("fill-none", {
     },
 });
 
-export default function EdgeLayer({ nodeMap, color, type = "active", filterNode }: EdgeLayerProps) {
+export default function EdgeLayer({ nodeMap, type = "active", filterNode }: EdgeLayerProps) {
     return (
         <g className="edge-layer">
             {filterNode.map((node) => {
@@ -42,17 +41,18 @@ export default function EdgeLayer({ nodeMap, color, type = "active", filterNode 
                 if (!parent) return null;
 
                 const { start, end } = getParentChildEdgeAnchors(parent, node);
-
                 const pathD = getBezierPath(start.x, start.y, end.x, end.y);
+                // 엣지 컬러는 “자식 노드 컬러” 기준
+                const edgeColor: NodeColor = node.color ?? "violet";
+
+                const pathClass =
+                    type === "ghost"
+                        ? cn(edgeVariants({ type })) //ghost는 고정 스타일 유지
+                        : cn(edgeVariants({ type, color: edgeColor })); //active는 컬러 적용
 
                 return (
                     <g key={`edge-${node.id}`}>
-                        <path
-                            d={pathD}
-                            data-edge-to={node.id}
-                            data-edge-from={parent.id}
-                            className={cn(edgeVariants({ type, color }))}
-                        />
+                        <path d={pathD} data-edge-to={node.id} data-edge-from={parent.id} className={pathClass} />
                     </g>
                 );
             })}

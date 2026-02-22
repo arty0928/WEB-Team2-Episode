@@ -10,3 +10,5 @@ export const ALL_COMPETENCIES: CompetencyTag[] = [
     { id: 7, category: "공통", competencyType: "창의성" },
     { id: 8, category: "공통", competencyType: "적응력" },
 ];
+
+export const SKILLS_FROM_COMPETENCY = ALL_COMPETENCIES.map((c) => c.competencyType);

@@ -50,11 +50,15 @@ export class YjsAdapter implements TreeAdapter {
                     nextId: null,
                     prevId: null,
                     contents: rootContents,
+                    color: "violet",
+                    size: "lg",
+
                     // Root 전용 필드들...
                     firstChildIdLeft: null,
                     lastChildIdLeft: null,
                     firstChildIdRight: null,
                     lastChildIdRight: null,
+                    nextColorIndex: 0,
                 };
 
                 const rootMap = new Y.Map();

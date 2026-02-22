@@ -1,10 +1,9 @@
 import Button from "@/shared/components/button/Button";
 import Card from "@/shared/components/card/Card";
 import Chip from "@/shared/components/chip/Chip";
+import { ALL_COMPETENCIES, SKILLS_FROM_COMPETENCY } from "@/shared/constants/competency";
 
-// TODO : API 연결 필요함
-export const SKILLS = ["팀워크", "커뮤니케이션", "협업", "갈등해결", "리더십"] as const;
-export type Skill = (typeof SKILLS)[number];
+export type Skill = (typeof ALL_COMPETENCIES)[number]["competencyType"];
 
 type Props = {
     selectedSkills: Skill[];
@@ -21,7 +20,7 @@ export default function FilterPopover({ selectedSkills, onSkillClick, onReset, o
             className="w-110 p-5 gap-7 shadow-lg bg-base-white"
             contents={
                 <div className="flex flex-wrap gap-2">
-                    {SKILLS.map((skill) => (
+                    {SKILLS_FROM_COMPETENCY.map((skill) => (
                         <Chip
                             key={skill}
                             variant={selectedSkills.includes(skill) ? "tertiary_outlined" : "quaternary_outlined"}

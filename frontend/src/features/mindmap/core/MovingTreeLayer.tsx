@@ -28,7 +28,7 @@ const MovingTree = React.memo(
 
         return (
             <>
-                <EdgeLayer nodeMap={fragmentMap} type="active" filterNode={fragmentNodes} color="violet" />
+                <EdgeLayer nodeMap={fragmentMap} type="active" filterNode={fragmentNodes} />
                 {Array.from(filterIds).map((id) => (
                     <NodeItem key={`moving-${id}`} nodeId={id} measure={false} />
                 ))}

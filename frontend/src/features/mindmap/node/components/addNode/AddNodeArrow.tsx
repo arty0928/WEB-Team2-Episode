@@ -19,18 +19,14 @@ const DIRECTION_ROTATE_MAP: Record<DirectionVariantProps["direction"], number> =
     right: 135,
 };
 
-export default function AddNodeArrow({ color, direction }: Props) {
-    const handleAddNode = () => {
-        // TODO: menu 컴포넌트 생성
-    };
-
+export default function AddNodeArrow({ color, direction, className, ...rest }: Props) {
     const centerClass = "flex items-center justify-center rounded-full";
 
-    const outerCircleClass = cn("w-13.5 h-13.5 cursor-pointer", centerClass, COLOR_CLASS_MAP.bg[color][15]);
+    const outerCircleClass = cn("w-13.5 h-13.5 cursor-pointer", centerClass, COLOR_CLASS_MAP.bg[color][15], className);
     const iconCircleClass = cn("w-11 h-11 border-base-white border-3", centerClass, COLOR_CLASS_MAP.bg[color][100]);
 
     return (
-        <button onClick={handleAddNode} className={outerCircleClass}>
+        <button type="button" className={outerCircleClass} {...rest}>
             <div className={iconCircleClass}>
                 <Icon
                     name="ic_tool_move"
