@@ -2,6 +2,7 @@ import * as Y from "yjs";
 
 import { ENV } from "@/constants/env";
 import { useCreateMindmap } from "@/features/mindmap/hooks/useCreateMindmap";
+import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
 import { MindmapId } from "@/features/mindmap/types/mindmap";
 import { makeDocWithArr } from "@/features/mindmap/utils/create_doc_with_arr";
 import { uploadToS3 } from "@/shared/utils/upload_to_s3";
@@ -13,7 +14,8 @@ interface InitializeOptions {
 }
 
 export function useInitializeMindmap(onSuccess: (mindmapId: MindmapId) => void) {
-    const { mutate: createMindmap, isPending } = useCreateMindmap();
+    const { mutate: createMindmap, isPending: isCreating } = useCreateMindmap();
+    const { mutateAsync: updateEpisodes, isPending: isUpdating } = useUpdateEpisodes();
 
     const initialize = ({ title, isShared, items }: InitializeOptions) => {
         createMindmap(
@@ -33,7 +35,7 @@ export function useInitializeMindmap(onSuccess: (mindmapId: MindmapId) => void) 
                         const cleanUploadInfo = { ...uploadInfo, fields };
                         const mindmapId = mindmap.mindmapId;
 
-                        const doc = makeDocWithArr({
+                        const { doc, episodes } = makeDocWithArr({
                             name: title,
                             mindmapId,
                             items,
@@ -43,6 +45,13 @@ export function useInitializeMindmap(onSuccess: (mindmapId: MindmapId) => void) 
 
                         if (uploadInfo) {
                             await uploadToS3(cleanUploadInfo, yDocBinary);
+                        }
+
+                        if (episodes.length > 0) {
+                            await updateEpisodes({
+                                mindmapId,
+                                body: { items: episodes },
+                            });
                         }
 
                         onSuccess(mindmapId);
@@ -57,5 +66,5 @@ export function useInitializeMindmap(onSuccess: (mindmapId: MindmapId) => void) 
         );
     };
 
-    return { initialize, isPending };
+    return { initialize, isPending: isCreating || isUpdating };
 }

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { episodeArchiveQueryKeys } from "@/features/episode_archive/api/episodeArchiveQueryKeys";
 import { MindmapGroupResponse, SearchEpisodesReq } from "@/features/episode_archive/types/episode";
 import { episodeEndpoints } from "@/shared/api/api";
 import { get } from "@/shared/api/method";
@@ -9,7 +10,7 @@ import { get } from "@/shared/api/method";
  */
 export const useEpisodeSearch = (params: SearchEpisodesReq) => {
     return useQuery<MindmapGroupResponse[]>({
-        queryKey: ["episodes", "search", params],
+        queryKey: episodeArchiveQueryKeys.search(params),
         queryFn: () =>
             get<MindmapGroupResponse[], SearchEpisodesReq>({
                 endpoint: episodeEndpoints.search,

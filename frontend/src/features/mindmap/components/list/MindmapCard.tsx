@@ -233,7 +233,7 @@ const MindmapCard = ({ data, interaction = "navigate", selected, onSelect, class
                                 variant="notification"
                                 leftSlot={<Icon name="ic_team" size={12} color="currentColor" />}
                             >
-                                공유
+                                팀
                             </Chip>
                         )}
                     </div>

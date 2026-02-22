@@ -1,8 +1,7 @@
-import { nanoid } from "nanoid";
+import { v7 as uuidv7 } from "uuid";
 
-// 암호 생성 로직이 바뀔 경우를 위해 분리함
 const generateId = () => {
-    return nanoid();
+    return uuidv7();
 };
 
 export default generateId;

@@ -1,6 +1,12 @@
-import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
+import {
+    DEFAULT_NODE_HEIGHT,
+    DEFAULT_NODE_WIDTH,
+    MAX_NODE_COUNT,
+    TEMP_NEW_NODE_ID,
+} from "@/features/mindmap/constants/node";
 import { TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId, NodeType } from "@/features/mindmap/types/node";
+import { NodeLimitExceededError } from "@/shared/utils/errors";
 import { exhaustiveCheck } from "@/utils/exhaustive_check";
 import generateId from "@/utils/generate_id";
 
@@ -157,6 +163,10 @@ export class TreeModel {
         type?: NodeType;
         addNodeDirection?: AddNodeDirection;
     }) {
+        if (this.getNodeCount() >= MAX_NODE_COUNT) {
+            throw new NodeLimitExceededError(MAX_NODE_COUNT);
+        }
+
         const id = generateId();
 
         const node: NodeElement & RootChildPointers = {
@@ -376,6 +386,13 @@ export class TreeModel {
             default:
                 exhaustiveCheck(direction);
         }
+    }
+
+    getNodeCount(): number {
+        const map = this.adapter.getMap();
+        const total = map.size - 1;
+
+        return total;
     }
 
     delete(nodeId: NodeId) {

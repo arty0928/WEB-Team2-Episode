@@ -1,5 +1,6 @@
 import { ENV } from "@/constants/env";
 import { ApiError } from "@/features/auth/types/api";
+import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { ERROR_CODES, ErrorCode } from "@/shared/constants/error";
 
 type ErrorStatus = number;
@@ -98,3 +99,15 @@ export class InternalServerError extends BaseError {
 //         });
 //     }
 // }
+
+export class NodeLimitExceededError extends BaseError {
+    constructor(max: number = MAX_NODE_COUNT) {
+        super({
+            status: 400,
+            code: "INVALID_REQUEST",
+            message: `노드는 최대 ${max}개까지 추가할 수 있어요.`,
+            isFatal: false,
+            displayType: "alert",
+        });
+    }
+}

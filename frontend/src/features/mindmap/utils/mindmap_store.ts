@@ -1,3 +1,4 @@
+import { TransactionTag } from "@/features/mindmap/constants/transaction";
 import { CollaboratorCursorsInfo, Collaborators, LocksInfo } from "@/features/mindmap/types/mindmap_collaboration";
 import { Listener, Unsubscribe } from "@/features/mindmap/types/mindmap_controller";
 import { DragSessionSnapshot, InteractionSnapshot } from "@/features/mindmap/types/mindmap_interaction";
@@ -12,6 +13,7 @@ export type StoreChannel =
     | "collaborators"
     | "cursors"
     | "locks"
+    | "transaction"
     | `node:${NodeId}`
     | `lock:${NodeId}`;
 
@@ -35,6 +37,13 @@ export type MindmapStoreState = {
     cursors: CollaboratorCursorsInfo;
 
     locks: LocksInfo;
+
+    transaction: null | {
+        tag: TransactionTag | null;
+        local: boolean; // transaction.local
+        cmdType: string | null; // "NODE/DELETE" 같은 값
+        changedIds: NodeId[]; // adapter change에서 온 값
+    };
 };
 
 export type MindmapStore = {

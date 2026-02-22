@@ -1,4 +1,11 @@
+import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { normalizeRootContents } from "@/features/mindmap/constants/rootNode";
+import {
+    getTransactionTag,
+    isMindmapCommandTxOrigin,
+    TRANSACTION_TAG,
+    transactionOrigin,
+} from "@/features/mindmap/constants/transaction";
 import { CollaborationManager } from "@/features/mindmap/core/CollaborationManager";
 import { InteractionMachine } from "@/features/mindmap/core/InteractionMachine";
 import QuadTree from "@/features/mindmap/core/QuadTree";
@@ -17,24 +24,9 @@ import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/featu
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { computeMindmapLayout } from "@/features/mindmap/utils/compute_mindmap_layout";
 import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmap_store";
-import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/native_like_event";
-import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
-
-function getTxOriginType(origin: AdapterChange["origin"]): string | boolean | null {
-    if (!origin) return null;
-    if (typeof origin === "string") return origin;
-
-    if (typeof origin === "object" && origin !== null && "type" in origin) {
-        const typeValue = (origin as { type: unknown }).type;
-
-        if (typeof typeValue === "string" || typeof typeValue === "boolean") {
-            return typeValue;
-        }
-    }
-
-    return null;
-}
+import type { Bounds, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
+import { NodeLimitExceededError } from "@/shared/utils/errors";
 
 function cloneNodesMapForLayout(nodes: Map<NodeId, NodeElement>): Map<NodeId, NodeElement> {
     const out = new Map<NodeId, NodeElement>();
@@ -316,17 +308,14 @@ export class MindmapController implements IMindmapController {
 
         this.store.setState((prev) => ({ ...prev, ready: true }), { channels: ["graph"] });
 
-        this.adapter.transact(
-            () => {
-                const patches = computeMindmapLayout({
-                    nodes: cloneNodesMapForLayout(this.adapter.getMap()),
-                    rootId: this.tree.getRootId(),
-                    config: this.opts.config?.layout,
-                });
-                for (const p of patches) this.tree.update(p.nodeId, p.patch);
-            },
-            { type: "mindmap-init-layout" },
-        );
+        this.adapter.transact(() => {
+            const patches = computeMindmapLayout({
+                nodes: cloneNodesMapForLayout(this.adapter.getMap()),
+                rootId: this.tree.getRootId(),
+                config: this.opts.config?.layout,
+            });
+            for (const p of patches) this.tree.update(p.nodeId, p.patch);
+        }, transactionOrigin.mindmapInitLayout());
     }
 
     detachCanvas(): void {
@@ -432,22 +421,19 @@ export class MindmapController implements IMindmapController {
                 return;
             }
 
-            this.adapter.transact(
-                () => {
-                    this.applySharedCommand(cmd);
+            this.adapter.transact(() => {
+                this.applySharedCommand(cmd);
 
-                    const runLayout = (cmd.meta.layout ?? "auto") !== "skip";
-                    if (runLayout) {
-                        const patches = computeMindmapLayout({
-                            rootId: this.tree.getRootId(),
-                            nodes: cloneNodesMapForLayout(this.adapter.getMap()),
-                            config: this.opts.config?.layout,
-                        });
-                        for (const p of patches) this.tree.update(p.nodeId, p.patch);
-                    }
-                },
-                { type: "mindmap-command", cmdType: cmd.type, meta: cmd.meta },
-            );
+                const runLayout = (cmd.meta.layout ?? "auto") !== "skip";
+                if (runLayout) {
+                    const patches = computeMindmapLayout({
+                        rootId: this.tree.getRootId(),
+                        nodes: cloneNodesMapForLayout(this.adapter.getMap()),
+                        config: this.opts.config?.layout,
+                    });
+                    for (const p of patches) this.tree.update(p.nodeId, p.patch);
+                }
+            }, transactionOrigin.mindmapCommand(cmd));
         } catch (e) {
             this.opts.onError?.(e);
             console.error(e);
@@ -486,7 +472,8 @@ export class MindmapController implements IMindmapController {
                     for (const p of patches) this.tree.update(p.nodeId, p.patch);
                 }
             },
-            { type: "mindmap-command-batch", count: enriched.length },
+
+            transactionOrigin.mindmapCommandBatch(enriched, meta),
         );
     }
 
@@ -503,6 +490,11 @@ export class MindmapController implements IMindmapController {
             this.presenceManager?.setLock(null);
         },
         addNode: (baseId: NodeId, direction: NodeDirection, side: AddNodeDirection, contents?: string) => {
+            if (this.tree.getNodeCount() >= MAX_NODE_COUNT) {
+                this.opts.onError?.(new NodeLimitExceededError(MAX_NODE_COUNT));
+                return;
+            }
+
             this.dispatch({
                 type: "NODE/ADD",
                 scope: "remote",
@@ -560,6 +552,11 @@ export class MindmapController implements IMindmapController {
         },
 
         startCreating: () => {
+            if (this.tree.getNodeCount() >= MAX_NODE_COUNT) {
+                this.opts.onError?.(new NodeLimitExceededError(MAX_NODE_COUNT));
+                return;
+            }
+
             this.interaction?.startCreating();
         },
 
@@ -733,6 +730,8 @@ export class MindmapController implements IMindmapController {
                 selfLockedNodeId: null,
                 byNodeId: new Map(),
             },
+
+            transaction: { local: false, cmdType: null, changedIds: [], tag: null },
         };
     }
 
@@ -822,8 +821,8 @@ export class MindmapController implements IMindmapController {
     private rebuildSpatialIndexesAndCacheBounds() {
         this.quadTree.clear();
 
-        let maxHalfW = 0;
-        let maxHalfH = 0;
+        const maxHalfW = 0;
+        const maxHalfH = 0;
 
         let minX = Infinity;
         let maxX = -Infinity;
@@ -831,16 +830,11 @@ export class MindmapController implements IMindmapController {
         let maxY = -Infinity;
 
         this.adapter.getMap().forEach((node) => {
-            const { w, h } = getOuterSize(node);
+            // QuadTree는 drag/탐색용 (기존 유지)
+            this.quadTree.insert(node);
 
-            const halfW = w / 2;
-            const halfH = h / 2;
-
-            if (halfW > maxHalfW) maxHalfW = halfW;
-            if (halfH > maxHalfH) maxHalfH = halfH;
-
-            const p: Point = { id: node.id, x: node.x, y: node.y };
-            this.quadTree.insert(p);
+            const w = typeof node.width === "number" && node.width > 0 ? node.width : 200;
+            const h = typeof node.height === "number" && node.height > 0 ? node.height : 80;
 
             const left = node.x - w / 2;
             const right = node.x + w / 2;
@@ -872,7 +866,22 @@ export class MindmapController implements IMindmapController {
     private handleAdapterChange(change: AdapterChange) {
         this.rebuildSpatialIndexesAndCacheBounds();
 
-        const changedChannels: StoreChannel[] = ["graph"];
+        const tag = getTransactionTag(change.origin);
+
+        let cmdType: MindmapCommand["type"] | null = null;
+
+        if (isMindmapCommandTxOrigin(change.origin)) {
+            cmdType = change.origin.cmdType;
+        }
+
+        const tx = {
+            local: change.local,
+            tag,
+            cmdType,
+            changedIds: change.changedIds,
+        };
+
+        const changedChannels: StoreChannel[] = ["graph", "transaction"];
         for (const id of change.changedIds) changedChannels.push(`node:${id}` as const);
 
         const selected = this.store.getState().selection.selectedNodeId;
@@ -886,25 +895,15 @@ export class MindmapController implements IMindmapController {
                     ...prev.graph,
                     rootId: this.tree.getRootId(),
                     nodes: this.adapter.getMap(),
-
                     revision: prev.graph.revision + 1,
                 },
                 selection: selectionCleared ? { selectedNodeId: null } : prev.selection,
+                transaction: tx,
             }),
             { channels: changedChannels },
         );
 
-        const origin = change.origin;
-        if (!origin) {
-            return;
-        }
-
-        const originType = getTxOriginType(origin);
-        const isLayoutTransaction = originType === "auto" || originType === "mindmap-init-layout";
-
-        if (isLayoutTransaction) {
-            return;
-        }
+        if (tag === TRANSACTION_TAG.MINDMAP_INIT_LAYOUT) return;
     }
 
     private refreshGraphChannels(channels: StoreChannel[]) {

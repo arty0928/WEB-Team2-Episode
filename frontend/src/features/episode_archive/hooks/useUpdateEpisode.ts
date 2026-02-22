@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { episodeArchiveQueryKeys } from "@/features/episode_archive/api/episodeArchiveQueryKeys";
 import { UpdateEpisodeRequest } from "@/features/episode_archive/types/episode";
 import { episodeEndpoints } from "@/shared/api/api";
 import { patch } from "@/shared/api/method";
@@ -14,7 +15,7 @@ export const useUpdateEpisode = (nodeId: string) => {
                 data,
             }),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["episodes", "search"] });
+            queryClient.invalidateQueries({ queryKey: episodeArchiveQueryKeys.searches() });
         },
     });
 };

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useParams } from "react-router";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -31,7 +31,6 @@ export default function MindmapDetailPage() {
     const { doc, provider, isSynced } = useMindmapSession({
         mindmapId,
         enableAwareness: true,
-        userInfo,
     });
 
     const config = useMemo(
@@ -50,5 +49,15 @@ export default function MindmapDetailPage() {
         );
     }
 
-    return <Mindmap doc={doc} provider={provider} user={user} mindmapId={mindmapId} config={config} />;
+    return (
+        <Suspense
+            fallback={
+                <div className="h-full w-full flex justify-center items-center">
+                    <Spinner contents={"서버에서 마인드맵 데이터를 불러오는 중입니다..."} />
+                </div>
+            }
+        >
+            <Mindmap doc={doc} provider={provider} user={user} mindmapId={mindmapId} config={config} />
+        </Suspense>
+    );
 }

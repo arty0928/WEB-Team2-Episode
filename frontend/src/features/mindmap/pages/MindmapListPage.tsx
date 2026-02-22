@@ -20,8 +20,8 @@ const MindmapListPage = () => {
     const navigate = useNavigate();
 
     return (
-        <MaxWidth maxWidth="lg" className="h-screen flex flex-col overflow-hidden ">
-            <div className="flex flex-col w-full gap-6 pt-6 pb-4">
+        <MaxWidth maxWidth="lg" className="flex flex-col overflow-hidden h-full">
+            <div className="flex flex-col w-full gap-6 pt-10 pb-4">
                 <Top
                     lowerGap="md"
                     title={<h1 className="typo-title-30-bold font-bold text-gray-900">마인드맵</h1>}

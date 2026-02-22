@@ -1,7 +1,7 @@
 import { cva, VariantProps } from "class-variance-authority";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
-import { COLOR_SET } from "@/shared/styles/color_set";
+import { COLOR_SET, INTERACTIVE_STYLES } from "@/shared/styles/color_set";
 import { cn } from "@/utils/cn";
 
 type AllowedElementType = "button" | "span";
@@ -15,6 +15,7 @@ type Props<T extends AllowedElementType> = ComponentPropsWithoutRef<T> &
 const Chip = <T extends AllowedElementType = "button">({
     variant = "primary",
     size = "md",
+    interactive = false,
     leftSlot,
     className,
     children,
@@ -24,7 +25,7 @@ const Chip = <T extends AllowedElementType = "button">({
     const Component = as ? as : "button";
 
     return (
-        <Component className={cn(variants({ variant, size }), className)} {...rest}>
+        <Component className={cn(variants({ variant, size, interactive }), className)} {...rest}>
             {leftSlot ? leftSlot : null}
 
             {children}
@@ -32,25 +33,34 @@ const Chip = <T extends AllowedElementType = "button">({
     );
 };
 
-const variants = cva("rounded-4xl flex flex-row items-center", {
+export default Chip;
+
+const variants = cva("rounded-4xl flex flex-row items-center transition-colors", {
     variants: {
-        variant: {
-            primary: [COLOR_SET.primary],
-            secondary: [COLOR_SET.secondary],
-            tertiary: [COLOR_SET.tertiary],
-            tertiary_outlined: [COLOR_SET.tertiary_outlined],
-            quaternary: [COLOR_SET.quaternary],
-            quaternary_outlined: [COLOR_SET.quaternary_outlined],
-            quaternary_accent_outlined: [COLOR_SET.quaternary_accent_outlined],
-            basic: [COLOR_SET.basic],
-            notification: [COLOR_SET.notification],
-            alert: [COLOR_SET.alert],
-        },
+        variant: COLOR_SET,
         size: {
             md: "typo-caption-14-medium py-2 px-3 h-9 gap-2",
             sm: "typo-caption-12-medium py-1 px-2.5 h-6 gap-1",
         },
+        interactive: {
+            true: "cursor-pointer",
+            false: "cursor-default",
+        },
     },
+    compoundVariants: [
+        { variant: "primary", interactive: true, className: INTERACTIVE_STYLES.primary },
+        { variant: "secondary", interactive: true, className: INTERACTIVE_STYLES.secondary },
+        { variant: "tertiary", interactive: true, className: INTERACTIVE_STYLES.tertiary },
+        { variant: "tertiary_outlined", interactive: true, className: INTERACTIVE_STYLES.tertiary_outlined },
+        { variant: "quaternary", interactive: true, className: INTERACTIVE_STYLES.quaternary },
+        { variant: "quaternary_outlined", interactive: true, className: INTERACTIVE_STYLES.quaternary_outlined },
+        {
+            variant: "quaternary_accent_outlined",
+            interactive: true,
+            className: INTERACTIVE_STYLES.quaternary_accent_outlined,
+        },
+        { variant: "basic", interactive: true, className: INTERACTIVE_STYLES.basic },
+        { variant: "notification", interactive: true, className: INTERACTIVE_STYLES.notification },
+        { variant: "alert", interactive: true, className: INTERACTIVE_STYLES.alert },
+    ],
 });
-
-export default Chip;

@@ -10,6 +10,7 @@ import Top from "@/shared/components/top/Top";
 import { FunnelInstance } from "@/shared/hooks/useFunnel";
 import { linkTo } from "@/shared/utils/route";
 
+const MAX_INPUT_LENGTH = 20;
 const MAX_EPISODE_COUNT = 8;
 type TeamDetailStepFunnel = Extract<FunnelInstance<CreateMindmapFunnel>, { step: "TEAM_DETAIL" }>;
 
@@ -18,16 +19,23 @@ function TextField(props: {
     required?: boolean;
     value: string;
     placeholder?: string;
+    maxLength?: number;
     onChange: (v: string) => void;
 }) {
-    const { label, required, value, placeholder, onChange } = props;
+    const { label, required, value, placeholder, onChange, maxLength } = props;
 
     return (
         <div className="flex flex-col gap-2">
             <label className="typo-body-14-medium text-text-sub1">
                 {label} {required ? <span className="text-red-500">*</span> : null}
             </label>
-            <Input inputSize="sm" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+            <Input
+                inputSize="sm"
+                value={value}
+                placeholder={placeholder}
+                onChange={(e) => onChange(e.target.value)}
+                maxLength={maxLength}
+            />
         </div>
     );
 }
@@ -53,11 +61,14 @@ export function TeamDetailStep({ funnel }: { funnel: TeamDetailStepFunnel }) {
     const projectName = funnel.context.projectName ?? "";
     const episodes = funnel.context.episodes ?? [];
 
-    const updateProjectName = (nextName: string) => funnel.history.setContext({ projectName: nextName });
+    const updateProjectName = (nextName: string) => {
+        funnel.history.setContext({ projectName: nextName.slice(0, MAX_INPUT_LENGTH) });
+    };
+
     const updateEpisode = (index: number, nextEpisode: string) => {
         funnel.history.setContext((prev) => {
             const next = [...(prev.episodes || [])];
-            next[index] = nextEpisode;
+            next[index] = nextEpisode.slice(0, MAX_INPUT_LENGTH);
             return { ...prev, episodes: next };
         });
     };
@@ -107,8 +118,9 @@ export function TeamDetailStep({ funnel }: { funnel: TeamDetailStepFunnel }) {
                             label="프로젝트 이름"
                             required
                             value={projectName}
-                            placeholder="프로젝트 이름을 입력해 주세요"
+                            placeholder={`프로젝트 이름을 입력해 주세요 (최대 ${MAX_INPUT_LENGTH}자)`}
                             onChange={updateProjectName}
+                            maxLength={MAX_INPUT_LENGTH}
                         />
                     </div>
 
@@ -126,6 +138,7 @@ export function TeamDetailStep({ funnel }: { funnel: TeamDetailStepFunnel }) {
                                         value={ep}
                                         onChange={(e) => updateEpisode(idx, e.target.value)}
                                         placeholder="에피소드 제목을 입력해 주세요"
+                                        maxLength={MAX_INPUT_LENGTH}
                                     />
                                 </div>
                             ))}

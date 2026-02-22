@@ -7,7 +7,10 @@ import TreeLayer from "@/features/mindmap/core/TreeLayer";
 import { useMindmapReady } from "@/features/mindmap/hooks/useMindmapStoreState";
 import { useMindmapGraphRevision } from "@/features/mindmap/hooks/useMindmapStoreState";
 
-export default function MindmapRenderer() {
+type Props = {
+    isShared?: boolean;
+};
+export default function MindmapRenderer({ isShared = false }: Props) {
     const engine = useMindmapControllerContext();
     const ready = useMindmapReady();
     useMindmapGraphRevision();
@@ -21,7 +24,7 @@ export default function MindmapRenderer() {
         <g ref={rootRef} className="mindmap-render-root" data-dragging="false">
             <TreeLayer nodeMap={nodeMap} />
             <InteractionLayer nodeMap={nodeMap} rootRef={rootRef} />
-            <CollaborationCursorsLayer />
+            {isShared && <CollaborationCursorsLayer />}
         </g>
     );
 }

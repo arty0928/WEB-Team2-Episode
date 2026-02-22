@@ -1,10 +1,7 @@
-/**
- * 수정되어야 하는 파일이므로 타입을 무시하는 주석이 작성되어있습니다.
- * 수정
- */
 import * as Y from "yjs";
 
 import { ROOT_NODE_OUTER_HEIGHT, ROOT_NODE_OUTER_WIDTH } from "@/features/mindmap/constants/rootNode";
+import { TRANSACTION_TAG } from "@/features/mindmap/constants/transaction";
 import { AdapterChange, TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
 import type { NodeElement, NodeId } from "@/features/mindmap/types/node";
 
@@ -66,7 +63,7 @@ export class YjsAdapter implements TreeAdapter {
                 }
                 this.yNodes.set(ROOT_NODE_ID, rootMap);
                 this.cache.set(ROOT_NODE_ID, rootData);
-            }, "init-root");
+            }, TRANSACTION_TAG.INIT_ROOT);
         }
 
         this.observeHandler = (events, transaction) => {
@@ -119,7 +116,7 @@ export class YjsAdapter implements TreeAdapter {
         return () => this.listeners.delete(cb);
     }
 
-    transact(fn: () => void, origin: unknown = "user-command"): void {
+    transact(fn: () => void, origin: unknown = TRANSACTION_TAG.USER_COMMAND): void {
         this.doc.transact(fn, origin);
     }
 

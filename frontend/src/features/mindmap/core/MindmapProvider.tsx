@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import * as Y from "yjs";
 
 import { createMindmapController } from "@/features/mindmap/core/MindmapController";
+import { useMindmapServerSideEffects } from "@/features/mindmap/hooks/useMindmapSideEffects";
 import { AwarenessLike, CollaboratorInfo } from "@/features/mindmap/types/mindmap_collaboration";
 import { IMindmapController, MindmapOptions } from "@/features/mindmap/types/mindmap_controller";
 
@@ -93,6 +94,8 @@ export function MindmapProvider({
             engine?.detachPresence();
         };
     }, [engine, awareness, user]);
+
+    useMindmapServerSideEffects({ engine, mindmapId: roomId });
 
     // 엔진이 준비되지 않았을 때는 children을 렌더링하지 않음
     if (!engine) return null;

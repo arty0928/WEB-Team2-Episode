@@ -39,7 +39,7 @@ export default function ControllerSideBar() {
     };
 
     return (
-        <div className="absolute top-20 left-0 z-50 p-4">
+        <div className="absolute top-0 left-0 z-50 p-4">
             <Col
                 upSlot={
                     <>

@@ -51,18 +51,19 @@ export function put<TResponse, TBody extends object, TParams extends HttpParams 
     });
 }
 
-export function del<TResponse = void, TParams extends HttpParams = HttpParams>({
+export function del<TResponse = void, TBody extends object = object, TParams extends HttpParams = HttpParams>({
     endpoint,
+    data,
     params,
     options,
-}: BaseParams<TParams>): Promise<TResponse> {
+}: DataParams<TBody, TParams>): Promise<TResponse> {
     return fetchWithAuth<TResponse>(endpoint, {
         ...options,
         method: "DELETE",
+        body: data ? JSON.stringify(data) : undefined,
         params,
     });
 }
-
 export function patch<TResponse, TBody extends object, TParams extends HttpParams = HttpParams>({
     endpoint,
     data,
