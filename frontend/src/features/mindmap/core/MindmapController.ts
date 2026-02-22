@@ -1,3 +1,4 @@
+import { normalizeRootContents } from "@/features/mindmap/constants/rootNode";
 import { CollaborationManager } from "@/features/mindmap/core/CollaborationManager";
 import { InteractionMachine } from "@/features/mindmap/core/InteractionMachine";
 import QuadTree from "@/features/mindmap/core/QuadTree";
@@ -16,8 +17,9 @@ import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/featu
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { computeMindmapLayout } from "@/features/mindmap/utils/compute_mindmap_layout";
 import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmap_store";
+import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/native_like_event";
-import type { Bounds, Rect } from "@/shared/types/spatial";
+import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
 
 function getTxOriginType(origin: AdapterChange["origin"]): string | boolean | null {
     if (!origin) return null;
@@ -92,10 +94,11 @@ export class MindmapController implements IMindmapController {
 
     private adapter: TreeAdapter;
     private tree: TreeModel;
+    private spatialStats: SpatialStats = { maxHalfW: 100, maxHalfH: 40 };
 
     private presenceManager: CollaborationManager | null = null;
 
-    private quadTree: QuadTree;
+    private quadTree: QuadTree<SpatialPoint>;
     private canvas: SVGSVGElement | null = null;
     private viewport: ViewportController | null = null;
 
@@ -124,7 +127,7 @@ export class MindmapController implements IMindmapController {
 
         this.tree = new TreeModel(this.adapter);
 
-        this.quadTree = new QuadTree(this.calculateInitialBounds());
+        this.quadTree = new QuadTree<SpatialPoint>(this.calculateInitialBounds());
         this.rebuildSpatialIndexesAndCacheBounds();
 
         this.unsubAdapter = this.adapter.onChange((c) => this.handleAdapterChange(c));
@@ -305,6 +308,9 @@ export class MindmapController implements IMindmapController {
                 this.store.setState((prev) => ({ ...prev, dragSession: snap }), { channels: ["dragSession"] });
             },
 
+            querySpatialPointsInRange: (range) => this.querySpatialPointsInRange(range),
+            getSpatialStats: () => this.getSpatialStats(),
+
             dragThreshold: this.opts.config?.interaction?.dragThreshold,
         });
 
@@ -356,6 +362,14 @@ export class MindmapController implements IMindmapController {
 
     getStore() {
         return this.store;
+    }
+
+    getSpatialStats(): SpatialStats {
+        return this.spatialStats;
+    }
+
+    querySpatialPointsInRange(range: Rect): Array<SpatialPoint> {
+        return this.quadTree.getPointsInRange(range);
     }
 
     private isNodeLockedByOther(nodeId: NodeId): boolean {
@@ -479,7 +493,7 @@ export class MindmapController implements IMindmapController {
     actions = {
         lockNode: (nodeId: NodeId) => {
             const node = this.tree.safeGetNode(nodeId);
-            if (!node || node.type === "root") return;
+            if (!node) return;
             if (!this.presenceManager) return;
             if (this.isNodeLockedByOther(nodeId)) return;
             this.presenceManager.setLock(nodeId);
@@ -677,7 +691,7 @@ export class MindmapController implements IMindmapController {
             if (hit.kind !== "node") return;
 
             const node = this.tree.safeGetNode(hit.nodeId);
-            if (!node || node.type === "root") return;
+            if (!node) return;
 
             if (!this.presenceManager) return;
 
@@ -794,7 +808,9 @@ export class MindmapController implements IMindmapController {
                 const cur = this.tree.safeGetNode(nodeId);
                 if (!cur) return;
 
-                this.tree.update(nodeId, { contents });
+                const nextContents = cur.type === "root" ? normalizeRootContents(contents) : contents;
+
+                this.tree.update(nodeId, { contents: nextContents });
                 return;
             }
 
@@ -806,17 +822,25 @@ export class MindmapController implements IMindmapController {
     private rebuildSpatialIndexesAndCacheBounds() {
         this.quadTree.clear();
 
+        let maxHalfW = 0;
+        let maxHalfH = 0;
+
         let minX = Infinity;
         let maxX = -Infinity;
         let minY = Infinity;
         let maxY = -Infinity;
 
         this.adapter.getMap().forEach((node) => {
-            // QuadTree는 drag/탐색용 (기존 유지)
-            this.quadTree.insert(node);
+            const { w, h } = getOuterSize(node);
 
-            const w = typeof node.width === "number" && node.width > 0 ? node.width : 200;
-            const h = typeof node.height === "number" && node.height > 0 ? node.height : 80;
+            const halfW = w / 2;
+            const halfH = h / 2;
+
+            if (halfW > maxHalfW) maxHalfW = halfW;
+            if (halfH > maxHalfH) maxHalfH = halfH;
+
+            const p: Point = { id: node.id, x: node.x, y: node.y };
+            this.quadTree.insert(p);
 
             const left = node.x - w / 2;
             const right = node.x + w / 2;
@@ -831,8 +855,13 @@ export class MindmapController implements IMindmapController {
 
         if (minX === Infinity) {
             this.contentBoundsCache = null;
+            this.spatialStats = { maxHalfW: 100, maxHalfH: 40 };
             return;
         }
+        this.spatialStats = {
+            maxHalfW: Math.max(1, maxHalfW),
+            maxHalfH: Math.max(1, maxHalfH),
+        };
 
         const width = Math.max(1, maxX - minX);
         const height = Math.max(1, maxY - minY);

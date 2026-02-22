@@ -12,10 +12,10 @@ export function useMindmapControllerEvents() {
         const onWheel = (e: WheelEvent) => engine.input.wheel(e);
         const onContextMenu = (e: MouseEvent) => e.preventDefault();
 
-        const onMouseDown = (e: MouseEvent) => engine.input.pointerDown(e);
-        const onMouseMove = (e: MouseEvent) => engine.input.pointerMove(e);
-        const onMouseUp = (e: MouseEvent) => engine.input.pointerUp(e);
-        const onMouseLeave = (e: MouseEvent) => engine.input.pointerUp(e);
+        const onPointerDown = (e: MouseEvent) => engine.input.pointerDown(e);
+        const onPointerMove = (e: MouseEvent) => engine.input.pointerMove(e);
+        const onPointerUp = (e: MouseEvent) => engine.input.pointerUp(e);
+        const onPointerLeave = (e: MouseEvent) => engine.input.pointerUp(e);
 
         const onKeyDown = (e: KeyboardEvent) => engine.input.keyDown(e);
 
@@ -23,23 +23,23 @@ export function useMindmapControllerEvents() {
 
         svg.addEventListener("wheel", onWheel, { passive: false });
         svg.addEventListener("contextmenu", onContextMenu);
-        svg.addEventListener("mousedown", onMouseDown);
+        svg.addEventListener("pointerdown", onPointerDown);
         svg.addEventListener("dblclick", onDblClick);
 
-        window.addEventListener("mousemove", onMouseMove);
-        window.addEventListener("mouseup", onMouseUp);
-        window.addEventListener("mouseleave", onMouseLeave);
+        window.addEventListener("pointermove", onPointerMove);
+        window.addEventListener("pointerup", onPointerUp);
+        window.addEventListener("pointerleave", onPointerLeave);
         window.addEventListener("keydown", onKeyDown);
 
         return () => {
             svg.removeEventListener("wheel", onWheel);
             svg.removeEventListener("contextmenu", onContextMenu);
-            svg.removeEventListener("mousedown", onMouseDown);
+            svg.removeEventListener("pointerdown", onPointerDown);
             svg.removeEventListener("dblclick", onDblClick);
 
-            window.removeEventListener("mousemove", onMouseMove);
-            window.removeEventListener("mouseup", onMouseUp);
-            window.removeEventListener("mouseleave", onMouseLeave);
+            window.removeEventListener("pointermove", onPointerMove);
+            window.removeEventListener("pointerup", onPointerUp);
+            window.removeEventListener("pointerleave", onPointerLeave);
             window.removeEventListener("keydown", onKeyDown);
         };
     }, [engine]);

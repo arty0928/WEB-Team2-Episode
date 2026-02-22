@@ -1,10 +1,25 @@
+import { NodeId } from "@/features/mindmap/types/node";
+
 /**
  * 공간 관련
  */
+export type WorldPoint = { x: number; y: number };
+
 export type Point = {
     x: number; //노드 정중아 world 좌표
     y: number;
     id: string;
+};
+
+export type SpatialPoint = {
+    id: NodeId;
+    x: number;
+    y: number;
+};
+
+export type SpatialStats = {
+    maxHalfW: number;
+    maxHalfH: number;
 };
 
 export type Rect = {

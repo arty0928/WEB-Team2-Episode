@@ -2,7 +2,7 @@ import { cva, VariantProps } from "class-variance-authority";
 
 import { NodeColor } from "@/features/mindmap/node/constants/colors";
 import { NodeElement, NodeId } from "@/features/mindmap/types/node";
-import { getParentChildEdgeAnchors } from "@/features/mindmap/utils/node_geometry";
+import { getParentChildEdgeAnchors } from "@/features/mindmap/utils/nodeGeometry";
 import { getBezierPath } from "@/features/mindmap/utils/path";
 import { cn } from "@/utils/cn";
 

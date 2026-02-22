@@ -4,17 +4,17 @@ import { ComponentPropsWithoutRef } from "react";
 import { cn } from "@/utils/cn";
 
 export const TEMP_NODE_SIZE = {
-    new: { width: 180, height: 80 },
+    new: { width: 150, height: 60 },
     ghost: { width: 100, height: 42 },
 } as const;
 
 type TempNodeProps = ComponentPropsWithoutRef<"div"> & VariantProps<typeof tempNodeVariants>;
 
-const tempNodeVariants = cva("", {
+const tempNodeVariants = cva("w-full h-full box-border", {
     variants: {
         type: {
-            new: `flex w-[${TEMP_NODE_SIZE.new.width}px] h-[${TEMP_NODE_SIZE.new.height}px] min-w-[${TEMP_NODE_SIZE.new.width}px] px-4.5 py-5 justify-center items-center gap-2.5 typo-body-14-medium rounded-xl border-2 border-gray-500 bg-base-white shadow-[0_0_15px_0_rgba(43,46,67,0.15)]`,
-            ghost: `w-[${TEMP_NODE_SIZE.ghost.width}px] h-[${TEMP_NODE_SIZE.ghost.height}px] rounded-xl bg-node-blue-op-100`,
+            new: "flex px-4.5 py-5 justify-center items-center gap-2.5 typo-body-14-medium rounded-xl border-2 border-gray-500 bg-base-white shadow-[0_0_15px_0_rgba(43,46,67,0.15)]",
+            ghost: "rounded-xl bg-node-blue-op-100",
         },
     },
 });

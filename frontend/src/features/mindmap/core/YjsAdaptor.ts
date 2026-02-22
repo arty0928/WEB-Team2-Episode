@@ -4,6 +4,7 @@
  */
 import * as Y from "yjs";
 
+import { ROOT_NODE_OUTER_HEIGHT, ROOT_NODE_OUTER_WIDTH } from "@/features/mindmap/constants/rootNode";
 import { AdapterChange, TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
 import type { NodeElement, NodeId } from "@/features/mindmap/types/node";
 
@@ -43,8 +44,8 @@ export class YjsAdapter implements TreeAdapter {
                     type: "root",
                     x: 0,
                     y: 0,
-                    width: 0,
-                    height: 0,
+                    width: ROOT_NODE_OUTER_WIDTH,
+                    height: ROOT_NODE_OUTER_HEIGHT,
                     addNodeDirection: "right",
                     parentId: "empty",
                     firstChildId: null,

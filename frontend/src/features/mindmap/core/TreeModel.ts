@@ -1,4 +1,4 @@
-import { TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
 import { TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId, NodeType } from "@/features/mindmap/types/node";
 import { exhaustiveCheck } from "@/utils/exhaustive_check";
@@ -163,8 +163,8 @@ export class TreeModel {
             id,
             x: 0,
             y: 0,
-            width: 200,
-            height: 80,
+            width: DEFAULT_NODE_WIDTH,
+            height: DEFAULT_NODE_HEIGHT,
             addNodeDirection: type === "root" ? "right" : addNodeDirection,
 
             parentId: ROOT_NODE_PARENT_ID,

@@ -1,4 +1,5 @@
 import { TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
+import { resolveDropBaseNode } from "@/features/mindmap/core/ghostDropTarget";
 import type {
     BaseNodeInfo,
     DragSessionSnapshot,
@@ -7,6 +8,7 @@ import type {
 } from "@/features/mindmap/types/mindmap_interaction";
 import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmap_interaction";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
+import { Rect, SpatialPoint, SpatialStats, WorldPoint } from "@/shared/types/spatial";
 import { calcDistance } from "@/utils/calc_distance";
 
 const DEFAULT_DRAG_THRESHOLD = 5;
@@ -19,7 +21,7 @@ type Deps = {
     getAllDescendantIds: (nodeId: NodeId) => Set<NodeId>;
     safeGetNode: (nodeId: NodeId) => NodeElement | undefined;
 
-    screenToWorld: (x: number, y: number) => { x: number; y: number };
+    screenToWorld: (x: number, y: number) => WorldPoint;
 
     onPan: (dx: number, dy: number) => void;
     onMoveNode: (targetId: NodeId, movingId: NodeId, direction: NodeDirection, side?: AddNodeDirection) => void;
@@ -28,6 +30,9 @@ type Deps = {
 
     emitInteraction: (snap: InteractionSnapshot) => void;
     emitDragSession: (snap: DragSessionSnapshot) => void;
+
+    querySpatialPointsInRange: (range: Rect) => Array<SpatialPoint>;
+    getSpatialStats: () => SpatialStats;
 
     dragThreshold?: number;
 };
@@ -192,103 +197,28 @@ export class InteractionMachine {
     private updateDropTarget(clientX: number, clientY: number) {
         if (this.mode !== "dragging" && this.mode !== "pending_creation") return;
 
-        const { x: mouseX, y: mouseY } = this.deps.screenToWorld(clientX, clientY);
+        const excludedIds = this.mode === "dragging" ? this.dragSubtreeIds : null;
 
-        const isDragging = this.mode === "dragging";
-        const isExcluded = (id: NodeId) => isDragging && !!this.dragSubtreeIds && this.dragSubtreeIds.has(id);
+        const next = resolveDropBaseNode({
+            clientX,
+            clientY,
+            mouseWorld: this.mousePos,
 
-        let parentNode: NodeElement = this.deps.getRootNode();
+            screenToWorld: this.deps.screenToWorld,
+            querySpatialPointsInRange: this.deps.querySpatialPointsInRange,
+            getSpatialStats: this.deps.getSpatialStats,
 
-        let side: AddNodeDirection = mouseX < parentNode.x ? "left" : "right";
+            getRootNode: this.deps.getRootNode,
+            safeGetNode: this.deps.safeGetNode,
+            getChildNodes: this.deps.getChildNodes,
 
-        let depthGuard = 0;
+            excludedIds,
+        });
 
-        while (depthGuard++ < 20) {
-            let childrenForBand = this.deps.getChildNodes(parentNode.id);
+        const prev = this.baseNode;
+        if (prev.targetId === next.targetId && prev.direction === next.direction && prev.side === next.side) return;
 
-            if (parentNode.type === "root") {
-                childrenForBand = childrenForBand.filter((c) => c.addNodeDirection === side);
-            }
-
-            childrenForBand = childrenForBand.filter((c) => !isExcluded(c.id));
-
-            if (childrenForBand.length === 0) {
-                this.baseNode = { targetId: parentNode.id, direction: "child", side };
-                return;
-            }
-
-            const parentW = parentNode.width || 200;
-            const parentWallX = side === "right" ? parentNode.x + parentW / 2 : parentNode.x - parentW / 2;
-
-            let outerWallX = parentWallX;
-
-            for (const child of childrenForBand) {
-                const cw = child.width || 200;
-                const childEdgeX = side === "right" ? child.x + cw / 2 : child.x - cw / 2;
-                outerWallX = side === "right" ? Math.max(outerWallX, childEdgeX) : Math.min(outerWallX, childEdgeX);
-            }
-
-            const isBeyondOuterWall = side === "right" ? mouseX > outerWallX : mouseX < outerWallX;
-            if (!isBeyondOuterWall) break;
-
-            let nextParent: NodeElement = childrenForBand[0]!;
-            let minYDist = Math.abs(mouseY - nextParent.y);
-
-            for (let i = 1; i < childrenForBand.length; i++) {
-                const c = childrenForBand[i]!;
-                const d = Math.abs(mouseY - c.y);
-                if (d < minYDist || (d === minYDist && c.y > nextParent.y)) {
-                    nextParent = c;
-                    minYDist = d;
-                }
-            }
-
-            if (isExcluded(nextParent.id)) break;
-
-            parentNode = nextParent;
-
-            if (parentNode.type === "root") {
-                side = mouseX < parentNode.x ? "left" : "right";
-            } else {
-                side = parentNode.addNodeDirection;
-            }
-        }
-
-        let children = this.deps.getChildNodes(parentNode.id);
-
-        if (parentNode.type === "root") {
-            children = children.filter((c) => c.addNodeDirection === side);
-        }
-
-        children = children.filter((c) => !isExcluded(c.id));
-
-        if (children.length === 0) {
-            this.baseNode = { targetId: parentNode.id, direction: "child", side };
-            return;
-        }
-
-        const ordered = [...children].sort((a, b) => a.y - b.y);
-
-        let insertIndex = -1;
-        for (let i = 0; i < ordered.length; i++) {
-            if (mouseY < ordered[i]!.y) {
-                insertIndex = i;
-                break;
-            }
-        }
-        if (insertIndex === -1) insertIndex = ordered.length;
-
-        if (insertIndex <= 0) {
-            this.baseNode = { targetId: ordered[0]!.id, direction: "prev", side };
-            return;
-        }
-
-        if (insertIndex >= ordered.length) {
-            this.baseNode = { targetId: ordered[ordered.length - 1]!.id, direction: "next", side };
-            return;
-        }
-
-        this.baseNode = { targetId: ordered[insertIndex]!.id, direction: "prev", side };
+        this.baseNode = next;
     }
 
     private clearStatus() {

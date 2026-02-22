@@ -1,7 +1,7 @@
 import { edgeVariants } from "@/features/mindmap/core/EdgeLayer";
 import TempNode, { TEMP_NODE_SIZE } from "@/features/mindmap/node/components/temp_node/TempNode";
 import { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
-import { getContentBounds } from "@/features/mindmap/utils/node_geometry";
+import { getEdgeStartBounds, getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { getBezierPath } from "@/features/mindmap/utils/path";
 
 type DropIndicatorProps = {
@@ -13,15 +13,12 @@ type DropIndicatorProps = {
 
 const GHOST_GAP_X = 100;
 const SIBLING_GAP_Y = 16;
-const DEFAULT_NODE_WIDTH = 200;
-const DEFAULT_NODE_HEIGHT = 60;
 
 export default function DropNodePreviewLayer({ targetId, direction, nodeMap, side }: DropIndicatorProps) {
     const targetNode = nodeMap.get(targetId);
     if (!targetNode || !direction) return null;
 
-    const targetWidth = targetNode.width || DEFAULT_NODE_WIDTH;
-    const targetHeight = targetNode.height || DEFAULT_NODE_HEIGHT;
+    const { w: targetWidth, h: targetHeight } = getOuterSize(targetNode);
 
     const ghostWidth = TEMP_NODE_SIZE.ghost.width;
     const ghostHeight = TEMP_NODE_SIZE.ghost.height;
@@ -88,7 +85,7 @@ export default function DropNodePreviewLayer({ targetId, direction, nodeMap, sid
 
     if (!parentNode) return null;
 
-    const parentBounds = getContentBounds(parentNode);
+    const parentBounds = getEdgeStartBounds(parentNode);
     const isRightBranch = branchSide === "right";
 
     const startX = isRightBranch ? parentBounds.right : parentBounds.left;

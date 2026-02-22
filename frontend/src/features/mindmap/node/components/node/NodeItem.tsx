@@ -1,17 +1,28 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/features/mindmap/constants/node";
+import {
+    normalizeRootContents,
+    ROOT_CONTENTS_MAX_LENGTH,
+    ROOT_NODE_OUTER_HEIGHT,
+    ROOT_NODE_OUTER_WIDTH,
+} from "@/features/mindmap/constants/rootNode";
 import { useMindmapActions, useMindmapNode, useMindmapNodeLock } from "@/features/mindmap/hooks/useMindmapStoreState";
 import { Node } from "@/features/mindmap/node/components/node/Node";
+import NodeCenter from "@/features/mindmap/node/components/node_center/NodeCenter";
 import type { NodeId } from "@/features/mindmap/types/node";
 import { cn } from "@/utils/cn";
 
-const FIXED_WIDTH = 200;
-const MIN_HEIGHT = 80;
 const MAX_CONTENTS_LENGTH = 200;
 
+type Props = {
+    nodeId: NodeId;
+    measure?: boolean;
+};
+
 // TODO: 컨트롤러의 actions이용하는 거로 변경
-function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
+function NodeItem({ nodeId, measure = true }: Props) {
     const nodeData = useMindmapNode(nodeId);
     const { updateNodeSize, updateNodeContents, unlockNode } = useMindmapActions();
 
@@ -20,16 +31,20 @@ function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
     const contentRef = useRef<HTMLDivElement>(null);
     const lastSizeRef = useRef({ w: 0, h: 0 });
 
+    // 실제 노드 사이즈 업데이트
     useEffect(() => {
+        if (!measure) return;
+        if (!nodeData) return;
+        if (nodeData.type === "root") return; //root는 고정 크기
         if (!contentRef.current) return;
 
         const observer = new ResizeObserver((entries) => {
             const entry = entries[0];
             if (!entry) return;
 
-            const { width, height } = entry.contentRect;
-            const newWidth = Math.round(width);
-            const newHeight = Math.max(Math.round(height), MIN_HEIGHT);
+            const { height } = entry.contentRect;
+            const newWidth = DEFAULT_NODE_WIDTH;
+            const newHeight = Math.max(Math.round(height), DEFAULT_NODE_HEIGHT);
 
             if (Math.abs(lastSizeRef.current.w - newWidth) > 1 || Math.abs(lastSizeRef.current.h - newHeight) > 1) {
                 lastSizeRef.current = { w: newWidth, h: newHeight };
@@ -42,7 +57,7 @@ function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
 
         observer.observe(contentRef.current);
         return () => observer.disconnect();
-    }, [nodeId, updateNodeSize]);
+    }, [measure, nodeData, nodeId, updateNodeSize]);
 
     if (!nodeData) return null;
 
@@ -50,7 +65,7 @@ function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
     const isRoot = nodeData.type === "root";
     const { addNodeDirection } = nodeData;
 
-    const locked = lock.locked && !isRoot;
+    const locked = lock.locked;
     const lockedByMe = locked && lock.lockedByMe;
     const lockedByOther = locked && !lock.lockedByMe;
 
@@ -118,12 +133,139 @@ function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
     const exitEdit = useCallback(() => {
         if (lockedByMe) unlockNode();
     }, [lockedByMe, unlockNode]);
+
+    // =========================
+    // 루트 12자 제한 안내 (textarea 아래 고정)
+    // =========================
+    const [rootHintVisible, setRootHintVisible] = useState(false);
+    const hintTimerRef = useRef<number | null>(null);
+
+    const showRootHint = useCallback(() => {
+        setRootHintVisible(true);
+
+        if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+        hintTimerRef.current = window.setTimeout(() => {
+            setRootHintVisible(false);
+            hintTimerRef.current = null;
+        }, 1200);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+        };
+    }, []);
+
+    if (isRoot) {
+        const w = ROOT_NODE_OUTER_WIDTH;
+        const h = ROOT_NODE_OUTER_HEIGHT;
+
+        const display = (contents ?? "").trim() || "마인드맵";
+
+        return (
+            <>
+                <foreignObject
+                    x={x - w / 2}
+                    y={y - h / 2}
+                    width={w}
+                    height={h}
+                    data-node-id={nodeId}
+                    className="overflow-visible transition-all duration-75"
+                >
+                    <div style={{ width: w, height: h, boxSizing: "border-box" }} className="relative">
+                        {locked && lockLabel && (
+                            <div
+                                className="absolute -top-3 -right-3 z-10 px-2 py-1 rounded-full text-11 text-white pointer-events-none select-none shadow"
+                                style={{ backgroundColor: lockColor, opacity: 0.95 }}
+                            >
+                                {lockLabel}
+                                {lockedByMe ? " (나)" : ""}
+                            </div>
+                        )}
+
+                        <NodeCenter>
+                            {lockedByMe ? (
+                                <div className="relative w-full">
+                                    <textarea
+                                        ref={textareaRef}
+                                        value={draft}
+                                        placeholder="마인드맵"
+                                        className="w-full bg-transparent outline-none resize-none overflow-hidden text-center leading-normal"
+                                        rows={1}
+                                        style={{
+                                            height: "auto",
+                                            minHeight: "1.5em",
+                                            display: "block",
+                                        }}
+                                        onMouseDown={(e) => e.stopPropagation()}
+                                        onFocus={(e) => {
+                                            e.currentTarget.style.height = "auto";
+                                            e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                                        }}
+                                        onKeyDown={(e) => {
+                                            e.stopPropagation();
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                commitDraft();
+                                                flushBroadcast();
+                                                exitEdit();
+                                            }
+                                        }}
+                                        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                            const rawValue = e.target.value;
+                                            const next = normalizeRootContents(rawValue);
+
+                                            if (rawValue.replace(/[\r\n]+/g, " ").length > ROOT_CONTENTS_MAX_LENGTH) {
+                                                showRootHint();
+                                            }
+
+                                            setDraft(next);
+                                            scheduleBroadcast(next);
+                                            e.currentTarget.style.height = "auto";
+                                            e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                                        }}
+                                        onBlur={() => {
+                                            const normalized = normalizeRootContents(draft);
+                                            if (normalized !== draft) setDraft(normalized);
+
+                                            commitDraft();
+                                            flushBroadcast(normalized);
+                                            exitEdit(); // 여기서 잠금 해제
+                                        }}
+                                    />
+
+                                    {rootHintVisible && (
+                                        <div
+                                            className="absolute left-1/2 top-full mt-2 -translate-x-1/2
+                                                   px-3 py-2 rounded-md bg-black/80 text-white text-12 shadow
+                                                   pointer-events-none select-none whitespace-nowrap"
+                                        >
+                                            12글자 내에서 작성해주세요
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div
+                                    className={cn(
+                                        "whitespace-pre-wrap break-all w-full text-center select-none",
+                                        !contents ? "text-white/70" : "text-white",
+                                    )}
+                                >
+                                    {display}
+                                </div>
+                            )}
+                        </NodeCenter>
+                    </div>
+                </foreignObject>
+            </>
+        );
+    }
     return (
         <foreignObject
-            x={x - (nodeW || FIXED_WIDTH) / 2}
-            y={y - (nodeH || MIN_HEIGHT) / 2}
-            width={nodeW || FIXED_WIDTH}
-            height={nodeH || MIN_HEIGHT}
+            x={x - (nodeW || DEFAULT_NODE_WIDTH) / 2}
+            y={y - (nodeH || DEFAULT_NODE_HEIGHT) / 2}
+            width={nodeW || DEFAULT_NODE_WIDTH}
+            height={nodeH || DEFAULT_NODE_HEIGHT}
             data-node-id={nodeId}
             className="overflow-visible transition-all duration-75"
         >
@@ -131,8 +273,8 @@ function NodeItem({ nodeId }: { nodeId: NodeId; measure?: boolean }) {
                 ref={contentRef}
                 className="inline-block"
                 style={{
-                    width: FIXED_WIDTH,
-                    minHeight: MIN_HEIGHT,
+                    width: DEFAULT_NODE_WIDTH,
+                    minHeight: DEFAULT_NODE_HEIGHT,
                     boxSizing: "border-box",
                 }}
             >
