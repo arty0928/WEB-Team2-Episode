@@ -24,8 +24,9 @@ import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/featu
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { computeMindmapLayout } from "@/features/mindmap/utils/compute_mindmap_layout";
 import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmap_store";
+import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/native_like_event";
-import type { Bounds, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
+import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
 import { NodeLimitExceededError } from "@/shared/utils/errors";
 
 function cloneNodesMapForLayout(nodes: Map<NodeId, NodeElement>): Map<NodeId, NodeElement> {
@@ -821,8 +822,8 @@ export class MindmapController implements IMindmapController {
     private rebuildSpatialIndexesAndCacheBounds() {
         this.quadTree.clear();
 
-        const maxHalfW = 0;
-        const maxHalfH = 0;
+        let maxHalfW = 0;
+        let maxHalfH = 0;
 
         let minX = Infinity;
         let maxX = -Infinity;
@@ -830,11 +831,16 @@ export class MindmapController implements IMindmapController {
         let maxY = -Infinity;
 
         this.adapter.getMap().forEach((node) => {
-            // QuadTree는 drag/탐색용 (기존 유지)
-            this.quadTree.insert(node);
+            const { w, h } = getOuterSize(node);
 
-            const w = typeof node.width === "number" && node.width > 0 ? node.width : 200;
-            const h = typeof node.height === "number" && node.height > 0 ? node.height : 80;
+            const halfW = w / 2;
+            const halfH = h / 2;
+
+            if (halfW > maxHalfW) maxHalfW = halfW;
+            if (halfH > maxHalfH) maxHalfH = halfH;
+
+            const p: Point = { id: node.id, x: node.x, y: node.y };
+            this.quadTree.insert(p);
 
             const left = node.x - w / 2;
             const right = node.x + w / 2;

@@ -4,7 +4,7 @@ import type { AddNodeDirection, NodeElement, NodeId } from "@/features/mindmap/t
 import type { Rect, SpatialPoint, SpatialStats, WorldPoint } from "@/shared/types/spatial";
 import { isIntersected } from "@/shared/utils/rect_helper";
 
-const NEAR_RADIUS_SCREEN = 50;
+const NEAR_RADIUS_SCREEN = 200;
 
 type Deps = {
     screenToWorld: (x: number, y: number) => WorldPoint;
