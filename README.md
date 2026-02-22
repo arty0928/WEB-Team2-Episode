@@ -89,7 +89,7 @@
 
 ## 🔧 프로젝트 아키텍처
 
-<img width="3964" alt="아키텍처" src="https://github.com/user-attachments/assets/a5d8f2f7-2a73-4037-9805-cacab7649786" />
+<img width="3800" alt="아키텍처" src="https://github.com/user-attachments/assets/fa52f9df-f600-4e45-8bf4-feddecfc430a" />
 
 
 
@@ -112,14 +112,14 @@
     <td><img src="https://github.com/user-attachments/assets/bd0b3f0c-908b-4d1e-91fc-86cf0433e425?s=64&v=4" width="100"></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/ATeals">김강민</a></td>
-    <td align="center"><a href="https://github.com/naarang">강민서</a></td>
-    <td align="center"><a href="https://github.com/kimhji">김지윤</a></td>
-    <td align="center"><a href="https://github.com/mjh000526">이주연</a></td>
-    <td align="center"><a href="https://github.com/ATeals">김현지</a></td>
-    <td align="center"><a href="https://github.com/naarang">김우주</a></td>
-    <td align="center"><a href="https://github.com/kimhji">박세현</a></td>
-    <td align="center"><a href="https://github.com/mjh000526">박은서</a></td>
+    <td align="center">김강민</td>
+    <td align="center">강민서</td>
+    <td align="center">김지윤</td>
+    <td align="center">이주연</td>
+    <td align="center"><a href="https://github.com/kimhji">김현지</a></td>
+    <td align="center"><a href="https://github.com/w0uldy0u">김우주</a></td>
+    <td align="center"><a href="https://github.com/pakxe">박세현</a></td>
+    <td align="center"><a href="https://github.com/arty0928">박은서</a></td>
   </tr>
   
   <tr>
