@@ -88,9 +88,16 @@ public class MindmapService {
                 competencyTypeService.getCompetencyTypesInIds(allCompetencyIds).stream()
                         .collect(Collectors.toMap(CompetencyTypeRes::id, java.util.function.Function.identity()));
 
-        Map<UUID, List<String>> participantNames = participants.stream().collect(
-                Collectors.groupingBy(p -> p.getMindmap().getId(),
-                                      Collectors.mapping(p -> p.getUser().getNickname(), Collectors.toList())));
+        List<MindmapParticipant> allParticipants = mindmapParticipantRepository.findAllByMindmapIdsWithUser(mindmapIds);
+
+        Map<UUID, List<String>> participantNames = allParticipants.stream().collect(
+                Collectors.groupingBy(p -> p.getMindmap().getId(), Collectors.mapping(p -> p.getUser().getNickname(),
+                                                                                      Collectors.collectingAndThen(
+                                                                                              Collectors.toList(),
+                                                                                              list -> list.stream()
+                                                                                                      .distinct()
+                                                                                                      .toList()))));
+
         return participants.stream().map(p -> {
             UUID id = p.getMindmap().getId();
             List<CompetencyTypeRes> ctResList =

@@ -524,7 +524,7 @@ class EpisodeServiceTest {
 
             assertThat(result).hasSize(2);
 
-            verify(mindmapAccessValidator, never()).findParticipantOrThrow(mindmapId, userId);
+            verify(mindmapAccessValidator, times(1)).findParticipantOrThrow(mindmapId, userId);
             verify(mindmapParticipantRepository, never()).findAllByMindmapIdWithUser(any());
             verify(episodeRepository, never()).saveAll(anyList());
             verify(episodeStarRepository, never()).saveAll(anyList());
@@ -596,7 +596,7 @@ class EpisodeServiceTest {
             assertThatThrownBy(() -> episodeService.upsertEpisodes(mindmapId, userId, items)).isInstanceOf(
                     CustomException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.EPISODE_NOT_FOUND);
 
-            verify(mindmapAccessValidator, never()).findParticipantOrThrow(any(), any(Long.class));
+            verify(mindmapAccessValidator, times(1)).findParticipantOrThrow(mindmapId, userId);
             verify(episodeRepository, never()).saveAll(anyList());
             verify(episodeStarRepository, never()).saveAll(anyList());
         }
@@ -637,7 +637,7 @@ class EpisodeServiceTest {
             verify(episodeStarRepository, never()).findAllById(any());
             verify(episodeStarRepository, never()).saveAll(anyList());
             verify(mindmapParticipantRepository, never()).findAllByMindmapIdWithUser(any());
-            verify(mindmapAccessValidator, never()).findParticipantOrThrow(any(), any(Long.class));
+            verify(mindmapAccessValidator, times(1)).findParticipantOrThrow(mindmapId, userId);
         }
     }
 
@@ -663,20 +663,20 @@ class EpisodeServiceTest {
         }
 
         @Test
-        @DisplayName("실패: 일부 nodeId에 접근 권한이 없거나 존재하지 않으면 EPISODE_NOT_FOUND")
+        @DisplayName("성공: 일부 nodeId에 접근 권한이 없거나 존재하지 않으면 제외 후 삭제")
         void deleteEpisodes_Fail_WhenNotAllAllowed() {
             UUID n1 = UUID.randomUUID();
             UUID n2 = UUID.randomUUID();
 
             List<UUID> nodeIds = List.of(n1, n2);
+            List<UUID> allowedIds = List.of(n1);
 
-            when(episodeStarRepository.findNodeIdsByUserIdAndNodeIdIn(userId, nodeIds)).thenReturn(List.of(n1));
+            when(episodeStarRepository.findNodeIdsByUserIdAndNodeIdIn(userId, nodeIds)).thenReturn(allowedIds);
 
-            assertThatThrownBy(
-                    () -> episodeService.deleteEpisodes(new EpisodeDeleteBatchReq(nodeIds), userId)).isInstanceOf(
-                    CustomException.class).hasFieldOrPropertyWithValue("errorCode", ErrorCode.EPISODE_NOT_FOUND);
+            episodeService.deleteEpisodes(new EpisodeDeleteBatchReq(nodeIds), userId);
 
-            verify(episodeRepository, never()).deleteAllByIdInBatch(anyList());
+            verify(episodeStarRepository, times(1)).findNodeIdsByUserIdAndNodeIdIn(userId, nodeIds);
+            verify(episodeRepository, times(1)).deleteAllByIdInBatch(allowedIds);
         }
 
         @Test

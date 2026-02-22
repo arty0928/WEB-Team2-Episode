@@ -164,6 +164,7 @@ public class EpisodeService {
     @Transactional
     public List<EpisodeDetail> upsertEpisodes(UUID mindmapId, long userId, EpisodeUpsertBatchReq items) {
         mindmapAccessValidator.findMindmapOrThrow(mindmapId);
+        mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
         if (items == null || items.items() == null || items.items().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
@@ -184,16 +185,20 @@ public class EpisodeService {
                 throw new CustomException(ErrorCode.EPISODE_NOT_FOUND);
             }
             episodeMap.put(e.getId(), e);
+            e.updateContent(reqByNodeId.get(e.getId()));
         }
 
         List<UUID> toCreate = nodeIds.stream().filter(id -> !episodeMap.containsKey(id)).toList();
 
         if (!toCreate.isEmpty()) {
-            mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
-
             List<MindmapParticipant> participants = mindmapParticipantRepository.findAllByMindmapIdWithUser(mindmapId);
 
-            List<Episode> newEpisodes = toCreate.stream().map(nodeId -> Episode.create(nodeId, mindmapId)).toList();
+            List<Episode> newEpisodes = toCreate.stream().map(nodeId -> {
+                Episode e = Episode.create(nodeId, mindmapId);
+                e.updateContent(reqByNodeId.get(nodeId));
+                return e;
+            }).toList();
+
             episodeRepository.saveAll(newEpisodes);
 
             List<EpisodeStar> newStars = new ArrayList<>(toCreate.size() * participants.size());
@@ -212,10 +217,13 @@ public class EpisodeService {
         List<EpisodeId> starIds = nodeIds.stream().map(nodeId -> new EpisodeId(nodeId, userId)).toList();
 
         List<EpisodeStar> stars = episodeStarRepository.findAllById(starIds);
-        Map<UUID, EpisodeStar> starMap = new HashMap<>();
-        for (EpisodeStar s : stars) {
-            starMap.put(s.getId().getNodeId(), s);
-        }
+
+        Map<UUID, EpisodeStar> starMap =
+                stars.stream().collect(Collectors.toMap(s -> s.getId().getNodeId(), Function.identity()));
+
+
+        Map<Integer, CompetencyTypeRes> ctMap = competencyTypeService.getAllData().stream()
+                .collect(Collectors.toMap(CompetencyTypeRes::id, Function.identity()));
 
         List<EpisodeDetail> result = new ArrayList<>(nodeIds.size());
         for (UUID nodeId : nodeIds) {
@@ -225,10 +233,7 @@ public class EpisodeService {
             EpisodeStar episodeStar = starMap.get(nodeId);
             if (episodeStar == null) throw new CustomException(ErrorCode.EPISODE_STAR_NOT_FOUND);
 
-            String req = reqByNodeId.get(nodeId);
-            episode.updateContent(req);
-
-            result.add(buildEpisodeDetail(episode, episodeStar));
+            result.add(buildEpisodeDetail(episode, episodeStar, ctMap));
         }
 
         return result;
@@ -272,14 +277,9 @@ public class EpisodeService {
             throw new CustomException(ErrorCode.INVALID_REQUEST);
         }
         List<UUID> dedup = req.nodeIds().stream().distinct().toList();
-
         List<UUID> allowed = episodeStarRepository.findNodeIdsByUserIdAndNodeIdIn(userId, dedup);
 
-        if (allowed.size() != dedup.size()) {
-            throw new CustomException(ErrorCode.EPISODE_NOT_FOUND);
-        }
-
-        episodeRepository.deleteAllByIdInBatch(dedup);
+        episodeRepository.deleteAllByIdInBatch(allowed);
     }
 
     @Transactional

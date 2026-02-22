@@ -1,10 +1,12 @@
 package com.yat2.episode.global.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -81,5 +83,20 @@ public class GlobalExceptionHandler {
         log.error("Data integrity violation", e);
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(ErrorCode.CONFLICT, ErrorCode.CONFLICT.getMessage()));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        Throwable cause = e.getCause();
+        log.warn("Request body parse error", e);
+        if (cause instanceof InvalidFormatException ife) {
+            String path = ife.getPath().stream()
+                    .map(ref -> ref.getFieldName() == null ? String.valueOf(ref.getIndex()) : ref.getFieldName())
+                    .collect(Collectors.joining("."));
+            return ResponseEntity.badRequest()
+                    .body(ErrorResponse.of(ErrorCode.INVALID_REQUEST, "요청 바디 형식이 잘못되었습니다. field=" + path));
+        }
+
+        return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.INVALID_REQUEST, "요청 바디 형식이 잘못되었습니다."));
     }
 }

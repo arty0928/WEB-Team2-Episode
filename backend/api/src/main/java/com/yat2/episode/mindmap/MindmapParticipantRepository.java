@@ -32,6 +32,18 @@ public interface MindmapParticipantRepository extends JpaRepository<MindmapParti
 
     @Query(
             """
+                    select mp from MindmapParticipant mp
+                    join fetch mp.user u
+                    join fetch mp.mindmap m
+                    where m.id in :mindmapIds
+                    """
+    )
+    List<MindmapParticipant> findAllByMindmapIdsWithUser(
+            @Param("mindmapIds") List<UUID> mindmapIds
+    );
+
+    @Query(
+            """
                         SELECT p
                         FROM MindmapParticipant p
                         JOIN FETCH p.mindmap m

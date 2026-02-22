@@ -464,21 +464,39 @@ class MindmapServiceTest {
         @Test
         @DisplayName("성공: mindmapId별 participant nickname이 그룹핑되어 MindmapDetailRes에 전달된다")
         void should_group_participant_names_by_mindmapId() {
-            UUID mindmapId = UUID.randomUUID();
-            Mindmap mindmap = createMindmap("맵1", true);
-            ReflectionTestUtils.setField(mindmap, "id", mindmapId);
+            // given
+            UUID mindmapId1 = UUID.randomUUID();
+            UUID mindmapId2 = UUID.randomUUID();
 
-            User u1 = User.newUser(1L, "애플");
-            User u2 = User.newUser(2L, "바나나");
+            Mindmap m1 = createMindmap("맵1", true);
+            Mindmap m2 = createMindmap("맵2", true);
+            ReflectionTestUtils.setField(m1, "id", mindmapId1);
+            ReflectionTestUtils.setField(m2, "id", mindmapId2);
 
-            MindmapParticipant p1 = new MindmapParticipant(u1, mindmap);
-            MindmapParticipant p2 = new MindmapParticipant(u2, mindmap);
+            User me = User.newUser(testUserId, "나");
+            User u1 = User.newUser(2L, "애플");
+            User u2 = User.newUser(3L, "바나나");
+            User u3 = User.newUser(4L, "체리");
+
+            MindmapParticipant myP1 = new MindmapParticipant(me, m1);
+            MindmapParticipant myP2 = new MindmapParticipant(me, m2);
 
             given(mindmapParticipantRepository.findByUserIdOrderByFavoriteAndLastJoinedDesc(testUserId)).willReturn(
-                    List.of(p1, p2));
+                    List.of(myP1, myP2));
 
-            given(episodeStarRepository.findCompetencyTypesByMindmapIds(List.of(mindmapId), testUserId)).willReturn(
-                    List.of());
+            MindmapParticipant p1_1 = new MindmapParticipant(me, m1);
+            MindmapParticipant p1_2 = new MindmapParticipant(u1, m1);
+            MindmapParticipant p1_3 = new MindmapParticipant(u2, m1);
+
+            MindmapParticipant p2_1 = new MindmapParticipant(me, m2);
+            MindmapParticipant p2_2 = new MindmapParticipant(u1, m2);
+            MindmapParticipant p2_3 = new MindmapParticipant(u3, m2);
+
+            given(mindmapParticipantRepository.findAllByMindmapIdsWithUser(List.of(mindmapId1, mindmapId2))).willReturn(
+                    List.of(p1_1, p1_2, p1_3, p2_1, p2_2, p2_3));
+
+            given(episodeStarRepository.findCompetencyTypesByMindmapIds(List.of(mindmapId1, mindmapId2),
+                                                                        testUserId)).willReturn(List.of());
 
             given(competencyTypeService.getCompetencyTypesInIds(Set.of())).willReturn(List.of());
 
@@ -486,8 +504,13 @@ class MindmapServiceTest {
 
             assertThat(result).hasSize(2);
 
-            assertThat(result.get(0).participants()).containsExactlyInAnyOrder("애플", "바나나");
-            assertThat(result.get(1).participants()).containsExactlyInAnyOrder("애플", "바나나");
+            MindmapDetailRes r1 =
+                    result.stream().filter(r -> r.mindmapId().equals(mindmapId1)).findFirst().orElseThrow();
+            MindmapDetailRes r2 =
+                    result.stream().filter(r -> r.mindmapId().equals(mindmapId2)).findFirst().orElseThrow();
+
+            assertThat(r1.participants()).containsExactlyInAnyOrder("나", "애플", "바나나");
+            assertThat(r2.participants()).containsExactlyInAnyOrder("나", "애플", "체리");
         }
 
         @Test
