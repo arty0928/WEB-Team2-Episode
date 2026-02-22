@@ -2,6 +2,7 @@
 <h1>Episode</h1>
 
 `Softeer 7th Team 2`
+
 <a href="https://episode.io.kr">
   <img alt="image" src="https://github.com/user-attachments/assets/f0dc6923-5076-4981-b9cd-ba671313d250" />
 </a>
@@ -19,8 +20,6 @@
 
 <div align="center">
 
-[피그마](https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/Handoff_guidelines_소프티어-7기--복사-?node-id=1-6&p=f&t=Z0PIWuZECLYFK4GB-0)
-|
 [Wiki](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki)
 |
 [Discussion](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/discussions?discussions_q=)
