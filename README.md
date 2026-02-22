@@ -32,6 +32,7 @@
 ![화면 기록 2026-02-22 오후 5 19 59](https://github.com/user-attachments/assets/3f322076-0cb7-4690-a6c5-2d3573d892b3)
 
 ### 나만의 경험을 모아 정리하는 개인 마인드맵
+![freecompress-화면 기록 2026-02-23 오전 3 00 38](https://github.com/user-attachments/assets/58d75fcf-3b29-4d68-85d5-a5502d124835)
 
 ### 다 같이 정리하는 팀 마인드맵
 
