@@ -1,11 +1,14 @@
 <div align="center">
 <h1>Episode</h1>
 
-`softeer 7th 2Team`
-
-<img alt="image" src="https://github.com/user-attachments/assets/f0dc6923-5076-4981-b9cd-ba671313d250" />
+`Softeer 7th Team 2`
+<a href="https://episode.io.kr">
+  <img alt="image" src="https://github.com/user-attachments/assets/f0dc6923-5076-4981-b9cd-ba671313d250" />
+</a>
 <h6>흩어진 경험을 한 편의 이야기로 잇다.</h6>
 </div>
+
+<br/>
 
 > 사용자는 경험을 활동 타입–활동명–상세 경험 구조의 마인드맵과 STAR 기법으로 정리하고, 핵심 역량 태그를 통해 경험을 체계적으로 관리·조회할 수 있습니다.⛓️‍💥📑 <br />
 >
@@ -17,7 +20,7 @@
 
 [피그마](https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/Handoff_guidelines_소프티어-7기--복사-?node-id=1-6&p=f&t=Z0PIWuZECLYFK4GB-0)
 |
-[wiki](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki)
+[Wiki](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki)
 
 </div>
 
