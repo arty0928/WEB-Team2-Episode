@@ -320,9 +320,6 @@ type: 한글 메시지
 
 <table>
   <tr>
-    <td align="center" colspan="4">**개발**</td>
-  </tr>
-  <tr>
     <td align="center"><img src="https://github.com/kimhji.png" width="100"><br></td>
     <td align="center"><img src="https://github.com/w0uldy0u.png" width="100"><br></td>
     <td align="center"><img src="https://github.com/pakxe.png" width="100"><br></td>
