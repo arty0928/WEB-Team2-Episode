@@ -4,8 +4,8 @@ import { ENV } from "@/constants/env";
 import { useCreateMindmap } from "@/features/mindmap/hooks/useCreateMindmap";
 import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
 import { MindmapId } from "@/features/mindmap/types/mindmap";
-import { makeDocWithArr } from "@/features/mindmap/utils/create_doc_with_arr";
-import { uploadToS3 } from "@/shared/utils/upload_to_s3";
+import { makeDocWithArr } from "@/features/mindmap/utils/createDocWithArr";
+import { uploadToS3 } from "@/shared/utils/uploadToS3";
 
 interface InitializeOptions {
     title: string;

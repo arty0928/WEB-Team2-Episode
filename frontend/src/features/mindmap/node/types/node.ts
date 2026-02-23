@@ -1,5 +1,5 @@
 import { nodeVariants } from "@/features/mindmap/node/components/node/Node";
-import { DefinedVariantProps } from "@/shared/types/safe_variant_props";
+import { DefinedVariantProps } from "@/shared/types/safeVariantProps";
 
 export type NodeVariant = "idle" | "interactive" | "highlighted";
 

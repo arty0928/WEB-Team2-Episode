@@ -2,7 +2,7 @@ import { useMindmapParticipants } from "@/features/mindmap/hooks/useMindmapStore
 import Icon from "@/shared/components/icon/Icon";
 import List from "@/shared/components/list/List";
 import ListRow from "@/shared/components/list/ListRow";
-import ProfileIcon from "@/shared/components/profile_icon/ProfileIcon";
+import ProfileIcon from "@/shared/components/profileIcon/ProfileIcon";
 
 export default function CollaborationList() {
     const users = useMindmapParticipants();

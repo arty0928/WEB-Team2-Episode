@@ -4,9 +4,9 @@ import { MindmapCategoryStep } from "@/features/mindmap/components/MindmapCatego
 import { MindmapTypeStep } from "@/features/mindmap/components/MindmapTypeStep";
 import { TeamDetailStep } from "@/features/mindmap/components/TeamDetailStep";
 import { MindmapType } from "@/features/mindmap/types/mindmap";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmap_funnel";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
 import Icon from "@/shared/components/icon/Icon";
-import MaxWidth from "@/shared/components/max_width/MaxWidth";
+import MaxWidth from "@/shared/components/maxWidth/MaxWidth";
 import Top from "@/shared/components/top/Top";
 import { useFunnel } from "@/shared/hooks/useFunnel";
 

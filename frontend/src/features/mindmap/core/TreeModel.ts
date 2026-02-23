@@ -1,7 +1,7 @@
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
 import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { NODE_COLORS, NodeColor } from "@/features/mindmap/node/constants/colors";
-import { TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
+import { TreeAdapter } from "@/features/mindmap/types/mindmapController";
 import type {
     AddNodeDirection,
     NodeDirection,
@@ -11,8 +11,8 @@ import type {
     NodeType,
 } from "@/features/mindmap/types/node";
 import { NodeLimitExceededError } from "@/shared/utils/errors";
-import { exhaustiveCheck } from "@/utils/exhaustive_check";
-import generateId from "@/utils/generate_id";
+import { exhaustiveCheck } from "@/utils/exhaustiveCheck";
+import generateId from "@/utils/generateId";
 
 const ROOT_NODE_PARENT_ID = "empty";
 export const ROOT_NODE_ID = "root";

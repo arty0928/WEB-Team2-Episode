@@ -1,4 +1,4 @@
-import type { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmap_command";
+import type { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommand";
 
 export const TRANSACTION_TAG = {
     USER_COMMAND: "user-command",

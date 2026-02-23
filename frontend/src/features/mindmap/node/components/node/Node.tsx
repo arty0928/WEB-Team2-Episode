@@ -12,7 +12,7 @@ import Icon from "@/shared/components/icon/Icon";
 import List from "@/shared/components/list/List";
 import ListRow from "@/shared/components/list/ListRow";
 import Popover from "@/shared/components/popover/Popover";
-import { NonNullableVariantProps } from "@/shared/types/safe_variant_props";
+import { NonNullableVariantProps } from "@/shared/types/safeVariantProps";
 import { cn } from "@/utils/cn";
 
 type Props = ComponentPropsWithoutRef<"div"> & {
@@ -20,7 +20,7 @@ type Props = ComponentPropsWithoutRef<"div"> & {
 };
 
 export const nodeVariants = cva(
-    "relative flex px-4.5 py-5 justify-center items-center gap-2.5 rounded-xl transition-shadow cursor-pointer outline-none",
+    "relative flex w-full px-4.5 py-5 justify-center items-center gap-2.5 rounded-xl transition-shadow cursor-pointer outline-none",
     {
         variants: {
             size: {

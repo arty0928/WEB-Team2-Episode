@@ -9,7 +9,7 @@ import {
     LockInfo,
     LocksInfo,
     LockState,
-} from "@/features/mindmap/types/mindmap_collaboration";
+} from "@/features/mindmap/types/mindmapCollaboration";
 import type { NodeId } from "@/features/mindmap/types/node";
 
 type Deps = {

@@ -2,7 +2,7 @@ import * as Y from "yjs";
 
 import { ROOT_NODE_OUTER_HEIGHT, ROOT_NODE_OUTER_WIDTH } from "@/features/mindmap/constants/rootNode";
 import { TRANSACTION_TAG } from "@/features/mindmap/constants/transaction";
-import { AdapterChange, TreeAdapter } from "@/features/mindmap/types/mindmap_controller";
+import { AdapterChange, TreeAdapter } from "@/features/mindmap/types/mindmapController";
 import type { NodeElement, NodeId } from "@/features/mindmap/types/node";
 
 export const ROOT_NODE_ID = "root";

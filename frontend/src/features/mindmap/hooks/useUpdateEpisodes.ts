@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { ApiError } from "@/features/auth/types/api";
-import { episodeArchiveQueryKeys } from "@/features/episode_archive/api/episodeArchiveQueryKeys";
+import { episodeArchiveQueryKeys } from "@/features/episodeArchive/api/episodeArchiveQueryKeys";
 import { MindmapId } from "@/features/mindmap/types/mindmap";
 import { NodeId } from "@/features/mindmap/types/node";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { post } from "@/shared/api/method";
-import { queryClient } from "@/shared/api/query_client";
+import { queryClient } from "@/shared/api/queryClient";
 
 export type UpdateEpisodesRequestBody = {
     items: {

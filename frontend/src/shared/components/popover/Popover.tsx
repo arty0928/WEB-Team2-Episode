@@ -3,7 +3,7 @@ import { ReactNode, useRef, useState } from "react";
 
 import useCalcSafeDirection from "@/shared/hooks/useCalcSafeDirection";
 import useClickOutside from "@/shared/hooks/useClickOutside";
-import { NonNullableVariantProps } from "@/shared/types/safe_variant_props";
+import { NonNullableVariantProps } from "@/shared/types/safeVariantProps";
 import { cn } from "@/utils/cn";
 
 type Props = NonNullableVariantProps<typeof variants> & {

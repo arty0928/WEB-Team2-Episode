@@ -1,4 +1,4 @@
-import { CompetencyTag } from "@/features/episode_archive/types/episode";
+import { CompetencyTag } from "@/features/episodeArchive/types/episode";
 
 export const ALL_COMPETENCIES: CompetencyTag[] = [
     { id: 1, category: "공통", competencyType: "팀워크" },

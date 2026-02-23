@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { queryClient } from "@/shared/api/query_client";
+import { queryClient } from "@/shared/api/queryClient";
 
 import App from "./App";
 

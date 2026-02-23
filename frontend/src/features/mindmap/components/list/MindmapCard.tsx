@@ -16,7 +16,7 @@ import Popover from "@/shared/components/popover/Popover";
 import useClickOutside from "@/shared/hooks/useClickOutside";
 import { linkTo } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
-import { getRelativeTime } from "@/utils/get_relative_time";
+import { getRelativeTime } from "@/utils/getRelativeTime";
 
 type Props = {
     data: MindmapItem;

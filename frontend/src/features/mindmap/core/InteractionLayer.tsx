@@ -4,7 +4,7 @@ import DropNodePreviewLayer from "@/features/mindmap/core/DropNodePreviewLayer";
 import MovingTreeLayer from "@/features/mindmap/core/MovingTreeLayer";
 import { useMindmapControllerEvents } from "@/features/mindmap/hooks/useMindmapEngineEvents";
 import { useMindmapInteraction } from "@/features/mindmap/hooks/useMindmapStoreState";
-import TempNode, { TEMP_NODE_SIZE } from "@/features/mindmap/node/components/temp_node/TempNode";
+import TempNode, { TEMP_NODE_SIZE } from "@/features/mindmap/node/components/tempNode/TempNode";
 import { NodeElement, NodeId } from "@/features/mindmap/types/node";
 
 export default function InteractionLayer({

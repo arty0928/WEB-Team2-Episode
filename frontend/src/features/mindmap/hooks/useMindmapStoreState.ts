@@ -2,9 +2,9 @@ import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 import { useMindmapControllerContext } from "@/features/mindmap/core/MindmapProvider";
 import { useMindmapControllerEvents } from "@/features/mindmap/hooks/useMindmapEngineEvents";
-import { LockInfo } from "@/features/mindmap/types/mindmap_collaboration";
+import { LockInfo } from "@/features/mindmap/types/mindmapCollaboration";
 import type { NodeId } from "@/features/mindmap/types/node";
-import { MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmap_store";
+import { MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmapStore";
 
 /** context로 뿌리고 있는 엔진 인스턴스 접근 */
 

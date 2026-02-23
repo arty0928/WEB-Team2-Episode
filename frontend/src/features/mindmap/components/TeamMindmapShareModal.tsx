@@ -5,8 +5,8 @@ import Button from "@/shared/components/button/Button";
 import Divider from "@/shared/components/divider/Divider";
 import Icon from "@/shared/components/icon/Icon";
 import Input from "@/shared/components/Input/Input";
-import Modal from "@/shared/components/Modal/Modal";
-import ProfileIcon from "@/shared/components/profile_icon/ProfileIcon";
+import Modal from "@/shared/components/modal/Modal";
+import ProfileIcon from "@/shared/components/profileIcon/ProfileIcon";
 
 type Props = {
     collaborators: string[];

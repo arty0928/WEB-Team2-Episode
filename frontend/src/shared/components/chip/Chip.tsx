@@ -1,7 +1,7 @@
 import { cva, VariantProps } from "class-variance-authority";
 import { ComponentPropsWithoutRef, ReactNode } from "react";
 
-import { COLOR_SET, INTERACTIVE_STYLES } from "@/shared/styles/color_set";
+import { COLOR_SET, INTERACTIVE_STYLES } from "@/shared/styles/colorSet";
 import { cn } from "@/utils/cn";
 
 type AllowedElementType = "button" | "span";

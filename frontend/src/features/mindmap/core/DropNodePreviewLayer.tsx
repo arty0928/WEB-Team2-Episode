@@ -1,5 +1,5 @@
 import { edgeVariants } from "@/features/mindmap/core/EdgeLayer";
-import TempNode, { TEMP_NODE_SIZE } from "@/features/mindmap/node/components/temp_node/TempNode";
+import TempNode, { TEMP_NODE_SIZE } from "@/features/mindmap/node/components/tempNode/TempNode";
 import { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { getEdgeStartBounds, getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { getBezierPath } from "@/features/mindmap/utils/path";

@@ -1,10 +1,10 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useInitializeMindmap } from "@/features/mindmap/hooks/useInitializeMindmap";
 import { ACTIVITY_CATEGORIES, ActivityCategoryItem } from "@/features/mindmap/types/mindmap";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmap_funnel";
-import BottomSticky from "@/shared/components/bottom_sticky/BottomSticky";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
+import BottomSticky from "@/shared/components/bottomSticky/BottomSticky";
 import Button from "@/shared/components/button/Button";
-import { EmojiCard } from "@/shared/components/emoji_card/EmojiCard";
+import { EmojiCard } from "@/shared/components/emojiCard/EmojiCard";
 import Top from "@/shared/components/top/Top";
 import { FunnelInstance } from "@/shared/hooks/useFunnel";
 import { linkTo } from "@/shared/utils/route";

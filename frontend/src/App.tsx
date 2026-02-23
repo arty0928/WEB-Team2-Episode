@@ -3,14 +3,14 @@ import { createBrowserRouter, Outlet, RouterProvider, useLocation } from "react-
 
 import { authMiddleWare } from "@/features/auth/middleware/authMiddleware";
 import { AuthProvider } from "@/features/auth/providers/AuthProvider";
-import EpisodeArchivePage from "@/features/episode_archive/pages/EpisodeArchivePage";
-import HomePage from "@/features/home/pages/HomePage";
+import EpisodeArchivePage from "@/features/episodeArchive/pages/EpisodeArchivePage";
+import HomePage from "@/features/home/HomePage";
 import CreateMindmapFunnelPage from "@/features/mindmap/pages/CreateMindmapPage";
 import MindmapDetailPage from "@/features/mindmap/pages/MindmapDetailPage";
 import MindmapListPage from "@/features/mindmap/pages/MindmapListPage";
-import LoginPage from "@/features/user/login/pages/LoginPage";
-import GlobalNavigationBar from "@/shared/components/global_navigation_bar/GlobalNavigationBar";
-import ServiceErrorBoundary from "@/shared/components/ServiceErrorBoundary/ServiceErrorBoundary";
+import LoginPage from "@/features/user/login/LoginPage";
+import GlobalNavigationBar from "@/shared/components/globalNavigationBar/GlobalNavigationBar";
+import ServiceErrorBoundary from "@/shared/components/serviceErrorBoundary/ServiceErrorBoundary";
 import Spinner from "@/shared/components/spinner/Spinner";
 import { Toaster } from "@/shared/components/ui/sonner";
 import { useAuthToast } from "@/shared/hooks/useAuthToast";

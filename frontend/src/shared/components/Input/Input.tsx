@@ -1,7 +1,7 @@
 import { VariantProps } from "class-variance-authority";
 import { ComponentPropsWithoutRef } from "react";
 
-import { InputVariants } from "@/shared/styles/input_variants";
+import { InputVariants } from "@/shared/styles/inputVariants";
 
 type SingleLineInputProps = ComponentPropsWithoutRef<"input"> &
     Omit<VariantProps<typeof InputVariants>, "fullWidth"> & {

@@ -2,12 +2,12 @@ import { memo, useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import EmptyEpisode from "@/features/episode_archive/components/EmptyEpisode";
-import EpisodeCompetencyChipGroup from "@/features/episode_archive/components/episodeEdit/EpisodeCompetencyChipGroup";
-import EpisodeContentSection from "@/features/episode_archive/components/episodeEdit/EpisodeContentSection";
-import { useEpisodeDetail } from "@/features/episode_archive/hooks/useEpisodeDetail";
-import { useUpdateEpisode } from "@/features/episode_archive/hooks/useUpdateEpisode";
-import type { EpisodeDetailResponse, UpdateEpisodeRequest } from "@/features/episode_archive/types/episode";
+import EmptyEpisode from "@/features/episodeArchive/components/EmptyEpisode";
+import EpisodeCompetencyChipGroup from "@/features/episodeArchive/components/episodeEdit/EpisodeCompetencyChipGroup";
+import EpisodeContentSection from "@/features/episodeArchive/components/episodeEdit/EpisodeContentSection";
+import { useEpisodeDetail } from "@/features/episodeArchive/hooks/useEpisodeDetail";
+import { useUpdateEpisode } from "@/features/episodeArchive/hooks/useUpdateEpisode";
+import { EpisodeDetailResponse, UpdateEpisodeRequest } from "@/features/episodeArchive/types/episode";
 import { useMindmapNode } from "@/features/mindmap/hooks/useMindmapStoreState";
 import Button from "@/shared/components/button/Button";
 import Icon from "@/shared/components/icon/Icon";

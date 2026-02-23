@@ -13,8 +13,8 @@ import StarEpisodeHeaderIndicator from "@/features/mindmap/star/components/StarE
 import StarEpisodePanelOverlay from "@/features/mindmap/star/StarEpisodePanelOverlay";
 import { StarEpisodePanelProvider } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import StarEpisodeTargetSync from "@/features/mindmap/star/StarEpisodeTargetSync";
-import { CollaboratorInfo } from "@/features/mindmap/types/mindmap_collaboration";
-import HeaderToolBar from "@/shared/components/HeaderToolBar/HeaderToolBar";
+import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaboration";
+import HeaderToolBar from "@/shared/components/headerToolBar/HeaderToolBar";
 import { BaseError } from "@/shared/utils/errors";
 
 export type MindmapConfig = {

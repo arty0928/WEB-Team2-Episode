@@ -1,6 +1,6 @@
 import MindmapTypeCard from "@/features/mindmap/components/MindmapTypeCard";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmap_funnel";
-import BottomSticky from "@/shared/components/bottom_sticky/BottomSticky";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
+import BottomSticky from "@/shared/components/bottomSticky/BottomSticky";
 import Button from "@/shared/components/button/Button";
 import Top from "@/shared/components/top/Top";
 import { FunnelInstance } from "@/shared/hooks/useFunnel";

@@ -3,7 +3,7 @@ import { ComponentPropsWithoutRef } from "react";
 import landingEpisode from "@/assets/img/img_landing_episode.png";
 import landingMain from "@/assets/img/img_landing_main.png";
 import landingMindmap from "@/assets/img/img_landing_mindmap.png";
-import { exhaustiveCheck } from "@/utils/exhaustive_check";
+import { exhaustiveCheck } from "@/utils/exhaustiveCheck";
 
 type LandingInfoType = "episode" | "main" | "mindmap";
 type Props = ComponentPropsWithoutRef<"img"> & {

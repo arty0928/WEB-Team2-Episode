@@ -12,20 +12,20 @@ import QuadTree from "@/features/mindmap/core/QuadTree";
 import { TreeModel } from "@/features/mindmap/core/TreeModel";
 import { ViewportController } from "@/features/mindmap/core/ViewportController";
 import { YjsAdapter } from "@/features/mindmap/core/YjsAdaptor";
-import { AwarenessLike, CollaboratorInfo, LockInfo } from "@/features/mindmap/types/mindmap_collaboration";
-import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmap_command";
+import { AwarenessLike, CollaboratorInfo, LockInfo } from "@/features/mindmap/types/mindmapCollaboration";
+import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommand";
 import {
     AdapterChange,
     IMindmapController,
     MindmapOptions,
     TreeAdapter,
-} from "@/features/mindmap/types/mindmap_controller";
-import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmap_interaction";
+} from "@/features/mindmap/types/mindmapController";
+import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmapInteraction";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
-import { computeMindmapLayout } from "@/features/mindmap/utils/compute_mindmap_layout";
-import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmap_store";
+import { computeMindmapLayout } from "@/features/mindmap/utils/computeMindmapLayout";
+import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmapStore";
 import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
-import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/native_like_event";
+import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/nativeLikeEvent";
 import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
 import { BadRequestError, NodeLimitExceededError } from "@/shared/utils/errors";
 

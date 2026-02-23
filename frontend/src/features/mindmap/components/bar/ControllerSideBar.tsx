@@ -2,8 +2,8 @@ import { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { useMindmapControllerContext } from "@/features/mindmap/core/MindmapProvider";
 import Icon from "@/shared/components/icon/Icon";
-import SquareButton from "@/shared/components/square_button/SquareButton";
-import SquareButtonToolTip from "@/shared/components/square_button/SquareButtonToolTip";
+import SquareButton from "@/shared/components/squareButton/SquareButton";
+import SquareButtonToolTip from "@/shared/components/squareButton/SquareButtonToolTip";
 import Tooltip from "@/shared/components/tooltip/Tooltip";
 import { cn } from "@/utils/cn";
 

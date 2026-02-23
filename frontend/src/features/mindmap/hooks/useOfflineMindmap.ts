@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { IndexeddbPersistence } from "y-indexeddb";
 import * as Y from "yjs";
 
-import { MindmapRoomId } from "@/features/mindmap/types/mindmap_room";
+import { MindmapRoomId } from "@/features/mindmap/types/mindmapRoom";
 
 type Props = {
     roomId: MindmapRoomId;

@@ -1,7 +1,7 @@
 import { redirect } from "react-router";
 
 import { authQueryOptions } from "@/features/auth/api/auth";
-import { queryClient } from "@/shared/api/query_client";
+import { queryClient } from "@/shared/api/queryClient";
 import { AUTH_MESSAGES } from "@/shared/constants/authMessage";
 import { linkTo } from "@/shared/utils/route";
 

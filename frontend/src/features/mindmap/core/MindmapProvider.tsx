@@ -3,8 +3,8 @@ import * as Y from "yjs";
 
 import { createMindmapController } from "@/features/mindmap/core/MindmapController";
 import { useMindmapServerSideEffects } from "@/features/mindmap/hooks/useMindmapSideEffects";
-import { AwarenessLike, CollaboratorInfo } from "@/features/mindmap/types/mindmap_collaboration";
-import { IMindmapController, MindmapOptions } from "@/features/mindmap/types/mindmap_controller";
+import { AwarenessLike, CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaboration";
+import { IMindmapController, MindmapOptions } from "@/features/mindmap/types/mindmapController";
 
 export const MindmapControllerContext = createContext<IMindmapController | null>(null);
 

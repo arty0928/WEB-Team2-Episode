@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { ApiError } from "@/features/auth/types/api";
-import { mindmapKeys } from "@/features/mindmap/api/mindmap_query_keys";
+import { mindmapKeys } from "@/features/mindmap/api/mindmapQueryKeys";
 import { MindmapItem, MindmapTabId } from "@/features/mindmap/types/mindmap";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { get } from "@/shared/api/method";

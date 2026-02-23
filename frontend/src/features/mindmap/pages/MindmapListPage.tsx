@@ -5,7 +5,7 @@ import MindmapList from "@/features/mindmap/components/list/MindmapList";
 import { MINDMAP_TABS, MindmapTabId } from "@/features/mindmap/types/mindmap";
 import Button from "@/shared/components/button/Button";
 import Icon from "@/shared/components/icon/Icon";
-import MaxWidth from "@/shared/components/max_width/MaxWidth";
+import MaxWidth from "@/shared/components/maxWidth/MaxWidth";
 import Spinner from "@/shared/components/spinner/Spinner";
 import Tab from "@/shared/components/tabs/Tab";
 import TabItem from "@/shared/components/tabs/TabItem";

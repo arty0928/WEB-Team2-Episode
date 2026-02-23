@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { ApiError } from "@/features/auth/types/api";
-import { mindmapKeys } from "@/features/mindmap/api/mindmap_query_keys";
+import { mindmapKeys } from "@/features/mindmap/api/mindmapQueryKeys";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { post } from "@/shared/api/method";
 

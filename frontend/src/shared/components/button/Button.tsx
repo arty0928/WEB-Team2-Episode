@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { ComponentPropsWithRef, ReactNode } from "react";
 
-import { COLOR_SET } from "@/shared/styles/color_set";
+import { COLOR_SET } from "@/shared/styles/colorSet";
 import { cn } from "@/utils/cn";
 
 type Props = ComponentPropsWithRef<"button"> &

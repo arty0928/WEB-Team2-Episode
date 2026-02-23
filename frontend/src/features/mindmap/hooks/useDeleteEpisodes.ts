@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { ApiError } from "@/features/auth/types/api";
-import { episodeArchiveQueryKeys } from "@/features/episode_archive/api/episodeArchiveQueryKeys";
+import { episodeArchiveQueryKeys } from "@/features/episodeArchive/api/episodeArchiveQueryKeys";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { del } from "@/shared/api/method";
-import { queryClient } from "@/shared/api/query_client";
+import { queryClient } from "@/shared/api/queryClient";
 
 export type DeleteEpisodesRequestBody = {
     nodeIds: string[];

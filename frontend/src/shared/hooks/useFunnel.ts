@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
-import { MissingRequiredKeys, UnknownRecord } from "@/shared/types/utility_type";
+import { MissingRequiredKeys, UnknownRecord } from "@/shared/types/utilityType";
 
 type StepContextMap = Record<string, Record<string, unknown>>;
 type StepKey<SCM extends StepContextMap> = Extract<keyof SCM, string>;

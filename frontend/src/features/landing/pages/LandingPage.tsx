@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import LandingInfo from "@/features/landing/components/LandingInfo";
-import CallToActionButton from "@/shared/components/call_to_action_button/CallToActionButton";
+import CallToActionButton from "@/shared/components/callToActionButton/CallToActionButton";
 import Icon from "@/shared/components/icon/Icon";
 import { linkTo } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
