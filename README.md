@@ -20,8 +20,6 @@
 
 <div align="center">
   
-[피그마](https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/Handoff_guidelines_소프티어-7기--복사-?node-id=1-6&p=f&t=Z0PIWuZECLYFK4GB-0)
-|
 [Wiki](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki)
 |
 [Discussion](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/discussions?discussions_q=)
