@@ -4,18 +4,10 @@
   <p><strong>Softeer 7th Team 2</strong></p>
   <p>✨ <em>흩어진 경험을 한 편의 이야기로 잇다</em> ✨</p>
 
-  <table>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki"><strong>📚 Wiki</strong></a><br/>
-        <small>트러블 슈팅과 프로젝트 과정을 기록합니다.</small>
-      </td>
-      <td align="center">
-        <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/discussions?discussions_q="><strong>💬 Discussion</strong></a><br/>
-        <small>협업 방식과 치열한 고민 과정을 공유합니다.</small>
-      </td>
-    </tr>
-  </table>
+  <p>
+    <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki"><strong>📚 Wiki</strong></a> | 트러블 슈팅과 프로젝트 과정을 기록합니다.<br/>
+    <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/discussions?discussions_q="><strong>💬 Discussion</strong></a> | 협업 방식과 치열한 고민 과정을 공유합니다.
+  </p>
 </div>
 
 <br/>
@@ -24,7 +16,7 @@
 
 > **"복잡한 경험 정리를 시각적인 마인드맵과 검증된 STAR 기법으로 완성하세요."** > 사용자는 활동 타입 – 활동명 – 상세 경험으로 이어지는 구조를 통해 커리어 맵을 시각화하고, 핵심 역량 태그를 통해 체계적으로 관리할 수 있습니다.⛓️‍💥📑
 
----
+<br/>
 
 ### 🧠 나만의 경험을 모으는 개인 마인드맵
 > **"단순한 기록을 넘어, 경험의 연결고리를 찾습니다."**
@@ -34,7 +26,7 @@
 
 ![개인 마인드맵](https://github.com/user-attachments/assets/58d75fcf-3b29-4d68-85d5-a5502d124835)
 
----
+<br/>
 
 ### 🤝 함께 정리하는 팀 마인드맵
 > **"함께했던 프로젝트, 기억의 조각을 같이 맞춰보세요."**
@@ -44,7 +36,7 @@
 
 ![팀 마인드맵](https://github.com/user-attachments/assets/d7376794-7ee8-4ce6-840d-569dfb3c4fe2)
 
----
+<br/>
 
 ### ✍️ 성과를 증명하는 STAR 에피소드 보관함
 > **"마인드맵에서 곧바로 이어지는 강력한 스토리텔링"**
@@ -76,8 +68,6 @@
 <img width="100%" alt="아키텍처" src="https://github.com/user-attachments/assets/fa52f9df-f600-4e45-8bf4-feddecfc430a" />
 
 <br />
-
----
 
 ## 🤝 협업 및 그라운드 룰
 
