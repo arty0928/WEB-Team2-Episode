@@ -315,43 +315,31 @@ type: 한글 메시지
 <br />
 <br />
 
+
 # 팀원 소개
 
 <table>
-
   <tr>
-    <td align="center" colspan="4">기획 · 디자인</td>
-    <td align="center" colspan="4">개발</td>
+    <td align="center" colspan="4">**개발**</td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/16d8c713-8cb1-45d0-b737-758191db6e95?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/cb090f5e-5d7a-419e-92c9-f63fa6e3e1f0?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/01719095-beaa-42f2-814e-8314dc184ca6?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/bd0b3f0c-908b-4d1e-91fc-86cf0433e425?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/16d8c713-8cb1-45d0-b737-758191db6e95?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/cb090f5e-5d7a-419e-92c9-f63fa6e3e1f0?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/01719095-beaa-42f2-814e-8314dc184ca6?s=64&v=4" width="100"></td>
-    <td><img src="https://github.com/user-attachments/assets/bd0b3f0c-908b-4d1e-91fc-86cf0433e425?s=64&v=4" width="100"></td>
+    <td align="center"><img src="https://github.com/kimhji.png" width="100"><br></td>
+    <td align="center"><img src="https://github.com/w0uldy0u.png" width="100"><br></td>
+    <td align="center"><img src="https://github.com/pakxe.png" width="100"><br></td>
+    <td align="center"><img src="https://github.com/arty0928.png" width="100"><br></td>
   </tr>
   <tr>
-    <td align="center">김강민</td>
-    <td align="center">강민서</td>
-    <td align="center">김지윤</td>
-    <td align="center">이주연</td>
     <td align="center"><a href="https://github.com/kimhji">김현지</a></td>
     <td align="center"><a href="https://github.com/w0uldy0u">김우주</a></td>
     <td align="center"><a href="https://github.com/pakxe">박세현</a></td>
     <td align="center"><a href="https://github.com/arty0928">박은서</a></td>
   </tr>
-  
   <tr>
-    <td align="center">기획</td>
-    <td align="center">디자인</td>
-    <td align="center">디자인</td>
-    <td align="center">디자인</td>
     <td align="center">BE</td>
     <td align="center">BE</td>
     <td align="center">FE</td>
     <td align="center">FE</td>
   </tr>
 </table>
+
+
