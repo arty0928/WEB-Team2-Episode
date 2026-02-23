@@ -6,6 +6,7 @@ import type { NodeId } from "@/features/mindmap/types/node";
 type StarEpisodePanelState = {
     isOpen: boolean;
     targetNodeId: NodeId | null;
+    isShared: boolean;
 };
 
 type Listener = () => void;
@@ -17,7 +18,11 @@ type StarEpisodePanelStore = {
 };
 
 const createStarEpisodePanelStore = (): StarEpisodePanelStore => {
-    let state: StarEpisodePanelState = { isOpen: false, targetNodeId: null };
+    let state: StarEpisodePanelState = {
+        isOpen: false,
+        targetNodeId: null,
+        isShared: false,
+    };
     const listeners = new Set<Listener>();
 
     const getState = () => state;
@@ -41,6 +46,7 @@ type StarEpisodePanelActions = {
     openFromMenu: (nodeId: NodeId) => void;
     close: () => void;
     setTargetNodeId: (nodeId: NodeId) => void;
+    setIsShared: (isShared: boolean) => void;
 };
 
 const StarEpisodePanelStoreContext = createContext<StarEpisodePanelStore | null>(null);
@@ -58,16 +64,15 @@ export function StarEpisodePanelProvider({ children }: Props) {
 
     const openFromMenu = useCallback(
         (nodeId: NodeId) => {
-            store.setState(() => ({ isOpen: true, targetNodeId: nodeId }));
+            store.setState((prev) => ({ ...prev, isOpen: true, targetNodeId: nodeId }));
         },
         [store],
     );
 
     const close = useCallback(() => {
-        store.setState(() => ({ isOpen: false, targetNodeId: null }));
+        store.setState((prev) => ({ ...prev, isOpen: false, targetNodeId: null }));
     }, [store]);
 
-    // 패널 열린 상태에서만 타겟 변경 (요구사항 4)
     const setTargetNodeId = useCallback(
         (nodeId: NodeId) => {
             store.setState((prev) => {
@@ -79,9 +84,16 @@ export function StarEpisodePanelProvider({ children }: Props) {
         [store],
     );
 
+    const setIsShared = useCallback(
+        (isShared: boolean) => {
+            store.setState((prev) => (prev.isShared === isShared ? prev : { ...prev, isShared }));
+        },
+        [store],
+    );
+
     const actions = useMemo<StarEpisodePanelActions>(
-        () => ({ openFromMenu, close, setTargetNodeId }),
-        [openFromMenu, close, setTargetNodeId],
+        () => ({ openFromMenu, close, setTargetNodeId, setIsShared }),
+        [openFromMenu, close, setTargetNodeId, setIsShared],
     );
 
     return (

@@ -16,7 +16,7 @@ function StarEpisodeHeaderIndicatorComponent({ className }: Props) {
     return (
         <div className={className}>
             <div className="bg-primary flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2">
-                <Icon name="ic_star" size={18} color="var(--color-base-white)" />
+                <Icon name="ic_star" color="var(--color-base-white)" />
                 <span className="typo-body-14-reg text-base-white whitespace-nowrap">STAR 정리하기</span>
             </div>
         </div>

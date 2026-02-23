@@ -25,17 +25,17 @@ const Chip = <T extends AllowedElementType = "button">({
     const Component = as ? as : "button";
 
     return (
-        <Component className={cn(variants({ variant, size, interactive }), className)} {...rest}>
-            {leftSlot ? leftSlot : null}
+        <Component className={cn(variants({ variant, size, interactive }), "min-w-0", className)} {...rest}>
+            {leftSlot && <span className="shrink-0">{leftSlot}</span>}
 
-            {children}
+            <span className="truncate block w-full">{children}</span>
         </Component>
     );
 };
 
 export default Chip;
 
-const variants = cva(" rounded-4xl flex flex-row items-center transition-colors", {
+const variants = cva("min-w-0 truncate rounded-4xl flex flex-row items-center transition-colors whitespace-nowrap", {
     variants: {
         variant: COLOR_SET,
         size: {

@@ -19,6 +19,7 @@ export default function EpisodeInfoSection({ className }: EpisodeInfoSectionProp
 
     const startDate = watch("startDate");
     const endDate = watch("endDate");
+    const content = watch("content");
 
     const getDisplayDate = useCallback((dateStr?: string) => {
         if (!dateStr || dateStr === "0000-00-00") return "";
@@ -43,7 +44,7 @@ export default function EpisodeInfoSection({ className }: EpisodeInfoSectionProp
     return (
         <div className={cn("flex flex-col gap-8 overflow-visible", className)}>
             <div className="flex flex-col gap-3 w-full overflow-visible">
-                <label className="typo-body-14-semibold text-text-main1">진행 기간</label>
+                <label className="typo-body-16-semibold text-text-main1">진행 기간</label>
                 <Popover
                     isOpen={isCalendarOpen}
                     isOnOpenChange={setIsCalendarOpen}
@@ -80,13 +81,9 @@ export default function EpisodeInfoSection({ className }: EpisodeInfoSectionProp
             </div>
 
             <div className="flex flex-col gap-3 w-full">
-                <label className="typo-body-14-semibold text-text-main1">에피소드</label>
-                <div className="flex w-full min-h-30 px-5 pt-4 pb-3.5 rounded-xl border border-gray-300 bg-white focus-within:border-primary transition-colors">
-                    <textarea
-                        {...register("content")}
-                        placeholder="에피소드 제목을 입력하세요"
-                        className="w-full typo-body-14-reg text-text-main1 outline-none border-none resize-none p-0 bg-transparent placeholder:text-text-placeholder"
-                    />
+                <label className="typo-body-16-semibold text-text-main1">에피소드 제목</label>
+                <div className="flex w-full h-fit px-5 pt-4 pb-3.5 rounded-xl bg-white focus-within:border-primary transition-colors">
+                    {content}
                 </div>
             </div>
         </div>

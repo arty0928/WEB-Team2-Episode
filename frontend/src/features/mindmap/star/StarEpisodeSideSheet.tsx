@@ -9,9 +9,26 @@ import { useEpisodeDetail } from "@/features/episodeArchive/hooks/useEpisodeDeta
 import { useUpdateEpisode } from "@/features/episodeArchive/hooks/useUpdateEpisode";
 import { EpisodeDetailResponse, UpdateEpisodeRequest } from "@/features/episodeArchive/types/episode";
 import { useMindmapNode } from "@/features/mindmap/hooks/useMindmapStoreState";
+import { useStarEpisodePanelSelector } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import Button from "@/shared/components/button/Button";
+import EpisodeGuide from "@/shared/components/episodeGuide/EpisodeGuide";
 import Icon from "@/shared/components/icon/Icon";
 import { cn } from "@/utils/cn";
+
+type FooterProps = {
+    disabled: boolean;
+    isPending: boolean;
+};
+
+const StarSheetFooter = memo(function StarSheetFooter({ disabled, isPending }: FooterProps) {
+    return (
+        <div className=" shrink-0 p-6 bg-base-white border-t border-gray-100">
+            <Button type="submit" variant="primary" layout="fullWidth" className="py-3 rounded-xl" disabled={disabled}>
+                {isPending ? "저장 중..." : "저장하기"}
+            </Button>
+        </div>
+    );
+});
 
 type Props = {
     nodeId: string;
@@ -38,6 +55,8 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
     const nodeText = (node?.contents ?? "").trim();
     const hasText = nodeText.length > 0;
 
+    const isShared = useStarEpisodePanelSelector((s) => s.isShared);
+
     const methods = useForm<EpisodeDetailResponse>({
         mode: "onChange",
         defaultValues: useMemo(() => buildEmptyEpisode(nodeId), [nodeId]),
@@ -49,10 +68,10 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
         formState: { dirtyFields },
     } = methods;
 
-    const { data, isLoading, isError } = useEpisodeDetail(nodeId, hasText);
+    const { data, isLoading } = useEpisodeDetail(nodeId, hasText);
     const { mutateAsync: updateEpisode, isPending } = useUpdateEpisode(nodeId);
 
-    // 요구사항 4: 패널 열려있는 상태에서 노드 바뀌면 그냥 내용 교체(저장 안 됨)
+    // 패널 열려있는 상태에서 노드 바뀌면 그냥 내용 교체(저장 안 됨)
     useEffect(() => {
         reset(buildEmptyEpisode(nodeId));
     }, [nodeId, reset]);
@@ -108,52 +127,37 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
             role="dialog"
             aria-label="STAR 정리하기"
             className={cn(
-                "absolute top-0 right-0 z-star-sheet",
-                "w-star-sheet h-full max-h-star-sheet",
+                "absolute inset-y-0 right-0 z-star-sheet",
+                "w-star-sheet",
                 "bg-base-white shadow-star-sheet overflow-hidden",
-                "flex flex-col",
+                "flex flex-col min-h-0",
             )}
         >
-            {/* 상단 고정 바 */}
-            <div className="h-star-sheet-header w-full flex items-center justify-between border-b border-gray-200 bg-base-white px-6 shrink-0">
-                <div className="typo-title-20-semibold text-text-main1">STAR 정리하기</div>
-
-                {/* 요구사항 1: 닫기는 X만 */}
-                <button
-                    type="button"
-                    onClick={onClose}
-                    className="size-10 flex items-center justify-center"
-                    aria-label="닫기"
-                >
-                    <Icon name="ic_x" size={24} color="var(--ColorSystem-Semantic-Text-color-text-sub1)" />
-                </button>
+            {/* 1. 상단 헤더: 고정 */}
+            <div className="py-2 w-full flex flex-col border-b border-gray-100 bg-base-white px-6 shrink-0">
+                <div className="flex w-full justify-between gap-4">
+                    <div className="typo-title-20-semibold text-text-main1 flex items-center">STAR 정리하기</div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="size-10 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors shrink-0"
+                    >
+                        <Icon name="ic_x" size={24} color="var(--ColorSystem-Semantic-Text-color-text-sub1)" />
+                    </button>
+                </div>
+                {isShared && <EpisodeGuide />}
             </div>
 
-            {/* 스크롤 영역 */}
-            <div className="flex-1 overflow-y-auto">
-                {/* 저장하기 버튼이 끝까지 “완전히 보이도록” 하단 패딩 확보 */}
-                <div className="px-6 py-6 pb-20 flex flex-col gap-4">
-                    {!hasText ? (
-                        // 요구사항 5: 빈 텍스트 노드면 API 호출 없이 EmptyEpisode
-                        <div className="min-h-72">
-                            <EmptyEpisode />
-                        </div>
-                    ) : (
-                        <FormProvider {...methods}>
-                            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
-                                {/* Episode (read-only box) */}
-                                <section className="flex flex-col gap-2">
-                                    <div className="flex items-center gap-1">
-                                        <div className="typo-body-16-semibold text-text-main1">에피소드</div>
-                                        <div className="typo-body-16-semibold text-red-100">*</div>
-                                    </div>
-
-                                    <div className="w-full rounded-lg border border-gray-200 bg-base-white px-4 py-3 typo-body-14-semibold text-gray-800 whitespace-pre-wrap break-words">
-                                        {nodeText}
-                                    </div>
-                                </section>
-
-                                {/* Competency */}
+            <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                    {/* 2. 중앙 내용 영역: 스크롤 가능 */}
+                    <div className="flex-1 min-h-0 overflow-y-auto px-6 py-6 flex flex-col gap-8">
+                        {!hasText ? (
+                            <div className="flex-1 flex items-center justify-center min-h-[240px]">
+                                <EmptyEpisode />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-8">
                                 <section className="flex flex-col gap-2">
                                     <div className="flex items-center gap-1">
                                         <span className="typo-body-16-semibold text-text-main1">역량 태그</span>
@@ -161,30 +165,19 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
                                     </div>
                                     <EpisodeCompetencyChipGroup isDisabled={isLoading || isPending} />
                                 </section>
-
-                                {/* Content */}
                                 <EpisodeContentSection className="w-full p-0 bg-transparent" />
+                            </div>
+                        )}
+                    </div>
 
-                                {isError ? (
-                                    <div className="typo-body-14-medium text-red-100">
-                                        에피소드 정보를 불러오지 못했습니다.
-                                    </div>
-                                ) : null}
-
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    layout="fullWidth"
-                                    className="py-3 rounded-xl"
-                                    disabled={isLoading || isPending}
-                                >
-                                    {isPending ? "저장 중..." : "저장하기"}
-                                </Button>
-                            </form>
-                        </FormProvider>
+                    {/* 3. 하단 푸터: hasText가 true일 때만 렌더링 */}
+                    {hasText && (
+                        <div className="shrink-0">
+                            <StarSheetFooter disabled={isLoading || isPending} isPending={isPending} />
+                        </div>
                     )}
-                </div>
-            </div>
+                </form>
+            </FormProvider>
         </aside>
     );
 }

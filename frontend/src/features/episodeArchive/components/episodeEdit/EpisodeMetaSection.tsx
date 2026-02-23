@@ -12,7 +12,7 @@ export default function EpisodeMetaSection({ className, onCancel, isSubmitting =
     return (
         <div className={cn("flex flex-col h-full", className)}>
             <div className="flex-1 overflow-y-auto">
-                <h3 className="typo-body-14-semibold text-text-main1 mb-4">역량 태그</h3>
+                <h3 className="typo-body-16-semibold text-text-main1 mb-4">역량 태그</h3>
                 <EpisodeCompetencyChipGroup isDisabled={isSubmitting} />
             </div>
 
