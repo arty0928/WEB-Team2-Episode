@@ -51,6 +51,7 @@ public class MindmapService {
     private final EpisodeRepository episodeRepository;
     private final EpisodeStarRepository episodeStarRepository;
     private final CompetencyTypeService competencyTypeService;
+    private static final int MAX_LENGTH = 20;
 
     public MindmapDetailRes getMindmapById(Long userId, UUID mindmapId) {
 
@@ -115,12 +116,13 @@ public class MindmapService {
     @Transactional
     public MindmapSummaryRes saveMindmapAndParticipant(long userId, MindmapCreateReq body, UUID mindmapId) {
         User user = userService.getUserOrThrow(userId);
-        String finalTitle = body.title();
-        if (finalTitle == null || finalTitle.isBlank()) {
-            if (body.isShared()) throw new CustomException(ErrorCode.MINDMAP_TITLE_REQUIRED);
+        String finalTitle;
+        if (body.isShared()) {
+            finalTitle = body.title();
+            if (finalTitle == null || finalTitle.isBlank()) throw new CustomException(ErrorCode.MINDMAP_TITLE_REQUIRED);
+        } else {
             finalTitle = getPrivateMindmapName(user);
         }
-
         Mindmap mindmap = new Mindmap(mindmapId, finalTitle, body.isShared());
         mindmapRepository.save(mindmap);
 
@@ -134,13 +136,38 @@ public class MindmapService {
         return snapshotRepository.createPresignedUploadInfo(s3ObjectKeyGenerator.generateMindmapSnapshotKey(mindmapId));
     }
 
+    private String trimBaseKeepSuffix(String baseName, int number) {
+        String suffix = "(" + number + ")";
+        String ellipsis = "…";
+
+        if (baseName.length() + suffix.length() <= MAX_LENGTH) {
+            return baseName + suffix;
+        }
+        int allowedBaseLen = MAX_LENGTH - suffix.length() - ellipsis.length();
+        if (allowedBaseLen <= 0) {
+            return ellipsis + suffix;
+        }
+
+        return baseName.substring(0, allowedBaseLen) + ellipsis + suffix;
+    }
+
+    private String trimWithEllipsis(String name) {
+        if (name.length() <= MAX_LENGTH) {
+            return name;
+        }
+        return name.substring(0, MAX_LENGTH - 1) + "…";
+    }
+
     private String getPrivateMindmapName(User user) {
-        String baseName = user.getNickname() + MindmapConstants.PRIVATE_NAME;
+        String rawBaseName = user.getNickname() + MindmapConstants.PRIVATE_NAME;
+        String baseName = trimWithEllipsis(rawBaseName);
+
         List<String> allNames = mindmapRepository.findAllNamesByBaseName(baseName, user.getKakaoId());
 
         if (allNames.isEmpty()) {
             return baseName;
         }
+
         int maxNum = -1;
         boolean baseNameExists = false;
         String prefixWithBracket = baseName + "(";
@@ -159,16 +186,10 @@ public class MindmapService {
             }
         }
         if (!baseNameExists) {
-            return baseName;
+            return trimWithEllipsis(baseName);
         }
-        StringBuilder sb = new StringBuilder(baseName);
-        if (maxNum == -1) {
-            sb.append("(1)");
-        } else {
-            sb.append("(").append(maxNum + 1).append(")");
-        }
-
-        return sb.toString();
+        int nextNum = (maxNum == -1) ? 1 : (maxNum + 1);
+        return trimBaseKeepSuffix(baseName, nextNum);
     }
 
     @Transactional

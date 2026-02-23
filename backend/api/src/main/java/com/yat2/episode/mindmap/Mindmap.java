@@ -37,7 +37,7 @@ public class Mindmap implements Persistable<UUID> {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "name", nullable = false, length = 43)
+    @Column(name = "name", nullable = false, length = 20)
     private String name;
 
     @Column(name = "is_shared", nullable = false)

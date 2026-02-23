@@ -116,7 +116,9 @@ public class MindmapController {
     @PostMapping()
     public ResponseEntity<MindmapUploadUrlRes> createMindmap(
             @RequestAttribute(USER_ID) long userId,
-            @RequestBody MindmapCreateReq reqBody
+            @Valid
+            @RequestBody
+            MindmapCreateReq reqBody
     ) {
         UUID uuid = UuidCreator.getTimeOrderedEpoch();
         S3UploadFieldsRes presignedData = mindmapService.getUploadInfo(uuid);
