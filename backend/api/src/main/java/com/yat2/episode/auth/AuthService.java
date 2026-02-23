@@ -31,7 +31,7 @@ public class AuthService {
         KakaoTokenResponse kakaoResponse = kakaoOAuthClient.requestToken(code);
         JWTClaimsSet claims = kakaoIdTokenVerifier.verify(kakaoResponse.idToken());
 
-        Long kakaoUserId = Long.parseLong(claims.getSubject());
+        long kakaoUserId = Long.parseLong(claims.getSubject());
 
         String nickname = Optional.ofNullable((String) claims.getClaim("nickname")).orElse("USER_" + kakaoUserId);
 
@@ -47,17 +47,12 @@ public class AuthService {
         return tokens;
     }
 
-    public Long getUserIdByToken(String token) {
-        return authJwtProvider.verifyAccessTokenAndGetUserId(token);
-    }
-
     @Transactional
     public AuthTokens refresh(String refreshToken) {
-        Long userId = authJwtProvider.verifyRefreshTokenAndGetUserId(refreshToken);
-        refreshTokenService.validateSession(refreshToken);
+        long userId = authJwtProvider.verifyRefreshTokenAndGetUserId(refreshToken);
 
         AuthTokens tokens = authJwtProvider.issueTokens(userId);
-        refreshTokenService.upsert(userId, tokens.refreshToken(), refreshToken);
+        refreshTokenService.rotateOrThrow(userId, tokens.refreshToken(), refreshToken);
 
         return tokens;
     }

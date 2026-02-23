@@ -37,23 +37,16 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void upsert(Long userId, String newRefreshToken, String beforeRefreshToken) {
+    public void rotateOrThrow(Long userId, String newRefreshToken, String beforeRefreshToken) {
         String beforeHash = hash(beforeRefreshToken);
         String newHash = hash(newRefreshToken);
         LocalDateTime expiresAt = LocalDateTime.now().plus(Duration.ofMillis(authJwtProperties.refreshTokenExpiry()));
 
-        RefreshToken rt = refreshTokenRepository.findByTokenHashAndUser_KakaoId(beforeHash, userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+        int updated = refreshTokenRepository.rotateIfMatch(userId, beforeHash, newHash, expiresAt);
 
-        rt.rotate(newHash, expiresAt);
-    }
-
-    @Transactional(readOnly = true)
-    public void validateSession(String refreshToken) {
-        String tokenHash = hash(refreshToken);
-
-        refreshTokenRepository.findByTokenHash(tokenHash)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
+        if (updated == 0) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
     }
 
     @Transactional
