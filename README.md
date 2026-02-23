@@ -95,7 +95,7 @@
             </td>
             <td>
                 <img src="https://img.shields.io/badge/Notion-000000?logo=Notion&style=for-the-badge">
-                <img src="https://img.shields.io/badge/Figma-F24E1E?logo=Figma&logoColor=ffffff&style=for-the-badge">
+                <a href="https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/Handoff_guidelines_소프티어-7기--복사-?node-id=1-6&p=f&t=Z0PIWuZECLYFK4GB-0"><img src="https://img.shields.io/badge/Figma-F24E1E?logo=Figma&logoColor=ffffff&style=for-the-badge"></a>
                 <img src="https://img.shields.io/badge/slack-4A154B?logo=slack&logoColor=white&style=for-the-badge"/>
             </td>
         </tr>
