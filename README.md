@@ -190,10 +190,10 @@ dev → (feat|fix|design|chore|refactor)/#이슈번호/작업내용
 | `chore` | 설정 및 단순 기타 작업 |
 | `docs` | 문서 수정 |
 | `test` | 테스트 코드 추가 |
+<br />
+<br />
 </details>
 
-<br />
-<br />
 
 <details>
 <summary>🎯 팀 그라운드 룰</summary>
