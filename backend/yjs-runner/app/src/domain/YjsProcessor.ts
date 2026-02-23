@@ -8,9 +8,41 @@ export interface YjsProcessor {
     getSnapshotFromDoc(doc: Y.Doc): Uint8Array;
 }
 
+function hasUnresolvedPending(doc: Y.Doc): boolean {
+    const store: any = (doc as any).store;
+    const pending = store?.pendingStructs;
+
+    if (!pending) return false;
+
+    const hasClientPending = pending.clients && pending.clients.size > 0;
+
+    const hasMissing = pending.missing && pending.missing.size > 0;
+
+    return hasClientPending || hasMissing;
+}
+
+function logPending(doc: Y.Doc) {
+    const store: any = (doc as any).store;
+
+    if (!store?.pendingStructs) return;
+
+    console.warn(`[YjsProcessor] ⚠ Pending Structs detected`);
+
+    const clients = Array.from(store.pendingStructs.clients.keys());
+    console.warn("Pending clientIds:", clients);
+
+    console.warn("Missing state vector:", store.pendingStructs.missing);
+}
+
 export class DefaultYjsProcessor implements YjsProcessor {
     buildUpdatedSnapshot(baseSnapshot: Uint8Array, updates: Uint8Array[]): Uint8Array {
-        return Y.encodeStateAsUpdate(this.getUpdatedYDocFromSnapshot(baseSnapshot, updates));
+        const doc = this.getUpdatedYDocFromSnapshot(baseSnapshot, updates);
+
+        if (hasUnresolvedPending(doc)) {
+            logPending(doc);
+        }
+
+        return Y.encodeStateAsUpdate(doc);
     }
 
     getUpdatedYDocFromSnapshot(baseSnapshot: Uint8Array, updates: Uint8Array[]): Y.Doc {
@@ -37,6 +69,11 @@ export class DefaultYjsProcessor implements YjsProcessor {
     }
 
     getSnapshotFromDoc(doc: Y.Doc): Uint8Array {
+        if (hasUnresolvedPending(doc)) {
+            logPending(doc);
+            // throw new Error("Unresolved pending structs detected before snapshot");
+        }
+
         try {
             return Y.encodeStateAsUpdate(doc);
         } catch (e) {
