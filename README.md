@@ -58,27 +58,9 @@
 <img width="100%" alt="STAR 상세화면" src="https://github.com/user-attachments/assets/0f964638-f9b7-418f-add6-e921b5457cd0" />
 
 <br />
+<br />
 
 ## 🛠 기술 스택
-
-| 분류 | 기술 스택 |
-| :--- | :--- |
-| **Frontend** | ![React](https://img.shields.io/badge/React-61DAFB?logo=React&logoColor=white&style=for-the-badge) ![TailwindCSS](https://img.shields.io/badge/tailwindcss-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge) ![ReactQuery](https://img.shields.io/badge/reactquery-FF4154?logo=reactquery&logoColor=white&style=for-the-badge) ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge) |
-| **Backend** | ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?logo=SpringBoot&logoColor=white&style=for-the-badge) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=MySQL&logoColor=white&style=for-the-badge) ![Flyway](https://img.shields.io/badge/Flyway-CC0200.svg?style=for-the-badge&logo=Flyway&logoColor=white) ![JPA](https://img.shields.io/badge/JPA-FF4716?logo=JPA&logoColor=white&style=for-the-badge) ![Node.js](https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white) ![Redis Stream](https://img.shields.io/badge/Redis_Stream-FF4438?logo=redis&logoColor=white&style=for-the-badge) |
-| **DevOps** | ![Caddy](https://img.shields.io/badge/Caddy-1F88C0.svg?style=for-the-badge&logo=Caddy&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=Docker&logoColor=white&style=for-the-badge) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white&style=for-the-badge) |
-| **Collaboration** | ![Notion](https://img.shields.io/badge/Notion-000000?logo=Notion&style=for-the-badge) ![Figma](https://img.shields.io/badge/Figma-F24E1E?logo=Figma&logoColor=white&style=for-the-badge) ![Slack](https://img.shields.io/badge/Slack-4A154B?logo=slack&logoColor=white&style=for-the-badge) |
-
-<br />
-
-## 🏗 프로젝트 아키텍처
-
-<img width="100%" alt="아키텍처" src="https://github.com/user-attachments/assets/fa52f9df-f600-4e45-8bf4-feddecfc430a" />
-
-<br />
-<br />
-
-### 개발 위키 및 기술 문서
-
 <table>
     <thead>
         <tr>
@@ -113,7 +95,7 @@
         </tr>
                 <tr>
             <td>
-                <p>배포</p>
+                <p>인프라</p>
             </td>
             <td>
                 <img src="https://img.shields.io/badge/Caddy-1F88C0.svg?style=for-the-badge&logo=Caddy&logoColor=white">
@@ -134,6 +116,13 @@
         </tr>
     </tbody>
 </table>
+
+<br />
+<br />
+
+## 🏗 프로젝트 아키텍처
+
+<img width="80%" alt="아키텍처" src="https://github.com/user-attachments/assets/fa52f9df-f600-4e45-8bf4-feddecfc430a" />
 
 <br />
 <br />
@@ -202,6 +191,9 @@ dev → (feat|fix|design|chore|refactor)/#이슈번호/작업내용
 | `docs` | 문서 수정 |
 | `test` | 테스트 코드 추가 |
 </details>
+
+<br />
+<br />
 
 <details>
 <summary>🎯 팀 그라운드 룰</summary>
