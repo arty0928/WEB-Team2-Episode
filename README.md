@@ -36,11 +36,9 @@
 ### 다 같이 정리하는 팀 마인드맵
 ![Adobe Express - 화면 기록 2026-02-23 오전 4 05 40 (online-video-cutter com) (1)](https://github.com/user-attachments/assets/d7376794-7ee8-4ce6-840d-569dfb3c4fe2)
 
-
-### 마인드맵 내 특정 역량에 대한 경험을 검색해보세요!
-
 ### 마인드맵의 노드와 연결되는 STAR 정리
 
+<img width="1728" height="1081" alt="image" src="https://github.com/user-attachments/assets/0f964638-f9b7-418f-add6-e921b5457cd0" />
 
 
 ## 🔧 기술 스택
