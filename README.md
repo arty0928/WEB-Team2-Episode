@@ -14,7 +14,9 @@
 
 ## 🚀 서비스 설명
 
-> **"복잡한 경험 정리를 시각적인 마인드맵과 검증된 STAR 기법으로 완성하세요."** > 사용자는 활동 타입 – 활동명 – 상세 경험으로 이어지는 구조를 통해 커리어 맵을 시각화하고, 핵심 역량 태그를 통해 체계적으로 관리할 수 있습니다.⛓️‍💥📑
+> **"복잡한 경험 정리를 시각적인 마인드맵과 검증된 STAR 기법으로 완성하세요."**
+
+사용자는 활동 타입 – 활동명 – 상세 경험으로 이어지는 구조를 통해 커리어 맵을 시각화하고, 핵심 역량 태그를 통해 체계적으로 관리할 수 있습니다.⛓️‍💥📑
 
 <br/>
 
@@ -67,6 +69,26 @@
 
 <img width="100%" alt="아키텍처" src="https://github.com/user-attachments/assets/fa52f9df-f600-4e45-8bf4-feddecfc430a" />
 
+<br />
+<br />
+
+### 개발 위키 및 기술 문서
+
+| FE (박세현/박은서) | BE (김우주/김현지) |
+| :--- | :--- |
+| 마인드맵 엔진 설계 및 로직 구현 | WebSocket Relay 서버 구조 설계 |
+| 마인드맵 엔진 통합 및 yjs 부착 | Snapshot/Sync 처리 로직 최적화 |
+| 실시간 동시 편집 적용 | Job Stream 활용 및 Relay 처리 |
+| [황당한 Rerendering 트러블슈팅](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%ED%99%A9%EB%8B%B9%ED%95%9C-rerendering-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85) | [초기 서버 세팅 과정](https://github.com/softeerbootcamp-7th/Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-%EC%B4%88%EA%B8%B0-%EC%84%9C%EB%B2%84-%EC%84%B8%ED%8C%85) |
+| [같은 기능을 함께 개발해보자](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%EA%B0%99%EC%9D%80-%EA%B8%B0%EB%8A%A5%EC%9D%84-%ED%95%A8%EA%BB%98-%EA%B0%9C%EB%B0%9C%ED%95%B4%EB%B3%B4%EC%9E%90) | [S3 Presigned URL 도입](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-S3-Presigned-URL-%EB%8F%84%EC%9E%85-%EA%B3%BC%EC%A0%95) |
+| [Tailwind CSS 동적 class 적용](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-Tailwind-CSS-%EB%8F%99%EC%A0%81-class-%EC%A0%81%EC%9A%A9-%ED%83%90%EC%83%89%EA%B8%B0) | [JdbcTemplate vs JPA Bulk 처리](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-(%EA%B3%A0%EB%AF%BC-%EA%B8%B0%EB%A1%9D)-JdbcTemplate-%ED%99%9C%EC%9A%A9-vs-JPA-%EA%B8%B0%EB%B0%98-Bulk-%EC%B2%98%EB%A6%AC-%EC%84%A0%ED%83%9D) |
+| [Zustand 상태 관리 도입 고민](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-%ED%81%B4%EB%9D%BC%EC%9D%B4%EC%96%B8%ED%8A%B8-%EC%83%81%ED%83%9C-%EA%B4%80%EB%A6%AC%EB%A5%BC-%EC%9C%84%ED%95%B4-zustand%EB%A5%BC-%EC%8D%A8%EC%95%BC-%ED%95%A0%EA%B9%8C%3F) | Redis Stream 최대 크기 계산 |
+| [고스트 노드 로직 설계](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-3%EB%B2%88-%EA%B0%88%EC%95%84%EC%97%8E%EC%9D%80-%EA%B3%A0%EC%8A%A4%ED%8A%B8-%EB%85%B8%EB%93%9C-%EB%A1%9C%EC%A7%81-%EC%84%A4%EA%B3%84) | |
+| [쿼드 트리 탐색 최적화](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-%ED%83%90%EC%83%89%EC%9D%84-%EB%B9%A0%EB%A5%B4%EA%B2%8C-%ED%95%98%EB%8A%94-%EC%BF%BC%EB%93%9C-%ED%8A%B8%EB%A6%AC-%EC%84%A4%EA%B3%84) | |
+| 브로커 패턴/웹소켓 안정화/AI 활용 | |
+| 마인드맵 리렌더링 및 의존성 최적화 | |
+
+<br />
 <br />
 
 ## 🤝 협업 및 그라운드 룰
