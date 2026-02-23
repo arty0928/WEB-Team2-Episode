@@ -19,7 +19,7 @@
 사용자는 활동 타입 – 활동명 – 상세 경험으로 이어지는 구조를 통해 커리어 맵을 시각화하고, 핵심 역량 태그를 통해 체계적으로 관리할 수 있습니다.⛓️‍💥📑
 
 
-<a href="https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/-2%EC%96%8F---Handoff_guidelines_%EC%86%8C%ED%94%84%ED%8B%B0%EC%96%B4-7%EA%B8%B0?node-id=1-6&p=f&t=Dd0NeyvcODzmZRCo-0"><strong> 👾 기획서</strong></a>
+<a href="https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/-2%EC%96%8F---Handoff_guidelines_%EC%86%8C%ED%94%84%ED%8B%B0%EC%96%B4-7%EA%B8%B0?node-id=1-6&p=f&t=Dd0NeyvcODzmZRCo-0"><strong> 👾 기획/디자인 문서</strong></a>
 
 
 
