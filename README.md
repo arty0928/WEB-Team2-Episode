@@ -74,19 +74,61 @@
 
 ### 개발 위키 및 기술 문서
 
-| FE (박세현/박은서) | BE (김우주/김현지) |
-| :--- | :--- |
-| 마인드맵 엔진 설계 및 로직 구현 | WebSocket Relay 서버 구조 설계 |
-| 마인드맵 엔진 통합 및 yjs 부착 | Snapshot/Sync 처리 로직 최적화 |
-| 실시간 동시 편집 적용 | Job Stream 활용 및 Relay 처리 |
-| [황당한 Rerendering 트러블슈팅](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%ED%99%A9%EB%8B%B9%ED%95%9C-rerendering-%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85) | [초기 서버 세팅 과정](https://github.com/softeerbootcamp-7th/Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-%EC%B4%88%EA%B8%B0-%EC%84%9C%EB%B2%84-%EC%84%B8%ED%8C%85) |
-| [같은 기능을 함께 개발해보자](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%EA%B0%99%EC%9D%80-%EA%B8%B0%EB%8A%A5%EC%9D%84-%ED%95%A8%EA%BB%98-%EA%B0%9C%EB%B0%9C%ED%95%B4%EB%B3%B4%EC%9E%90) | [S3 Presigned URL 도입](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-S3-Presigned-URL-%EB%8F%84%EC%9E%85-%EA%B3%BC%EC%A0%95) |
-| [Tailwind CSS 동적 class 적용](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-Tailwind-CSS-%EB%8F%99%EC%A0%81-class-%EC%A0%81%EC%9A%A9-%ED%83%90%EC%83%89%EA%B8%B0) | [JdbcTemplate vs JPA Bulk 처리](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5B%EA%B0%9C%EB%B0%9C-%EC%9C%84%ED%82%A4%5D-(%EA%B3%A0%EB%AF%BC-%EA%B8%B0%EB%A1%9D)-JdbcTemplate-%ED%99%9C%EC%9A%A9-vs-JPA-%EA%B8%B0%EB%B0%98-Bulk-%EC%B2%98%EB%A6%AC-%EC%84%A0%ED%83%9D) |
-| [Zustand 상태 관리 도입 고민](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-%ED%81%B4%EB%9D%BC%EC%9D%B4%EC%96%B8%ED%8A%B8-%EC%83%81%ED%83%9C-%EA%B4%80%EB%A6%AC%EB%A5%BC-%EC%9C%84%ED%95%B4-zustand%EB%A5%BC-%EC%8D%A8%EC%95%BC-%ED%95%A0%EA%B9%8C%3F) | Redis Stream 최대 크기 계산 |
-| [고스트 노드 로직 설계](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-3%EB%B2%88-%EA%B0%88%EC%95%84%EC%97%8E%EC%9D%80-%EA%B3%A0%EC%8A%A4%ED%8A%B8-%EB%85%B8%EB%93%9C-%EB%A1%9C%EC%A7%81-%EC%84%A4%EA%B3%84) | |
-| [쿼드 트리 탐색 최적화](https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki/%5BFE%5D-%ED%83%90%EC%83%89%EC%9D%84-%EB%B9%A0%EB%A5%B4%EA%B2%8C-%ED%95%98%EB%8A%94-%EC%BF%BC%EB%93%9C-%ED%8A%B8%EB%A6%AC-%EC%84%A4%EA%B3%84) | |
-| 브로커 패턴/웹소켓 안정화/AI 활용 | |
-| 마인드맵 리렌더링 및 의존성 최적화 | |
+<table>
+    <thead>
+        <tr>
+            <th>분류</th>
+            <th>기술 스택</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                  <p>프론트엔드</p>
+            </td>
+            <td>
+                  <img src="https://img.shields.io/badge/React-61DAFB?logo=React&logoColor=white&style=for-the-badge">
+                  <img src="https://img.shields.io/badge/tailwindcss-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge"/>
+                  <img src="https://img.shields.io/badge/reactquery-FF4154?logo=reactquery&logoColor=white&style=for-the-badge">
+                  <img src="https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white/&style=for-the-badge"> 
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>백엔드</p>
+            </td>
+            <td>
+                <img src="https://img.shields.io/badge/Spring Boot-6DB33F?logo=SpringBoot&logoColor=d1d2d3&&style=for-the-badge">
+                <img src="https://img.shields.io/badge/MySQL-4479A1?logo=MySQL&logoColor=white&style=for-the-badge"/>
+                <img src="https://img.shields.io/badge/Flyway-CC0200.svg?style=for-the-badge&logo=Flyway&logoColor=white"/>
+                <img src="https://img.shields.io/badge/JPA-FF4716?logo=JPA&logoColor=white&style=for-the-badge"/>
+                <img src="https://img.shields.io/badge/node.js-%23339933.svg?&style=for-the-badge&logo=node.js&logoColor=white" />
+                <img src="https://img.shields.io/badge/Redis Stream-FF4438?logo=redis&logoColor=white&style=for-the-badge"/>
+            </td>
+        </tr>
+                <tr>
+            <td>
+                <p>배포</p>
+            </td>
+            <td>
+                <img src="https://img.shields.io/badge/Caddy-1F88C0.svg?style=for-the-badge&logo=Caddy&logoColor=white">
+                <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white">
+                <img src="https://img.shields.io/badge/Docker-2496ED?&logo=Docker&logoColor=white&style=for-the-badge">
+                <img src="https://img.shields.io/badge/GitHub Actions-000000?logo=github-actions&style=for-the-badge">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p>협업</p>
+            </td>
+            <td>
+                <img src="https://img.shields.io/badge/Notion-000000?logo=Notion&style=for-the-badge">
+                <a href="https://www.figma.com/design/hTYvt1ufIO462HogLTosKe/Handoff_guidelines_소프티어-7기--복사-?node-id=1-6&p=f&t=Z0PIWuZECLYFK4GB-0"><img src="https://img.shields.io/badge/Figma-F24E1E?logo=Figma&logoColor=ffffff&style=for-the-badge"></a>
+                <img src="https://img.shields.io/badge/slack-4A154B?logo=slack&logoColor=white&style=for-the-badge"/>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <br />
 <br />
@@ -97,11 +139,50 @@
 <summary>🌿 협업 전략 (브랜치 & 커밋 컨벤션)</summary>
 
 ### 브랜치 전략
-`main → dev → feature/#이슈번호/작업내용` 구조를 사용합니다.
 
-* **브랜치 생성**: 모든 브랜치는 이슈에서 생성하며, 작업 단위별로 브랜치를 분리합니다.
-* **Merge 규칙**: 최소 **2명 이상의 Approve**가 필요합니다.
-* **충돌 방지**: dev 브랜치를 수시로 rebase하며, 의존 작업은 Mock 데이터를 활용해 병렬 진행합니다.
+우리 프로젝트는 **`dev` 브랜치를 메인 브랜치로** 사용합니다.
+
+브랜치 흐름은 다음과 같습니다.
+
+```
+dev → (feat|fix|design|chore|refactor)/#이슈번호/작업내용
+```
+
+
+#### 📌 브랜치 운영 원칙
+
+- **브랜치 단위**  
+  하나의 **Issue = 하나의 작업 단위**입니다.  
+  각 Issue는 작업 유형에 따라 아래와 같은 형식의 브랜치로 생성되며, 하나의 PR로 관리합니다.
+
+  ```
+  (feat|fix|design|chore|refactor)/#이슈번호/작업내용
+  ```
+
+- **브랜치 생성**  
+  모든 작업은 Issue 생성 후, `dev` 브랜치에서 분기하여 진행합니다.
+
+- **dev 브랜치 반영 방식**  
+  작업 중 최신 변경 사항을 반영하기 위해,  
+  rebase가 아닌 **merge commit 방식으로 `dev` 브랜치를 작업 브랜치에 병합**합니다.
+
+- **Merge 규칙**  
+  `dev` 브랜치로 병합 시 **최소 1명 이상의 Approve**가 필요합니다.
+
+- **Merge 방식**  
+  `dev` 브랜치로 병합할 때는 **Squash Merge**를 사용합니다.  
+  이를 통해 하나의 Issue 작업이 하나의 커밋으로 정리되도록 유지합니다.
+
+
+#### 🚀 배포 전략
+
+- 배포는 `dev` 브랜치를 기준으로 진행합니다.
+- 배포는 GitHub Actions **Release 워크플로우** 수동 실행으로 시작합니다.
+- 수동 실행 시, 워크플로우가 **Semantic Versioning** 규칙에 따라 `v0.0.0` 형식의 **태그를 생성/푸시**합니다.
+- 태그 생성을 트리거로 **배포 워크플로우가 자동 실행**됩니다.
+- 배포 과정에서 **GitHub Release가 자동 생성**되며, 태그를 기준으로 배포/릴리즈 이력을 관리합니다.
+
+<br/>
 
 ### 커밋 규칙
 `type: 한글 메시지` 형식으로 작성합니다.
