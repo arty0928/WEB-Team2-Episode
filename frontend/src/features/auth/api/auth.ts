@@ -19,7 +19,7 @@ export const logout = async (): Promise<void | ApiError> => {
     }
 };
 
-export const fetchCurrentUser = async (skipRefresh = true): Promise<User | null> => {
+export const fetchCurrentUser = async (skipRefresh = false): Promise<User | null> => {
     try {
         return await get<User>({
             endpoint: USER_ME_ENDPOINT,
@@ -35,6 +35,6 @@ export const fetchCurrentUser = async (skipRefresh = true): Promise<User | null>
 
 export const authQueryOptions = queryOptions({
     queryKey: AUTH_QUERY_KEYS.user,
-    queryFn: () => fetchCurrentUser(true),
+    queryFn: () => fetchCurrentUser(false),
     staleTime: 1000 * 60 * 5,
 });

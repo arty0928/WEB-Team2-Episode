@@ -19,7 +19,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const { data: user } = useSuspenseQuery<User | null>({
         queryKey: AUTH_QUERY_KEYS.user,
-        queryFn: () => fetchCurrentUser(true),
+        queryFn: () => fetchCurrentUser(false),
         retry: false,
     });
 
@@ -29,8 +29,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     const logoutMutation = useMutation({
         mutationFn: async () => logoutApi(),
-        onSuccess: () => {
-            queryClient.removeQueries({ queryKey: AUTH_QUERY_KEYS.user });
+        onSuccess: async () => {
+            await queryClient.cancelQueries();
+            queryClient.setQueryData(AUTH_QUERY_KEYS.user, null);
+            queryClient.clear();
+
             navigate(`${linkTo.home()}?${AUTH_MESSAGES.AUTH_ERROR}=${AUTH_MESSAGES.LOGOUT}`, { replace: true }); // 뒤로 가기 히스토리 제어, 보호 라우트는 middleware가 막아 landing으로 튕김
         },
     });

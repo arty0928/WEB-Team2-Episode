@@ -8,6 +8,7 @@ import { BadRequestError, InternalServerError, NotFoundError } from "@/shared/ut
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const TOKEN_REFRESH_ERROR = new ApiError(401, "TOKEN_EXPIRED", ERROR_CODES.TOKEN_EXPIRED);
+
 /**
  * 토큰 만료 시 자동 갱신 및 재시도하는 API 요청 래퍼
  * @throws {ApiError} 모든 에러를 ApiError 타입으로 변환하여 던집니다
@@ -53,6 +54,7 @@ export async function fetchWithAuth<T>(endpoint: string, options: FetchOptions =
             const { isRefreshing, refreshPromise } = getRefreshState();
 
             let refreshed = false;
+
             if (isRefreshing && refreshPromise) {
                 refreshed = await refreshPromise;
             } else {
@@ -90,8 +92,6 @@ export async function fetchWithAuth<T>(endpoint: string, options: FetchOptions =
             switch (status) {
                 case 400:
                     throw new BadRequestError(message);
-                // case 401:
-                //     throw new UnauthorizedError(message);
                 case 404:
                     throw new NotFoundError(message);
                 case 500:
