@@ -4,6 +4,7 @@ import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
 import { ENV } from "@/constants/env";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ApiError } from "@/features/auth/types/api";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { post } from "@/shared/api/method";
@@ -70,6 +71,7 @@ type Props = {
 };
 
 export function useMindmapSession({ mindmapId }: Props) {
+    const { logout } = useAuth();
     const doc = useMemo(() => new Y.Doc(), [mindmapId]);
     const [provider, setProvider] = useState<WebsocketProvider | undefined>(undefined);
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
@@ -177,6 +179,13 @@ export function useMindmapSession({ mindmapId }: Props) {
                 setProvider(wsProvider);
             } catch (err) {
                 console.error("❌ 세션 연결 실패:", err);
+
+                if (err instanceof ApiError && err.status === 401) {
+                    toast.error("세션이 만료되었습니다. 다시 로그인해주세요.");
+
+                    await logout();
+                    return;
+                }
                 if (isUnmountedRef.current) return;
 
                 if (retryCount < MAX_RETRY) {
