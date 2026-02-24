@@ -1,11 +1,13 @@
 package com.yat2.episode.collaboration;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
+import org.springframework.web.socket.handler.SessionLimitExceededException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ import com.yat2.episode.collaboration.config.WebSocketProperties;
 
 import static com.yat2.episode.global.constant.AttributeKeys.CONNECTED_AT;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class SessionRegistry {
@@ -66,32 +69,49 @@ public class SessionRegistry {
         ConcurrentHashMap<String, WebSocketSession> sessions = rooms.get(mindmapId);
         if (sessions == null || sessions.isEmpty()) return;
 
-        BinaryMessage message = new BinaryMessage(payload);
-        List<String> deadSessionIds = new ArrayList<>();
-
         final String senderId = (sender == null) ? null : sender.getId();
+        final int len = (payload == null) ? 0 : payload.length;
+
+        List<String> deadSessionIds = null;
 
         for (Map.Entry<String, WebSocketSession> entry : sessions.entrySet()) {
             String sessionId = entry.getKey();
             WebSocketSession session = entry.getValue();
 
-            if (senderId != null && senderId.equals(sessionId)) {
-                continue;
-            }
+            if (senderId != null && senderId.equals(sessionId)) continue;
 
-            if (!session.isOpen()) {
+            if (session == null || !session.isOpen()) {
+                if (deadSessionIds == null) deadSessionIds = new ArrayList<>();
                 deadSessionIds.add(sessionId);
                 continue;
             }
 
             try {
-                session.sendMessage(message);
-            } catch (Exception ignored) {
+                if (payload == null) {
+                    return;
+                }
+                session.sendMessage(new BinaryMessage(payload));
+
+            } catch (SessionLimitExceededException e) {
+                if (deadSessionIds == null) deadSessionIds = new ArrayList<>();
+                deadSessionIds.add(sessionId);
+
+                log.warn("[WS][LIMIT] mindmapId={} sessionId={} senderId={} payloadBytes={} msg={}", mindmapId,
+                         sessionId, senderId, len, e.getMessage());
+
+            } catch (Exception e) {
+                if (deadSessionIds == null) deadSessionIds = new ArrayList<>();
+                deadSessionIds.add(sessionId);
+
+                log.debug("[WS][SEND_FAIL] mindmapId={} sessionId={} senderId={} payloadBytes={} ex={}", mindmapId,
+                          sessionId, senderId, len, e.toString());
             }
         }
 
-        for (String deadId : deadSessionIds) {
-            removeSession(mindmapId, deadId);
+        if (deadSessionIds != null) {
+            for (String deadId : deadSessionIds) {
+                removeSession(mindmapId, deadId);
+            }
         }
     }
 

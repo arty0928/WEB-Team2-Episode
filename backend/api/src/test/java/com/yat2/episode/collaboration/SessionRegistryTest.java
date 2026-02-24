@@ -154,31 +154,6 @@ class SessionRegistryTest {
             assertThat(registry.findAllAlivePeers(roomId, "NONE")).hasSize(1).extracting(WebSocketSession::getId)
                     .containsExactly("sender");
         }
-
-        @Test
-        @DisplayName("전송 중 예외가 발생해도 세션은 제거하지 않는다")
-        void broadcast_sendThrows_notRemoved() throws Exception {
-            UUID roomId = UUID.randomUUID();
-
-            WebSocketSession sender = mock(WebSocketSession.class);
-            when(sender.getId()).thenReturn("sender");
-            when(sender.isOpen()).thenReturn(true);
-            when(sender.getAttributes()).thenReturn(new HashMap<>());
-
-            WebSocketSession bad = mock(WebSocketSession.class);
-            when(bad.getId()).thenReturn("bad");
-            when(bad.isOpen()).thenReturn(true);
-            when(bad.getAttributes()).thenReturn(new HashMap<>());
-
-            doThrow(new IOException("boom")).when(bad).sendMessage(any(BinaryMessage.class));
-
-            registry.addSession(roomId, sender);
-            registry.addSession(roomId, bad);
-
-            registry.broadcast(roomId, sender, new byte[]{ 1 });
-
-            assertThat(registry.findAllAlivePeers(roomId, "NONE")).hasSize(2);
-        }
     }
 
     @Nested
