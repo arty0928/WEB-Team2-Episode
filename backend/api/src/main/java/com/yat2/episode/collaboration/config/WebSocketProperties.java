@@ -9,6 +9,7 @@ public record WebSocketProperties(
         int sendTimeout,
         int bufferSize,
         int maxMessageSize,
+        int roomSessionLimit,
         String pathPrefix,
         List<String> allowedOriginPatterns
 ) {}

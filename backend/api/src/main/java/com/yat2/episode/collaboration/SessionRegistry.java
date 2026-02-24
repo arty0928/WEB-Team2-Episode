@@ -3,6 +3,7 @@ package com.yat2.episode.collaboration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
@@ -33,6 +34,17 @@ public class SessionRegistry {
             if (sessions == null) {
                 sessions = new ConcurrentHashMap<>();
             }
+
+            int limit = wsProperties.roomSessionLimit();
+
+            if (sessions.size() >= limit) {
+                try {
+                    decorated.close(new CloseStatus(4001, "ROOM_SESSION_LIMIT"));
+                } catch (Exception ignored) {
+                }
+                return sessions;
+            }
+
             sessions.put(decorated.getId(), decorated);
             return sessions;
         });

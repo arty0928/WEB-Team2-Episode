@@ -138,6 +138,7 @@ collaboration:
     allowed-origin-patterns:
       - "http://localhost:*"
       - "https://episode.io.kr"
+    room-session-limit: 20
 
   redis:
     update-stream:

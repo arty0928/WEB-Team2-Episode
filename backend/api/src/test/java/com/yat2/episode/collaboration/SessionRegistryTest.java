@@ -37,6 +37,7 @@ class SessionRegistryTest {
     void setUp() {
         wsProperties = mock(WebSocketProperties.class);
         when(wsProperties.sendTimeout()).thenReturn(1000);
+        when(wsProperties.roomSessionLimit()).thenReturn(1000);
         when(wsProperties.bufferSize()).thenReturn(1024 * 1024);
         registry = new SessionRegistry(wsProperties);
     }
