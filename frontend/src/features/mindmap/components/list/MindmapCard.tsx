@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { useDeleteMindmap } from "@/features/mindmap/hooks/useDeleteMindmap";
 import { useUpdateMindmapFavorite } from "@/features/mindmap/hooks/useUpdateMindmapFavorite";
 import { useUpdateMindmapName } from "@/features/mindmap/hooks/useUpdateMindmapName";
-import { MindmapItem, MindmapType } from "@/features/mindmap/types/mindmap";
+import { MindmapItem, MindmapType } from "@/features/mindmap/types/mindmapType";
 import Button from "@/shared/components/button/Button";
 import Card from "@/shared/components/card/Card";
 import Chip from "@/shared/components/chip/Chip";

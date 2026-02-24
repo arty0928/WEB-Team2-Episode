@@ -1,6 +1,6 @@
 import EpisodeSearch from "@/features/episodeArchive/components/EpisodeSearch";
 import MindmapFilter from "@/features/episodeArchive/components/MindmapFilter";
-import { MindmapItem } from "@/features/mindmap/types/mindmap";
+import { MindmapItem } from "@/features/mindmap/types/mindmapType";
 
 type Props = {
     mindmapList: MindmapItem[];

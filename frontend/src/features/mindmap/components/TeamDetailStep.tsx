@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 
 import { useInitializeMindmap } from "@/features/mindmap/hooks/useInitializeMindmap";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnelType";
 import BottomSticky from "@/shared/components/bottomSticky/BottomSticky";
 import Button from "@/shared/components/button/Button";
 import Input from "@/shared/components/Input/Input";

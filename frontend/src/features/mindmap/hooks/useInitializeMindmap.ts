@@ -3,7 +3,7 @@ import * as Y from "yjs";
 import { ENV } from "@/constants/env";
 import { useCreateMindmap } from "@/features/mindmap/hooks/useCreateMindmap";
 import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
-import { MindmapId } from "@/features/mindmap/types/mindmap";
+import { MindmapId } from "@/features/mindmap/types/mindmapType";
 import { makeDocWithArr } from "@/features/mindmap/utils/createDocWithArr";
 import { uploadToS3 } from "@/shared/utils/uploadToS3";
 

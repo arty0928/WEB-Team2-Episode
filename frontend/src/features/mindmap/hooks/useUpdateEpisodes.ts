@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { ApiError } from "@/features/auth/types/api";
 import { episodeArchiveQueryKeys } from "@/features/episodeArchive/api/episodeArchiveQueryKeys";
-import { MindmapId } from "@/features/mindmap/types/mindmap";
+import { MindmapId } from "@/features/mindmap/types/mindmapType";
 import { NodeId } from "@/features/mindmap/types/node";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { post } from "@/shared/api/method";

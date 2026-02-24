@@ -1,7 +1,7 @@
 import { TransactionTag } from "@/features/mindmap/constants/transaction";
-import { CollaboratorCursorsInfo, Collaborators, LocksInfo } from "@/features/mindmap/types/mindmapCollaboration";
-import { Listener, Unsubscribe } from "@/features/mindmap/types/mindmapController";
-import { DragSessionSnapshot, InteractionSnapshot } from "@/features/mindmap/types/mindmapInteraction";
+import { CollaboratorCursorsInfo, Collaborators, LocksInfo } from "@/features/mindmap/types/mindmapCollaborationType";
+import { Listener, Unsubscribe } from "@/features/mindmap/types/mindmapControllerType";
+import { DragSessionSnapshot, InteractionSnapshot } from "@/features/mindmap/types/mindmapInteractionType";
 import { NodeElement, NodeId } from "@/features/mindmap/types/node";
 
 export type StoreChannel =

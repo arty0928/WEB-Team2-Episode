@@ -6,6 +6,7 @@ import * as Y from "yjs";
 import ControllerSideBar from "@/features/mindmap/components/bar/ControllerSideBar";
 import { TeamMindmapShareModal } from "@/features/mindmap/components/TeamMindmapShareModal";
 import CollaborationList from "@/features/mindmap/core/CollaborationList";
+import CursorChatLayer from "@/features/mindmap/core/CursorChatLayer";
 import { MindmapProvider } from "@/features/mindmap/core/MindmapProvider";
 import MindmapRenderer from "@/features/mindmap/core/MindmapRenderer";
 import { useMindmapDetail } from "@/features/mindmap/hooks/useMindmapDetail";
@@ -13,7 +14,7 @@ import StarEpisodeHeaderIndicator from "@/features/mindmap/star/components/StarE
 import StarEpisodePanelOverlay from "@/features/mindmap/star/StarEpisodePanelOverlay";
 import { StarEpisodePanelProvider, useStarEpisodePanelActions } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import StarEpisodeTargetSync from "@/features/mindmap/star/StarEpisodeTargetSync";
-import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaboration";
+import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import HeaderToolBar from "@/shared/components/headerToolBar/HeaderToolBar";
 import { BaseError } from "@/shared/utils/errors";
 
@@ -87,6 +88,7 @@ const MindmapContent = ({
                             <svg ref={canvasRef} className="w-full h-full block">
                                 <MindmapRenderer isShared={mindmapData.isShared} />
                             </svg>
+                            <CursorChatLayer />
                             <StarEpisodePanelOverlay />
                         </div>
                     </div>

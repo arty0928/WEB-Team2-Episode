@@ -1,8 +1,8 @@
 import type * as Y from "yjs";
 
 import { MindmapConfig } from "@/features/mindmap/core/Mindmap";
-import { AwarenessLike, CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaboration";
-import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommand";
+import { AwarenessLike, CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
+import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommandType";
 import { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { MindmapStore, MindmapStoreState } from "@/features/mindmap/utils/mindmapStore";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/nativeLikeEvent";
@@ -47,6 +47,7 @@ export type IMindmapController = {
 
         lockNode(nodeId: NodeId): void;
         unlockNode(): void;
+        sendCursorChat(message: string): void;
     };
 
     input: {

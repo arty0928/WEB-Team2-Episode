@@ -1,7 +1,7 @@
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH, TEMP_NEW_NODE_ID } from "@/features/mindmap/constants/node";
 import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { NODE_COLORS, NodeColor } from "@/features/mindmap/node/constants/colors";
-import { TreeAdapter } from "@/features/mindmap/types/mindmapController";
+import { TreeAdapter } from "@/features/mindmap/types/mindmapControllerType";
 import type {
     AddNodeDirection,
     NodeDirection,

@@ -5,7 +5,7 @@ import MindmapEpisodeContainer from "@/features/episodeArchive/components/Episod
 import EpisodeHeader from "@/features/episodeArchive/components/EpisodeHeader";
 import { useEpisodeSearch } from "@/features/episodeArchive/hooks/useEpisodeSearch";
 import { useMindmapList } from "@/features/mindmap/hooks/useMindmapList";
-import { MINDMAP_TABS, MindmapTabId } from "@/features/mindmap/types/mindmap";
+import { MINDMAP_TABS, MindmapTabId } from "@/features/mindmap/types/mindmapType";
 import Spinner from "@/shared/components/spinner/Spinner";
 import Tab from "@/shared/components/tabs/Tab";
 import TabItem from "@/shared/components/tabs/TabItem";

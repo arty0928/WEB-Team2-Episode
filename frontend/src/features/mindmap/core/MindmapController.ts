@@ -12,15 +12,18 @@ import QuadTree from "@/features/mindmap/core/QuadTree";
 import { TreeModel } from "@/features/mindmap/core/TreeModel";
 import { ViewportController } from "@/features/mindmap/core/ViewportController";
 import { YjsAdapter } from "@/features/mindmap/core/YjsAdaptor";
-import { AwarenessLike, CollaboratorInfo, LockInfo } from "@/features/mindmap/types/mindmapCollaboration";
-import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommand";
+import { AwarenessLike, CollaboratorInfo, LockInfo } from "@/features/mindmap/types/mindmapCollaborationType";
+import { MindmapCommand, MindmapCommandMeta } from "@/features/mindmap/types/mindmapCommandType";
 import {
     AdapterChange,
     IMindmapController,
     MindmapOptions,
     TreeAdapter,
-} from "@/features/mindmap/types/mindmapController";
-import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmapInteraction";
+} from "@/features/mindmap/types/mindmapControllerType";
+import {
+    EMPTY_DRAG_SESSION_SNAPSHOT,
+    EMPTY_INTERACTION_SNAPSHOT,
+} from "@/features/mindmap/types/mindmapInteractionType";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { computeMindmapLayout } from "@/features/mindmap/utils/computeMindmapLayout";
 import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmapStore";
@@ -529,6 +532,10 @@ export class MindmapController implements IMindmapController {
     }
 
     actions = {
+        sendCursorChat: (message: string) => {
+            this.presenceManager?.sendChat(message);
+        },
+
         lockNode: (nodeId: NodeId) => {
             const node = this.tree.safeGetNode(nodeId);
             if (!node) return;

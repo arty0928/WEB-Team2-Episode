@@ -1,6 +1,6 @@
 import MindmapCard from "@/features/mindmap/components/list/MindmapCard";
 import { useMindmapList } from "@/features/mindmap/hooks/useMindmapList";
-import { MindmapTabId } from "@/features/mindmap/types/mindmap";
+import { MindmapTabId } from "@/features/mindmap/types/mindmapType";
 
 type Props = {
     mindmapType: MindmapTabId;

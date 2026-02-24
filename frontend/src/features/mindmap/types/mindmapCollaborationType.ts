@@ -12,10 +12,17 @@ export type Collaborator = {
     isSelf: boolean;
 };
 
+export type CursorChat = {
+    id: string; // 유니크 이벤트 id (중복 방지)
+    message: string; // 1줄 메시지
+    at: number; // ms timestamp
+};
+
 export type CollaboratorCursor = {
     clientId: number;
     user: CollaboratorInfo;
     cursor: CursorPos;
+    chat?: CursorChat | null;
 };
 
 export type Collaborators = {
@@ -59,4 +66,5 @@ export type SharedInfo = {
     user?: CollaboratorInfo;
     cursor?: CursorPos | null;
     lock?: LockState;
+    chat?: CursorChat | null;
 };

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { useNavigate } from "react-router";
 
 import MindmapList from "@/features/mindmap/components/list/MindmapList";
-import { MINDMAP_TABS, MindmapTabId } from "@/features/mindmap/types/mindmap";
+import { MINDMAP_TABS, MindmapTabId } from "@/features/mindmap/types/mindmapType";
 import Button from "@/shared/components/button/Button";
 import Icon from "@/shared/components/icon/Icon";
 import MaxWidth from "@/shared/components/maxWidth/MaxWidth";

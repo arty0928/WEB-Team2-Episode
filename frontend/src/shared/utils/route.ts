@@ -1,4 +1,4 @@
-import { MindmapType } from "@/features/mindmap/types/mindmap";
+import { MindmapType } from "@/features/mindmap/types/mindmapType";
 export const PATHS = {
     home: "/",
     mindmap: {

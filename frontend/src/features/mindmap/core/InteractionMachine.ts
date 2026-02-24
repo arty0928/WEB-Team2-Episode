@@ -5,8 +5,11 @@ import type {
     DragSessionSnapshot,
     InteractionMode,
     InteractionSnapshot,
-} from "@/features/mindmap/types/mindmapInteraction";
-import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmapInteraction";
+} from "@/features/mindmap/types/mindmapInteractionType";
+import {
+    EMPTY_DRAG_SESSION_SNAPSHOT,
+    EMPTY_INTERACTION_SNAPSHOT,
+} from "@/features/mindmap/types/mindmapInteractionType";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { Rect, SpatialPoint, SpatialStats, WorldPoint } from "@/shared/types/spatial";
 import { calcDistance } from "@/utils/calcDistance";

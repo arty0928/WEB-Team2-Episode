@@ -4,7 +4,7 @@ import { TRANSACTION_TAG } from "@/features/mindmap/constants/transaction";
 import { ROOT_NODE_ID } from "@/features/mindmap/core/YjsAdaptor";
 import { useDeleteEpisodes } from "@/features/mindmap/hooks/useDeleteEpisodes";
 import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
-import type { IMindmapController } from "@/features/mindmap/types/mindmapController";
+import type { IMindmapController } from "@/features/mindmap/types/mindmapControllerType";
 
 export function useMindmapServerSideEffects(args: {
     engine: IMindmapController | null;

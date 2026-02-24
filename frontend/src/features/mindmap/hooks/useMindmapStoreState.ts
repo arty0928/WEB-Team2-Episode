@@ -2,7 +2,7 @@ import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 import { useMindmapControllerContext } from "@/features/mindmap/core/MindmapProvider";
 import { useMindmapControllerEvents } from "@/features/mindmap/hooks/useMindmapEngineEvents";
-import { LockInfo } from "@/features/mindmap/types/mindmapCollaboration";
+import { LockInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import type { NodeId } from "@/features/mindmap/types/node";
 import { MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmapStore";
 

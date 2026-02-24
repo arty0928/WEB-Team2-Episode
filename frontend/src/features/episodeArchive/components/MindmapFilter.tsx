@@ -1,4 +1,4 @@
-import { MindmapItem } from "@/features/mindmap/types/mindmap";
+import { MindmapItem } from "@/features/mindmap/types/mindmapType";
 import Dropdown from "@/shared/components/dropdown/Dropdown";
 import { cn } from "@/utils/cn";
 

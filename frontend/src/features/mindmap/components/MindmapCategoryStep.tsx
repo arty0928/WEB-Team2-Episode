@@ -1,7 +1,7 @@
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useInitializeMindmap } from "@/features/mindmap/hooks/useInitializeMindmap";
-import { ACTIVITY_CATEGORIES, ActivityCategoryItem } from "@/features/mindmap/types/mindmap";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnelType";
+import { ACTIVITY_CATEGORIES, ActivityCategoryItem } from "@/features/mindmap/types/mindmapType";
 import BottomSticky from "@/shared/components/bottomSticky/BottomSticky";
 import Button from "@/shared/components/button/Button";
 import { EmojiCard } from "@/shared/components/emojiCard/EmojiCard";

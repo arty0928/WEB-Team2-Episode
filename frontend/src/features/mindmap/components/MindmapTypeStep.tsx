@@ -1,5 +1,5 @@
 import MindmapTypeCard from "@/features/mindmap/components/MindmapTypeCard";
-import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnel";
+import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnelType";
 import BottomSticky from "@/shared/components/bottomSticky/BottomSticky";
 import Button from "@/shared/components/button/Button";
 import Top from "@/shared/components/top/Top";

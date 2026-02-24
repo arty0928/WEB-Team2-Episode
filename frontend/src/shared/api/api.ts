@@ -1,4 +1,4 @@
-import { MindmapId } from "@/features/mindmap/types/mindmap";
+import { MindmapId } from "@/features/mindmap/types/mindmapType";
 
 export const USER_ENDPOINT = "/users";
 export const USER_ME_ENDPOINT = `${USER_ENDPOINT}/me`;

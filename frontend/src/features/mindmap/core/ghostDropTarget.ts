@@ -1,5 +1,5 @@
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/features/mindmap/constants/node";
-import type { BaseNodeInfo } from "@/features/mindmap/types/mindmapInteraction";
+import type { BaseNodeInfo } from "@/features/mindmap/types/mindmapInteractionType";
 import type { AddNodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import type { Rect, SpatialPoint, SpatialStats, WorldPoint } from "@/shared/types/spatial";
 import { isIntersected } from "@/shared/utils/rectHelper";

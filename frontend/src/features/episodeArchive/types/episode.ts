@@ -1,4 +1,4 @@
-import { MindmapTabId } from "@/features/mindmap/types/mindmap";
+import { MindmapTabId } from "@/features/mindmap/types/mindmapType";
 import { HttpParams } from "@/shared/api/types";
 
 /** 에피소드 내 역량 태그 타입 */
