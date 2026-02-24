@@ -31,7 +31,7 @@ export default function EpisodeContentSection({ className }: EpisodeContentSecti
     return (
         <div className={cn("flex flex-col gap-4", className)}>
             {fields.map((field) => {
-                const content = (watch(field.id) as string) || "";
+                const content = (watch(field.id) as string) || ""; //map 에서 useWatch 훅 사용 불가
                 const isLimit = content.length >= 200;
 
                 return (

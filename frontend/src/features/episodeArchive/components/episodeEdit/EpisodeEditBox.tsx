@@ -1,4 +1,5 @@
 import { FormProvider } from "react-hook-form";
+import { toast } from "sonner";
 
 import EpisodeContentSection from "@/features/episodeArchive/components/episodeEdit/EpisodeContentSection";
 import EpisodeInfoSection from "@/features/episodeArchive/components/episodeEdit/EpisodeInfoSection";
@@ -16,15 +17,16 @@ export default function EpisodeEditBox({ initialData, onCancel }: EpisodeEditBox
     const methods = useEpisodeEditForm(initialData);
     const {
         handleSubmit,
-        formState: { dirtyFields },
+        formState: { dirtyFields, isDirty },
     } = methods;
 
-    const { mutate: updateEpisode, isPending } = useUpdateEpisode(initialData.nodeId);
+    const { mutateAsync: updateEpisode, isPending } = useUpdateEpisode(initialData.nodeId);
+    const isSaveDisabled = isPending || !isDirty;
 
-    const onSubmit = (formData: EpisodeDetailResponse) => {
+    const onSubmit = async (formData: EpisodeDetailResponse) => {
         const requestBody: UpdateEpisodeRequest = {};
 
-        const starFields: (keyof UpdateEpisodeRequest & keyof EpisodeDetailResponse)[] = [
+        const starFields: Array<keyof UpdateEpisodeRequest & keyof EpisodeDetailResponse> = [
             "situation",
             "task",
             "action",
@@ -32,22 +34,28 @@ export default function EpisodeEditBox({ initialData, onCancel }: EpisodeEditBox
         ];
 
         starFields.forEach((field) => {
-            if (dirtyFields[field]) {
-                requestBody[field] = (formData[field] as string) || "";
-            }
+            if (dirtyFields[field]) requestBody[field] = (formData[field] as string) || "";
         });
 
         if (dirtyFields.competencyTypes) {
             requestBody.competencyTypeIds = (formData.competencyTypes ?? []).map((t) => t.id);
         }
 
-        if (dirtyFields.startDate) requestBody.startDate = formData.startDate || "0000-00-00";
-        if (dirtyFields.endDate) requestBody.endDate = formData.endDate || "0000-00-00";
+        // 입력 기간
+        const isDateRangeDirty = Boolean(dirtyFields.startDate || dirtyFields.endDate);
+        if (isDateRangeDirty) {
+            requestBody.startDate = formData.startDate || "";
+            requestBody.endDate = formData.endDate || "";
+        }
 
-        if (Object.keys(requestBody).length > 0) {
-            updateEpisode(requestBody, { onSuccess: () => onCancel() });
-        } else {
-            onCancel();
+        if (Object.keys(requestBody).length === 0) return;
+
+        try {
+            await updateEpisode(requestBody);
+            toast.success("에피소드 내용이 저장되었습니다.");
+        } catch (error) {
+            toast.error("저장에 실패했습니다. 다시 시도해 주세요.");
+            console.error(error);
         }
     };
 
@@ -59,7 +67,12 @@ export default function EpisodeEditBox({ initialData, onCancel }: EpisodeEditBox
             >
                 <EpisodeInfoSection className="w-48 p-6 shrink-0" />
                 <EpisodeContentSection className="flex-1 p-6 bg-white/50" />
-                <EpisodeMetaSection className="w-47 p-6 shrink-0" onCancel={onCancel} isSubmitting={isPending} />
+                <EpisodeMetaSection
+                    className="w-47 p-6 shrink-0"
+                    onCancel={onCancel}
+                    isSubmitting={isPending}
+                    isSaveDisabled={isSaveDisabled}
+                />
             </form>
         </FormProvider>
     );

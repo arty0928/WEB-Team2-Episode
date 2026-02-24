@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import EmptyEpisode from "@/features/episodeArchive/components/EmptyEpisode";
 import EpisodeCompetencyChipGroup from "@/features/episodeArchive/components/episodeEdit/EpisodeCompetencyChipGroup";
 import EpisodeContentSection from "@/features/episodeArchive/components/episodeEdit/EpisodeContentSection";
+import EpisodeDateRangeSection from "@/features/episodeArchive/components/episodeEdit/EpisodeDateRangeSection";
 import { useEpisodeDetail } from "@/features/episodeArchive/hooks/useEpisodeDetail";
 import { useUpdateEpisode } from "@/features/episodeArchive/hooks/useUpdateEpisode";
 import { EpisodeDetailResponse, UpdateEpisodeRequest } from "@/features/episodeArchive/types/episode";
@@ -22,7 +23,7 @@ type FooterProps = {
 
 const StarSheetFooter = memo(function StarSheetFooter({ disabled, isPending }: FooterProps) {
     return (
-        <div className=" shrink-0 p-6 bg-base-white border-t border-gray-100">
+        <div className=" shrink-0 p-6 pb-6 bg-base-white border-t border-gray-100">
             <Button type="submit" variant="primary" layout="fullWidth" className="py-3 rounded-xl" disabled={disabled}>
                 {isPending ? "저장 중..." : "저장하기"}
             </Button>
@@ -65,11 +66,12 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
     const {
         reset,
         handleSubmit,
-        formState: { dirtyFields },
+        formState: { dirtyFields, isDirty },
     } = methods;
 
     const { data, isLoading } = useEpisodeDetail(nodeId, hasText);
     const { mutateAsync: updateEpisode, isPending } = useUpdateEpisode(nodeId);
+    const isSaveDisabled = isLoading || isPending || !isDirty;
 
     // 패널 열려있는 상태에서 노드 바뀌면 그냥 내용 교체(저장 안 됨)
     useEffect(() => {
@@ -101,6 +103,13 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
 
         if (dirtyFields.competencyTypes) {
             requestBody.competencyTypeIds = (formData.competencyTypes ?? []).map((t) => t.id);
+        }
+
+        // 입력 기간
+        const isDateRangeDirty = Boolean(dirtyFields.startDate || dirtyFields.endDate);
+        if (isDateRangeDirty) {
+            requestBody.startDate = formData.startDate || "";
+            requestBody.endDate = formData.endDate || "";
         }
 
         if (Object.keys(requestBody).length === 0) return;
@@ -153,11 +162,13 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
                     {/* 2. 중앙 내용 영역: 스크롤 가능 */}
                     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-6 flex flex-col gap-8">
                         {!hasText ? (
-                            <div className="flex-1 flex items-center justify-center min-h-[240px]">
+                            <div className="flex-1 flex items-center justify-center min-h-60">
                                 <EmptyEpisode />
                             </div>
                         ) : (
                             <div className="flex flex-col gap-8">
+                                <EpisodeDateRangeSection layout="sideSheetRow" />
+
                                 <section className="flex flex-col gap-2">
                                     <div className="flex items-center gap-1">
                                         <span className="typo-body-16-semibold text-text-main1">역량 태그</span>
@@ -165,6 +176,7 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
                                     </div>
                                     <EpisodeCompetencyChipGroup isDisabled={isLoading || isPending} />
                                 </section>
+
                                 <EpisodeContentSection className="w-full p-0 bg-transparent" />
                             </div>
                         )}
@@ -173,7 +185,7 @@ function StarEpisodeSideSheetComponent({ nodeId, onClose }: Props) {
                     {/* 3. 하단 푸터: hasText가 true일 때만 렌더링 */}
                     {hasText && (
                         <div className="shrink-0">
-                            <StarSheetFooter disabled={isLoading || isPending} isPending={isPending} />
+                            <StarSheetFooter disabled={isSaveDisabled} isPending={isPending} />
                         </div>
                     )}
                 </form>

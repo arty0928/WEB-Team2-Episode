@@ -4,13 +4,14 @@ import { UseFormRegisterReturn } from "react-hook-form";
 import Icon from "@/shared/components/icon/Icon";
 
 type DateInputProps = {
+    isSide?: boolean;
     placeholder?: string;
     value?: string;
     onClick?: () => void;
     registration: UseFormRegisterReturn;
 };
 
-const DateInput = memo(({ placeholder, value, onClick, registration }: DateInputProps) => {
+const DateInput = memo(({ isSide = false, placeholder, value, onClick, registration }: DateInputProps) => {
     return (
         <div
             onClick={onClick}
@@ -25,10 +26,11 @@ const DateInput = memo(({ placeholder, value, onClick, registration }: DateInput
                 /* min-w-0와 truncate를 추가하여 텍스트가 아이콘을 밀어내지 않게 함 */
                 className="flex-1 min-w-0 typo-body-14-reg text-text-main1 outline-none border-none p-0 bg-transparent placeholder:text-text-placeholder cursor-pointer truncate"
             />
-            {/* 아이콘이 사라지지 않도록 shrink-0 적용 */}
-            <div className="flex items-center justify-center w-5 h-5 shrink-0">
-                <Icon name="ic_calendar_days" size={17} color="var(--color-gray-800)" />
-            </div>
+            {isSide && (
+                <div className="flex items-center justify-center w-5 h-5 shrink-0">
+                    <Icon name="ic_calendar_days" size={17} color="var(--color-gray-800)" />
+                </div>
+            )}
         </div>
     );
 });

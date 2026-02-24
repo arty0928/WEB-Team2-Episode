@@ -34,9 +34,7 @@ const CustomCalendar = memo(({ selectedRange, onSelect }: CustomCalendarProps) =
                     caption_label: "typo-body-14-semibold text-gray-800",
                     head_cell: "typo-caption-12-reg text-gray-400 w-9",
                     cell: "relative p-0 text-center typo-body-14-reg focus-within:relative focus-within:z-20",
-                    day: cn(
-                        "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md transition-colors",
-                    ),
+                    day: cn("h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 transition-colors"),
                     day_range_start: "day-range-start rounded-l-md bg-primary text-white",
                     day_range_end: "day-range-end rounded-r-md bg-primary text-white",
                     day_selected: "bg-primary text-white hover:bg-primary/90 focus:bg-primary",

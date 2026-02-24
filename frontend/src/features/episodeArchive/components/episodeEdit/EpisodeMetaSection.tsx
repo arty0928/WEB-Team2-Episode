@@ -6,9 +6,15 @@ type EpisodeMetaSectionProps = {
     className?: string;
     onCancel: () => void;
     isSubmitting?: boolean;
+    isSaveDisabled?: boolean;
 };
 
-export default function EpisodeMetaSection({ className, onCancel, isSubmitting = false }: EpisodeMetaSectionProps) {
+export default function EpisodeMetaSection({
+    isSubmitting = false,
+    isSaveDisabled = false,
+    className,
+    onCancel,
+}: EpisodeMetaSectionProps) {
     return (
         <div className={cn("flex flex-col h-full", className)}>
             <div className="flex-1 overflow-y-auto">
@@ -22,7 +28,7 @@ export default function EpisodeMetaSection({ className, onCancel, isSubmitting =
                     variant="primary"
                     layout="fullWidth"
                     className="py-3 rounded-xl"
-                    disabled={isSubmitting}
+                    disabled={isSaveDisabled}
                 >
                     {isSubmitting ? "저장 중..." : "저장하기"}
                 </Button>
