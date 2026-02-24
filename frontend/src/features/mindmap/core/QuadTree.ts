@@ -174,22 +174,16 @@ export default class QuadTree<TPoint extends Point> {
     private moveToChild(): boolean {
         if (!this.children) return true;
 
-        let allMoved = true;
-
-        this.points.forEach((point) => {
-            const ok = this.delegateInsert(point);
-            if (!ok) {
-                allMoved = false;
+        for (const point of this.points) {
+            if (!this.delegateInsert(point)) {
+                // 한 점이라도 이동에 실패하면 분할을 롤백합니다.
+                this.children = null;
+                return false;
             }
-        });
-
-        if (allMoved) {
-            this.points.clear();
-            return true;
         }
 
-        this.children = null;
-        return false;
+        this.points.clear();
+        return true;
     }
 
     /** 삽입 작업을 자식 노드에게 위임 */
