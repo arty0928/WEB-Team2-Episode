@@ -57,10 +57,12 @@ public class MindmapService {
 
         List<MindmapParticipant> participants = mindmapParticipantRepository.findAllByMindmapIdWithUser(mindmapId);
         MindmapParticipant p = mindmapAccessValidator.findUserInParticipantsOrThrow(participants, userId);
-        List<Integer> competencyTypeIds = getSortedCompetencyTypeIds(mindmapId, userId);
+
+        List<Integer> competencyTypeIds = getSortedCompetencyTypeIdsByParticipantId(mindmapId, p.getId());
+
         List<CompetencyTypeRes> ctResList = competencyTypeService.getCompetencyTypesInIds(competencyTypeIds);
         return MindmapDetailRes.of(p, ctResList,
-                                   participants.stream().map((participant) -> participant.getUser().getNickname())
+                                   participants.stream().map(participant -> participant.getUser().getNickname())
                                            .toList());
     }
 
@@ -76,9 +78,11 @@ public class MindmapService {
         if (participants.isEmpty()) return List.of();
 
         List<UUID> mindmapIds = participants.stream().map(p -> p.getMindmap().getId()).distinct().toList();
+        List<Integer> participantIds = participants.stream().map(MindmapParticipant::getId).toList();
 
         Map<UUID, Set<Integer>> competencyMap = new HashMap<>();
-        for (MindmapCompetencyRow row : episodeStarRepository.findCompetencyTypesByMindmapIds(mindmapIds, userId)) {
+        for (MindmapCompetencyRow row : episodeStarRepository.findCompetencyTypesByMindmapIds(mindmapIds,
+                                                                                              participantIds)) {
             competencyMap.computeIfAbsent(row.mindmapId(), k -> new HashSet<>()).add(row.competencyTypeId());
         }
 
@@ -104,10 +108,10 @@ public class MindmapService {
             List<CompetencyTypeRes> ctResList =
                     competencyMap.getOrDefault(id, Set.of()).stream().sorted().map(competencyResMap::get)
                             .filter(java.util.Objects::nonNull).toList();
-            return MindmapDetailRes.of(p, ctResList, participantNames.getOrDefault(p.getMindmap().getId(), List.of()));
+
+            return MindmapDetailRes.of(p, ctResList, participantNames.getOrDefault(id, List.of()));
         }).toList();
     }
-
 
     public List<MindmapSummaryRes> getMindmapList(Long userId) {
         return mindmapRepository.findByUserIdOrderByLastJoinedDesc(userId).stream().map(MindmapSummaryRes::of).toList();
@@ -221,7 +225,6 @@ public class MindmapService {
         mindmapAccessValidator.findMindmapOrThrow(mindmapId);
         MindmapParticipant participant = mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
         participant.updateFavorite(status);
-
         return MindmapSummaryRes.of(participant);
     }
 
@@ -230,7 +233,6 @@ public class MindmapService {
         mindmapAccessValidator.findMindmapOrThrow(mindmapId);
         MindmapParticipant participant = mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
         participant.getMindmap().updateName(name);
-
         return MindmapSummaryRes.of(participant);
     }
 
@@ -247,8 +249,10 @@ public class MindmapService {
                     List<UUID> existingEpisodeNodeIds = episodeRepository.findNodeIdsByMindmapId(mindmapId);
 
                     if (!existingEpisodeNodeIds.isEmpty()) {
+                        // userId 기반 → participantId 기반
+                        Integer participantId = savedParticipant.getId();
                         List<EpisodeStar> starsToCreate =
-                                existingEpisodeNodeIds.stream().map(nodeId -> EpisodeStar.create(nodeId, userId))
+                                existingEpisodeNodeIds.stream().map(nodeId -> EpisodeStar.create(nodeId, participantId))
                                         .toList();
                         episodeStarRepository.saveAll(starsToCreate);
                     }
@@ -273,13 +277,14 @@ public class MindmapService {
 
     public List<CompetencyTypeRes> getCompetencyTypesInMindmap(UUID mindmapId, long userId) {
         mindmapAccessValidator.findMindmapOrThrow(mindmapId);
-        mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
-        List<Integer> ids = getSortedCompetencyTypeIds(mindmapId, userId);
+        MindmapParticipant participant = mindmapAccessValidator.findParticipantOrThrow(mindmapId, userId);
+
+        List<Integer> ids = getSortedCompetencyTypeIdsByParticipantId(mindmapId, participant.getId());
         return competencyTypeService.getCompetencyTypesInIds(ids);
     }
 
-    private List<Integer> getSortedCompetencyTypeIds(UUID mindmapId, long userId) {
-        return episodeStarRepository.findCompetencyTypesByMindmapId(mindmapId, userId).stream().sorted().toList();
+    private List<Integer> getSortedCompetencyTypeIdsByParticipantId(UUID mindmapId, int participantId) {
+        return episodeStarRepository.findCompetencyTypesByMindmapId(mindmapId, participantId).stream().sorted()
+                .toList();
     }
-
 }

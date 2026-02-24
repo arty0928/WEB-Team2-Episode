@@ -14,11 +14,14 @@ import java.util.UUID;
 
 import com.yat2.episode.episode.dto.response.EpisodeSummaryRes;
 import com.yat2.episode.mindmap.Mindmap;
+import com.yat2.episode.mindmap.MindmapParticipant;
+import com.yat2.episode.user.User;
 import com.yat2.episode.utils.AbstractRepositoryTest;
 
 import static com.yat2.episode.utils.TestEntityFactory.createEpisode;
 import static com.yat2.episode.utils.TestEntityFactory.createEpisodeStar;
 import static com.yat2.episode.utils.TestEntityFactory.createMindmap;
+import static com.yat2.episode.utils.TestEntityFactory.createParticipant;
 import static com.yat2.episode.utils.TestEntityFactory.createUser;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,12 +61,17 @@ class EpisodeRepositoryTest extends AbstractRepositoryTest {
 
     @Test
     @DisplayName("요약 리스트 조회")
-    void findSummariesByMindmapIdAndUserId() {
+    void findSummariesByMindmapIdAndParticipantId() {
         Mindmap m1 = createMindmap("mm-1");
         em.persist(m1);
 
         long userId = 100L;
-        em.persist(createUser(userId));
+        User user = createUser(userId);
+        em.persist(user);
+
+        // participant 생성 및 persist (participant_id FK 만족)
+        MindmapParticipant participant = createParticipant(m1, user);
+        em.persist(participant);
 
         UUID node1 = UUID.randomUUID();
         UUID node2 = UUID.randomUUID();
@@ -71,12 +79,14 @@ class EpisodeRepositoryTest extends AbstractRepositoryTest {
         em.persist(createEpisode(node1, m1.getId(), "content1"));
         em.persist(createEpisode(node2, m1.getId(), "content2"));
 
-        em.persist(createEpisodeStar(node1, userId, Set.of(1, 2)));
-        em.persist(createEpisodeStar(node2, userId, Set.of(2, 3)));
+        // participantId 기반 Star 생성
+        em.persist(createEpisodeStar(node1, participant.getId(), Set.of(1, 2)));
+        em.persist(createEpisodeStar(node2, participant.getId(), Set.of(2, 3)));
 
         flushAndClear();
 
-        List<EpisodeSummaryRes> summaries = episodeRepository.findSummariesByMindmapIdAndUserId(m1.getId(), userId);
+        List<EpisodeSummaryRes> summaries =
+                episodeRepository.findSummariesByMindmapIdAndParticipantId(m1.getId(), participant.getId());
 
         assertThat(summaries).hasSize(2);
         assertThat(summaries).extracting(EpisodeSummaryRes::nodeId).containsExactlyInAnyOrder(node1, node2);
@@ -89,15 +99,19 @@ class EpisodeRepositoryTest extends AbstractRepositoryTest {
         em.persist(m1);
 
         long userId = 100L;
-        em.persist(createUser(userId));
+        User user = createUser(userId);
+        em.persist(user);
+
+        MindmapParticipant participant = createParticipant(m1, user);
+        em.persist(participant);
 
         UUID node = UUID.randomUUID();
         em.persist(createEpisode(node, m1.getId(), "content"));
-        em.persist(createEpisodeStar(node, userId, Set.of(7, 8)));
+        em.persist(createEpisodeStar(node, participant.getId(), Set.of(7, 8)));
 
         flushAndClear();
 
-        Optional<EpisodeStar> opt = episodeStarRepository.findStarDetail(node, userId);
+        Optional<EpisodeStar> opt = episodeStarRepository.findStarDetail(node, participant.getId());
 
         assertThat(opt).isPresent();
         assertThat(opt.get().getEpisode().getId()).isEqualTo(node);
@@ -106,15 +120,22 @@ class EpisodeRepositoryTest extends AbstractRepositoryTest {
     }
 
     @Test
-    @DisplayName("Mindmap에 속한 competencyTypeIds 중복 제거 조회 (user별)")
+    @DisplayName("Mindmap에 속한 competencyTypeIds 중복 제거 조회 (participant별)")
     void findCompetencyTypesByMindmapId() {
         Mindmap m1 = createMindmap("mm-1");
         em.persist(m1);
 
         long userA = 100L;
         long userB = 200L;
-        em.persist(createUser(userA));
-        em.persist(createUser(userB));
+        User ua = createUser(userA);
+        User ub = createUser(userB);
+        em.persist(ua);
+        em.persist(ub);
+
+        MindmapParticipant pa = createParticipant(m1, ua);
+        MindmapParticipant pb = createParticipant(m1, ub);
+        em.persist(pa);
+        em.persist(pb);
 
         UUID node1 = UUID.randomUUID();
         UUID node2 = UUID.randomUUID();
@@ -122,12 +143,12 @@ class EpisodeRepositoryTest extends AbstractRepositoryTest {
         em.persist(createEpisode(node1, m1.getId(), "c1"));
         em.persist(createEpisode(node2, m1.getId(), "c2"));
 
-        em.persist(createEpisodeStar(node1, userA, Set.of(1, 2, 3)));
-        em.persist(createEpisodeStar(node2, userB, Set.of(2, 3, 4)));
+        em.persist(createEpisodeStar(node1, pa.getId(), Set.of(1, 2, 3)));
+        em.persist(createEpisodeStar(node2, pb.getId(), Set.of(2, 3, 4)));
 
         flushAndClear();
 
-        List<Integer> ids = episodeStarRepository.findCompetencyTypesByMindmapId(m1.getId(), userA);
+        List<Integer> ids = episodeStarRepository.findCompetencyTypesByMindmapId(m1.getId(), pa.getId());
 
         assertThat(ids).containsExactlyInAnyOrder(1, 2, 3);
     }

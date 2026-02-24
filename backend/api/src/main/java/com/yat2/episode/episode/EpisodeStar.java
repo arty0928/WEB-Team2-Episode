@@ -45,7 +45,7 @@ public class EpisodeStar {
     @CollectionTable(
             name = "episode_star_competency_types",
             joinColumns = { @JoinColumn(name = "node_id", referencedColumnName = "node_id"),
-                            @JoinColumn(name = "user_id", referencedColumnName = "user_id") }
+                            @JoinColumn(name = "participant_id", referencedColumnName = "participant_id") }
     )
     @Column(name = "competency_type_id")
     private Set<Integer> competencyTypeIds = new HashSet<>();
@@ -76,9 +76,9 @@ public class EpisodeStar {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public static EpisodeStar create(UUID nodeId, long userId) {
+    public static EpisodeStar create(UUID nodeId, Integer participantId) {
         EpisodeStar episodeStar = new EpisodeStar();
-        episodeStar.id = new EpisodeId(nodeId, userId);
+        episodeStar.id = new EpisodeId(nodeId, participantId);
         return episodeStar;
     }
 

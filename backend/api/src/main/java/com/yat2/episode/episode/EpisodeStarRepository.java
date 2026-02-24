@@ -20,12 +20,12 @@ public interface EpisodeStarRepository extends JpaRepository<EpisodeStar, Episod
                         JOIN FETCH s.episode e
                         LEFT JOIN FETCH s.competencyTypeIds
                         WHERE s.id.nodeId = :nodeId
-                          AND s.id.userId = :userId
+                          AND s.id.participantId = :participantId
                     """
     )
     Optional<EpisodeStar> findStarDetail(
             @Param("nodeId") UUID nodeId,
-            @Param("userId") long userId
+            @Param("participantId") int participantId
     );
 
     @Query(
@@ -35,62 +35,78 @@ public interface EpisodeStarRepository extends JpaRepository<EpisodeStar, Episod
                         JOIN es.episode e
                         JOIN es.competencyTypeIds ctId
                         WHERE e.mindmapId = :mindmapId
-                          AND es.id.userId = :userId
+                        AND es.id.participantId = :participantId
                     """
     )
     List<Integer> findCompetencyTypesByMindmapId(
             @Param("mindmapId") UUID mindmapId,
-            @Param("userId") long userId
+            @Param("participantId") int participantId
     );
 
     @Query(
             """
-                        SELECT DISTINCT s
-                        FROM EpisodeStar s
-                        JOIN FETCH s.episode e
-                        LEFT JOIN FETCH s.competencyTypeIds ctId
-                        WHERE s.id.userId = :userId
-                          AND e.mindmapId IN :mindmapIds
-                          AND (
-                            :keyword IS NULL OR :keyword = '' OR
-                            e.content LIKE %:keyword% OR
-                            s.situation LIKE %:keyword% OR
-                            s.task LIKE %:keyword% OR
-                            s.action LIKE %:keyword% OR
-                            s.result LIKE %:keyword%
-                          ) ORDER BY s.createdAt DESC
+                    SELECT DISTINCT s
+                    FROM EpisodeStar s
+                    JOIN FETCH s.episode e
+                    LEFT JOIN FETCH s.competencyTypeIds ctId
+                    WHERE s.id.participantId IN :participantIds
+                      AND e.mindmapId IN :mindmapIds
+                      AND (
+                        :keyword IS NULL OR :keyword = '' OR
+                        e.content LIKE %:keyword% OR
+                        s.situation LIKE %:keyword% OR
+                        s.task LIKE %:keyword% OR
+                        s.action LIKE %:keyword% OR
+                        s.result LIKE %:keyword%
+                      )
+                    ORDER BY s.createdAt DESC
                     """
     )
     List<EpisodeStar> searchEpisodes(
-            @Param("userId") long userId,
+            @Param("participantIds") List<Integer> participantIds,
             @Param("mindmapIds") List<UUID> mindmapIds,
             @Param("keyword") String keyword
     );
 
     @Query(
             """
-                        SELECT DISTINCT new com.yat2.episode.mindmap.dto.MindmapCompetencyRow(e.mindmapId, ctId)
-                        FROM EpisodeStar es
-                        JOIN es.episode e
-                        JOIN es.competencyTypeIds ctId
-                        WHERE e.mindmapId IN :mindmapIds
-                          AND es.id.userId = :userId
+                    SELECT DISTINCT new com.yat2.episode.mindmap.dto.MindmapCompetencyRow(e.mindmapId, ctId)
+                    FROM EpisodeStar es
+                    JOIN es.episode e
+                    JOIN es.competencyTypeIds ctId
+                    WHERE e.mindmapId IN :mindmapIds
+                      AND es.id.participantId IN :participantIds
                     """
     )
     List<MindmapCompetencyRow> findCompetencyTypesByMindmapIds(
             @Param("mindmapIds") List<UUID> mindmapIds,
-            @Param("userId") long userId
+            @Param("participantIds") List<Integer> participantIds
+    );
+
+    @Query(
+            """
+                    SELECT s.id.nodeId
+                    FROM EpisodeStar s
+                    WHERE s.id.participantId = :participantId
+                      AND s.id.nodeId IN :nodeIds
+                    """
+    )
+    List<UUID> findNodeIdsByParticipantIdAndNodeIdIn(
+            @Param("participantId") int participantId,
+            @Param("nodeIds") List<UUID> nodeIds
     );
 
     @Query(
             """
                         SELECT s.id.nodeId
                         FROM EpisodeStar s
-                        WHERE s.id.userId = :userId
+                        JOIN MindmapParticipant mp
+                          ON mp.id = s.id.participantId
+                        WHERE mp.user.id = :userId
                           AND s.id.nodeId IN :nodeIds
                     """
     )
-    List<UUID> findNodeIdsByUserIdAndNodeIdIn(
+    List<UUID> findAccessibleNodeIdsByUserIdAndNodeIds(
             @Param("userId") long userId,
             @Param("nodeIds") List<UUID> nodeIds
     );

@@ -20,7 +20,6 @@ public class EpisodeId implements Serializable {
     @Column(name = "node_id", columnDefinition = "BINARY(16)", nullable = false)
     private UUID nodeId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
+    @Column(name = "participant_id", nullable = false)
+    private Integer participantId;
 }

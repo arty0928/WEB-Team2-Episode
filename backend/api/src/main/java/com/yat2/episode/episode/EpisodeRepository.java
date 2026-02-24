@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.yat2.episode.episode.dto.response.EpisodeSummaryRes;
@@ -29,11 +30,16 @@ public interface EpisodeRepository extends JpaRepository<Episode, UUID> {
                     FROM EpisodeStar s
                     JOIN s.episode e
                     WHERE e.mindmapId = :mindmapId
-                      AND s.id.userId = :userId
+                      AND s.id.participantId = :participantId
                     """
     )
-    List<EpisodeSummaryRes> findSummariesByMindmapIdAndUserId(
+    List<EpisodeSummaryRes> findSummariesByMindmapIdAndParticipantId(
             @Param("mindmapId") UUID mindmapId,
-            @Param("userId") long userId
+            @Param("participantId") int participantId
+    );
+
+    @Query("SELECT e.mindmapId FROM Episode e WHERE e.id = :nodeId")
+    Optional<UUID> findMindmapIdByNodeId(
+            @Param("nodeId") UUID nodeId
     );
 }

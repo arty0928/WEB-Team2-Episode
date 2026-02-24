@@ -52,6 +52,12 @@ public class TestEntityFactory {
         return participant;
     }
 
+    public static MindmapParticipant createParticipant(Mindmap mindmap, User user, int participantId) {
+        MindmapParticipant participant = createParticipant(mindmap, user);
+        ReflectionTestUtils.setField(participant, "id", participantId);
+        return participant;
+    }
+
     public static User createUser(long kakaoId) {
         User user = TestEntityFactory.createEntity(User.class);
         ReflectionTestUtils.setField(user, "kakaoId", kakaoId);
@@ -66,8 +72,8 @@ public class TestEntityFactory {
         return episode;
     }
 
-    public static EpisodeStar createEpisodeStar(UUID nodeId, long userId, Set<Integer> competencyTypeIds) {
-        EpisodeStar star = EpisodeStar.create(nodeId, userId);
+    public static EpisodeStar createEpisodeStar(UUID nodeId, int participantId, Set<Integer> competencyTypeIds) {
+        EpisodeStar star = EpisodeStar.create(nodeId, participantId);
 
         star.update(new StarUpdateReq(competencyTypeIds, "situation", "task", "action", "result", null, null),
                     LocalDate.now(), LocalDate.now().plusDays(1));
