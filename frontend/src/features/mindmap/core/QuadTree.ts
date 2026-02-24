@@ -50,9 +50,14 @@ export default class QuadTree<TPoint extends Point> {
 
         // 용량 초과 시 영역을 4개로 분할하고 기존 점들을 자식 노드로 재배치
         this.split();
-        this.moveToChild();
+        const moved = this.moveToChild();
 
-        // 새로 들어온 점도 자식 노드로 위임
+        if (!moved) {
+            // 트리 불변식이 깨져있음(= 저장된 점들 중 일부가 bounds 밖으로 탈출)
+            // 상위(보통 root insert)에서 rebuild 후 재시도하도록 실패 반환
+            return false;
+        }
+
         return this.delegateInsert(point);
     }
 
@@ -165,15 +170,35 @@ export default class QuadTree<TPoint extends Point> {
         SE.collectAllPoints(points);
     }
 
-    /** 현재 노드가 보유한 점들을 자식 노드로 이동시킨 후 현재 목록 비우기 */
-    private moveToChild() {
-        this.points.forEach((point) => this.delegateInsert(point));
-        this.points.clear();
+    /** 현재 노드가 보유한 점들을 자식 노드로 이동 (실패 시 롤백) */
+    private moveToChild(): boolean {
+        if (!this.children) return true;
+
+        let allMoved = true;
+
+        this.points.forEach((point) => {
+            const ok = this.delegateInsert(point);
+            if (!ok) {
+                allMoved = false;
+            }
+        });
+
+        if (allMoved) {
+            this.points.clear();
+            return true;
+        }
+
+        this.children = null;
+        return false;
     }
 
     /** 삽입 작업을 자식 노드에게 위임 */
     private delegateInsert(point: TPoint): boolean {
         if (!this.children) return false;
+
+        if (!isPointInRect(point, this.bounds)) {
+            return false;
+        }
 
         const { NW, NE, SW, SE } = this.children;
 
@@ -182,8 +207,9 @@ export default class QuadTree<TPoint extends Point> {
         if (isPointInRect(point, SW.getBounds())) return SW.executeInsert(point);
         if (isPointInRect(point, SE.getBounds())) return SE.executeInsert(point);
 
-        console.error("[QuadTree] 어떤 자식 영역에도 속하지 않는 좌표입니다.", point);
-        return false;
+        throw new Error("[QuadTree] 어떤 자식 영역에도 속하지 않는 좌표입니다.", {
+            cause: { point, parent: this.bounds },
+        });
     }
 
     /** 삭제 작업을 자식 노드에게 위임 */
@@ -213,6 +239,11 @@ export default class QuadTree<TPoint extends Point> {
         if (this.isNearBoundary(point)) {
             this.rebuild();
         }
+        const ok = this.executeInsert(point);
+        if (ok) return true;
+
+        // 트리가 깨졌다면(특히 moveToChild 롤백 케이스) 전체 재구축 후 1회 재시도
+        this.rebuild();
         return this.executeInsert(point);
     }
 
