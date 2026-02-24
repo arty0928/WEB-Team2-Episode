@@ -1,5 +1,6 @@
 import type { JobConsumer } from "../infrastructure/redis/JobConsumer";
 import type { SnapshotService } from "../services/SnapshotService";
+import type { Job } from "../contracts/Job";
 import wait from "waait";
 
 export class SnapshotWorker {
@@ -27,11 +28,13 @@ export class SnapshotWorker {
                 if (!jobs || jobs.length === 0) continue;
 
                 const successIds: string[] = [];
+                const successJobs: Job[] = [];
 
                 for (const job of jobs) {
                     try {
                         await this.deps.service.process(job);
                         successIds.push(job.entryId);
+                        successJobs.push(job);
                         console.log(
                             `[Worker] ${job.type} Job 처리 완료 entryId: ${job.entryId}  roomId: ${job.roomId}`,
                         );
@@ -46,6 +49,7 @@ export class SnapshotWorker {
                 if (successIds.length) {
                     await this.deps.consumer.ack(successIds);
                     await this.deps.consumer.del(successIds);
+                    await this.deps.consumer.clearInflight(successJobs);
                 }
             } catch (e) {
                 console.error("[Worker] 전역 Error:", e);

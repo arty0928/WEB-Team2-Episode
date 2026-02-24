@@ -20,39 +20,64 @@ import com.yat2.episode.collaboration.config.RedisProperties;
 @Service
 @RequiredArgsConstructor
 public class JobStreamStore {
+
     private final StringRedisTemplate stringRedisTemplate;
     private final RedisProperties redisProperties;
 
     public void publishSnapshot(UUID roomId) {
-        publish(JobType.SNAPSHOT, roomId, redisProperties.jobStream().dedupeTtl().snapshot());
+        publishWithInflight(JobType.SNAPSHOT, roomId);
     }
 
-    public void publishSync(UUID roomId) {
-        publish(JobType.SYNC, roomId, redisProperties.jobStream().dedupeTtl().sync());
-    }
-
-    private void publish(JobType type, UUID roomId, Duration dedupeTtl) {
+    public void publishSnapshotForce(UUID roomId) {
         try {
-            if (type != JobType.SNAPSHOT && !tryDedupe(type, roomId, dedupeTtl)) {
-                return;
-            }
-
-            Map<String, String> fields = new HashMap<>();
-            fields.put(redisProperties.jobStream().fields().type(), type.name());
-            fields.put(redisProperties.jobStream().fields().roomId(), roomId.toString());
-
-            StreamOperations<String, String, String> ops = stringRedisTemplate.opsForStream();
-            MapRecord<String, String, String> record =
-                    StreamRecords.newRecord().in(redisProperties.jobStream().key()).ofMap(fields);
-            ops.add(record);
+            publish(JobType.SNAPSHOT, roomId);
         } catch (Exception e) {
-            log.error("Failed to publish job. type={}, roomId={}", type, roomId, e);
+            log.error("Failed to publish snapshot job. roomId={}", roomId, e);
         }
     }
 
-    private boolean tryDedupe(JobType type, UUID roomId, Duration ttl) {
-        String key = redisProperties.jobStream().dedupeKeyPrefix() + type.name() + ":" + roomId;
-        Boolean ok = stringRedisTemplate.opsForValue().setIfAbsent(key, "1", ttl);
-        return Boolean.TRUE.equals(ok);
+    public void publishSync(UUID roomId) {
+        publishWithInflight(JobType.SYNC, roomId);
+    }
+
+    private void publishWithInflight(JobType type, UUID roomId) {
+        Duration ttl = redisProperties.jobStream().inflightTtl();
+        String lockKey = inflightKey(type, roomId);
+
+        Boolean locked = Boolean.FALSE;
+        try {
+            locked = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, "1", ttl);
+            if (!Boolean.TRUE.equals(locked)) {
+                return;
+            }
+
+            publish(type, roomId);
+
+        } catch (Exception e) {
+            log.error("Failed to publish job with inflight. type={}, roomId={}", type, roomId, e);
+
+            if (Boolean.TRUE.equals(locked)) {
+                try {
+                    stringRedisTemplate.delete(lockKey);
+                } catch (Exception ex) {
+                    log.warn("Failed to delete inflight after publish failure. key={}", lockKey, ex);
+                }
+            }
+        }
+    }
+
+    private void publish(JobType type, UUID roomId) {
+        Map<String, String> fields = new HashMap<>();
+        fields.put(redisProperties.jobStream().fields().type(), type.name());
+        fields.put(redisProperties.jobStream().fields().roomId(), roomId.toString());
+
+        StreamOperations<String, String, String> ops = stringRedisTemplate.opsForStream();
+        MapRecord<String, String, String> record =
+                StreamRecords.newRecord().in(redisProperties.jobStream().key()).ofMap(fields);
+        ops.add(record);
+    }
+
+    private String inflightKey(JobType type, UUID roomId) {
+        return redisProperties.updateStream().keyPrefix() + roomId + ":inflight:" + type.name();
     }
 }

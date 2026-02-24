@@ -13,23 +13,18 @@ public record RedisProperties(
     public record UpdateStream(
             String keyPrefix,
             Duration ttl,
-            String fieldUpdate
+            String fieldUpdate,
+            long snapshotThreshold
     ) {}
 
     public record JobStream(
             String key,
-            String dedupeKeyPrefix,
-            Fields fields,
-            DedupeTtl dedupeTtl
+            Duration inflightTtl,
+            Fields fields
     ) {
         public record Fields(
                 String type,
                 String roomId
-        ) {}
-
-        public record DedupeTtl(
-                Duration sync,
-                Duration snapshot
         ) {}
     }
 

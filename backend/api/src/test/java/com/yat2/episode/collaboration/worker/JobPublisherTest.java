@@ -54,7 +54,7 @@ class JobPublisherTest {
     }
 
     @Test
-    @DisplayName("publishSnapshotAsync는 jobExecutor에 작업을 위임하고, 실행되면 publishSnapshot이 호출된다")
+    @DisplayName("publishSnapshotAsync는 jobExecutor에 작업을 위임하고, 실행되면 publishSnapshotForce가 호출된다")
     void publishSnapshotAsync_delegatesToExecutor_andPublishes() {
         UUID roomId = UUID.randomUUID();
 
@@ -64,7 +64,7 @@ class JobPublisherTest {
         verify(jobExecutor).execute(taskCaptor.capture());
 
         assertThatCode(() -> taskCaptor.getValue().run()).doesNotThrowAnyException();
-        verify(jobStreamStore).publishSnapshot(roomId);
+        verify(jobStreamStore).publishSnapshotForce(roomId);
         verify(jobStreamStore, never()).publishSync(any());
     }
 

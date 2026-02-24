@@ -30,7 +30,7 @@ public class JobPublisher {
     }
 
     public void publishSnapshotAsync(UUID roomId) {
-        executeSafely(() -> jobStreamStore.publishSnapshot(roomId), JobType.SNAPSHOT.name(), roomId);
+        executeSafely(() -> jobStreamStore.publishSnapshotForce(roomId), JobType.SNAPSHOT.name(), roomId);
     }
 
     private void executeSafely(Runnable task, String type, UUID roomId) {

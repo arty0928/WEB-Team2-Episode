@@ -12,6 +12,8 @@ export interface JobConsumer {
     ack(entryId: string[]): Promise<void>;
 
     del(messageIds: string[]): Promise<number>;
+
+    clearInflight(jobs: Job[]): Promise<void>;
 }
 
 export type RedisJobConsumerConfig = {
@@ -172,5 +174,18 @@ export class RedisStreamJobConsumer implements JobConsumer {
         }
 
         return { jobs, badEntryIds };
+    }
+
+    async clearInflight(jobs: Job[]): Promise<void> {
+        if (!jobs || jobs.length === 0) return;
+        const keys = jobs.map((j) => `${REDIS_KEYS.ROOM_STREAM_PREFIX}${j.roomId}:inflight:${j.type}`);
+
+        if (keys.length === 0) return;
+
+        try {
+            await this.redis.del(...keys);
+        } catch (e) {
+            console.warn(`[JobConsumer] inflight clear failed error=${String(e)}`);
+        }
     }
 }

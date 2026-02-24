@@ -70,7 +70,7 @@ describe("SnapshotService Integration Test (Redis + InMemory Storage)", () => {
     });
 
     it("성공: base + Redis updates 병합 후 snapshot 저장, Redis stream 정리", async () => {
-        const streamKey = `${REDIS_KEYS.ROOM_STREAM_PREFIX}${ROOM_ID}`;
+        const streamKey = `${REDIS_KEYS.ROOM_STREAM_PREFIX}${ROOM_ID}:updates`;
 
         const baseDoc = new Y.Doc();
         baseDoc.getText("test").insert(0, "hello");

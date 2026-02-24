@@ -16,7 +16,7 @@ export class RedisUpdateRepository implements UpdateRepository {
     constructor(private readonly redis: Redis) {}
 
     private getStreamKey(roomId: string): string {
-        return `${REDIS_KEYS.ROOM_STREAM_PREFIX}${roomId}`;
+        return `${REDIS_KEYS.ROOM_STREAM_PREFIX}${roomId}:updates`;
     }
 
     async fetchAllUpdates(roomId: string): Promise<SnapshotBuildContext> {
