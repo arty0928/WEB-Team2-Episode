@@ -3,6 +3,7 @@ import { resolveDropBaseNode } from "@/features/mindmap/core/ghostDropTarget";
 import type {
     BaseNodeInfo,
     DragSessionSnapshot,
+    HitInfo,
     InteractionMode,
     InteractionSnapshot,
 } from "@/features/mindmap/types/mindmapInteractionType";
@@ -15,8 +16,6 @@ import { Rect, SpatialPoint, SpatialStats, WorldPoint } from "@/shared/types/spa
 import { calcDistance } from "@/utils/calcDistance";
 
 const DEFAULT_DRAG_THRESHOLD = 5;
-
-export type HitResult = { kind: "node"; nodeId: NodeId } | { kind: "canvas" };
 
 type Deps = {
     getRootNode: () => NodeElement;
@@ -65,7 +64,7 @@ export class InteractionMachine {
         this.deps.emitDragSession(this.dragSessionSnapshot);
     }
 
-    pointerDown(hit: HitResult, e: { clientX: number; clientY: number; button?: number; buttons?: number }) {
+    pointerDown(hit: HitInfo, e: { clientX: number; clientY: number; button?: number; buttons?: number }) {
         if (this.mode === "pending_creation") return;
 
         if (hit.kind === "node") {
@@ -74,6 +73,9 @@ export class InteractionMachine {
 
             const node = this.deps.safeGetNode(hit.nodeId);
             if (!node || node.type === "root") return;
+
+            // 드래그는 Content 에서만 시작
+            if (!hit.dragHandle) return;
 
             this.draggingNodeId = hit.nodeId;
             this.mode = "potential_drag";

@@ -1,3 +1,4 @@
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/features/mindmap/constants/node";
 import type { AddNodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 
 export type LayoutConfig = {
@@ -27,8 +28,8 @@ function isRootNode(node: NodeElement): node is RootNodeElement {
 const DEFAULT_CONFIG: LayoutConfig = {
     xGap: 100,
     yGap: 16,
-    defaultNodeWidth: 200,
-    defaultNodeHeight: 60,
+    defaultNodeWidth: DEFAULT_NODE_WIDTH,
+    defaultNodeHeight: DEFAULT_NODE_HEIGHT,
 };
 
 type PartitionDirection = "left" | "right";

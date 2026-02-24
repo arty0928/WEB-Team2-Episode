@@ -1,9 +1,10 @@
+import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/features/mindmap/constants/node";
 import { ROOT_CENTER_DIAMETER } from "@/features/mindmap/constants/rootNode";
 import { NodeElement } from "@/features/mindmap/types/node";
 
 // * node.width에서 AddNode 영역만큼 제외해 content 벽 좌표를 계산 */
-const DEFAULT_OUTER_W = 200; // 측정 전 fallback
-const DEFAULT_OUTER_H = 60;
+const DEFAULT_OUTER_W = DEFAULT_NODE_WIDTH; // 측정 전 fallback
+const DEFAULT_OUTER_H = DEFAULT_NODE_HEIGHT;
 
 export const ADD_NODE_TOTAL_W = 48;
 

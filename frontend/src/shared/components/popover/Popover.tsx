@@ -15,7 +15,7 @@ type Props = NonNullableVariantProps<typeof variants> & {
     isOpen?: boolean;
     isOnOpenChange?: (open: boolean) => void;
 
-    // ✅ Phase 4: wrapper className을 명시적으로 제어
+    // wrapper className을 명시적으로 제어
     wrapperClassName?: string;
 };
 

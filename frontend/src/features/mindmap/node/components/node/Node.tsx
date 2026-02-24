@@ -88,6 +88,12 @@ function NodeContent({
     // 인터랙티브 상태 판단: 호버 중이거나 메뉴가 열려있을 때
     const variant: NodeVariant = isHover || isMenuOpened ? "interactive" : highlight ? "highlighted" : "idle";
     const colorClass = colorBySize({ size, color, variant: variant });
+    const surfaceClassName = cn(
+        nodeVariants({ size }),
+        colorClass,
+        className,
+        variant !== "idle" ? shadowClass(color) : "",
+    );
 
     const { deleteNode, selectNode } = useMindmapActions();
     const { openFromMenu } = useStarEpisodePanelActions();
@@ -107,29 +113,31 @@ function NodeContent({
 
     return (
         <div
-            className={cn(nodeVariants({ size }), colorClass, className, variant !== "idle" ? shadowClass(color) : "")}
+            className="relative w-full"
             onPointerEnter={() => setIsHover(true)}
             onPointerLeave={() => setIsHover(false)}
-            {...rest}
         >
-            {/* 1. 편집 중일 때는 에디터(textarea) 표시 */}
-            {isEditing ? (
-                renderEditor()
-            ) : (
-                /* 2. 편집 중이 아닐 때: 내용 유무에 따른 텍스트 표시 */
-                <div
-                    className={cn(
-                        "whitespace-pre-wrap break-all w-full text-center select-none",
-                        !hasContent && "text-gray-500",
-                    )}
-                >
-                    {hasContent ? contents : "빈 칸"}
-                </div>
-            )}
+            {/* 드래그는 이 “카드 표면”에서만 시작 */}
+            <div data-node-drag-handle="true" className={surfaceClassName} {...rest}>
+                {isEditing ? (
+                    renderEditor()
+                ) : (
+                    <div
+                        className={cn(
+                            "whitespace-pre-wrap break-all w-full text-center select-none",
+                            !hasContent && "text-gray-500",
+                        )}
+                    >
+                        {hasContent ? contents : "빈 칸"}
+                    </div>
+                )}
+            </div>
 
-            {/* 3. 메뉴: 인터랙티브 상태일 때만 노출 */}
+            {/* 인터랙티브 상태일 때만 노출 */}
             {variant === "interactive" && (
                 <button
+                    type="button"
+                    data-mindmap-no-drag="true"
                     className={cn(nodeMenuVariants({ color }), "absolute top-0 right-0 transition-opacity")}
                     onClick={(e) => e.stopPropagation()} // 노드 클릭 이벤트 전파 방지
                 >
@@ -137,23 +145,25 @@ function NodeContent({
                         isOnOpenChange={(v) => setMenuIsOpened(v)}
                         direction="bottom_right"
                         contents={
-                            <List className="w-40">
-                                <ListRow
-                                    contents="삭제하기"
-                                    className="text-red-300 typo-body-14-medium"
-                                    leftSlot={<Icon name="ic_nodemenu_delete" size={16} />}
-                                    onClick={() => deleteNode(nodeId)}
-                                />
-                                {/* 내용이 있을 때만 STAR 작성하기 메뉴 표시 */}
-                                {hasContent && !isRoot && (
+                            <div data-mindmap-no-drag="true">
+                                <List className="w-40">
                                     <ListRow
-                                        contents="STAR 작성하기"
-                                        className="text-text-main2 typo-body-14-medium"
-                                        leftSlot={<Icon name="ic_star" size={16} />}
-                                        onClick={handleOpenStarFromMenu}
+                                        contents="삭제하기"
+                                        className="text-red-300 typo-body-14-medium"
+                                        leftSlot={<Icon name="ic_nodemenu_delete" size={16} />}
+                                        onClick={() => deleteNode(nodeId)}
                                     />
-                                )}
-                            </List>
+                                    {/* 내용이 있을 때만 STAR 작성하기 메뉴 표시 */}
+                                    {hasContent && !isRoot && (
+                                        <ListRow
+                                            contents="STAR 작성하기"
+                                            className="text-text-main2 typo-body-14-medium"
+                                            leftSlot={<Icon name="ic_star" size={16} />}
+                                            onClick={handleOpenStarFromMenu}
+                                        />
+                                    )}
+                                </List>
+                            </div>
                         }
                     >
                         <Icon name="ic_ellipsis" size={16} color="var(--color-base-white)" />

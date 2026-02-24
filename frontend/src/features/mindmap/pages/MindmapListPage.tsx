@@ -44,7 +44,7 @@ const MindmapListPage = () => {
                 </Button>
             </div>
 
-            <div className="flex-1 w-full overflow-y-auto p-1 custom-scrollbar">
+            <div className="flex-1 w-full overflow-y-auto px-1 pt-2 pb-8 custom-scrollbar">
                 <Suspense fallback={<Spinner />}>
                     <MindmapList mindmapType={selectedTabId} />
                 </Suspense>

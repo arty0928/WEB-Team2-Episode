@@ -1,3 +1,4 @@
+import { DRAG_HANDLE_SELECTOR, NO_DRAG_SELECTOR, NODE_SELECTOR } from "@/features/mindmap/constants/interaction";
 import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { normalizeRootContents } from "@/features/mindmap/constants/rootNode";
 import {
@@ -19,11 +20,9 @@ import {
     IMindmapController,
     MindmapOptions,
     TreeAdapter,
-} from "@/features/mindmap/types/mindmapControllerType";
-import {
-    EMPTY_DRAG_SESSION_SNAPSHOT,
-    EMPTY_INTERACTION_SNAPSHOT,
-} from "@/features/mindmap/types/mindmapInteractionType";
+} from "@/features/mindmap/types/mindmapController";
+import { EMPTY_DRAG_SESSION_SNAPSHOT, EMPTY_INTERACTION_SNAPSHOT } from "@/features/mindmap/types/mindmapInteraction";
+import { HitInfo } from "@/features/mindmap/types/mindmapInteractionType";
 import type { AddNodeDirection, NodeDirection, NodeElement, NodeId } from "@/features/mindmap/types/node";
 import { computeMindmapLayout } from "@/features/mindmap/utils/computeMindmapLayout";
 import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/mindmap/utils/mindmapStore";
@@ -52,24 +51,29 @@ function makeMeta(partial?: Partial<MindmapCommandMeta>): MindmapCommandMeta {
     };
 }
 
-// function isAddNodeDirection(x: string | null): x is AddNodeDirection {
-//     return x === "left" || x === "right";
-// }
-
 function isElement(x: unknown): x is Element {
     return typeof Element !== "undefined" && x instanceof Element;
 }
 
-function resolveHit(target: EventTarget | null | undefined): { kind: "node"; nodeId: NodeId } | { kind: "canvas" } {
+function resolveHit(target: EventTarget | null | undefined): HitInfo {
     if (!target || !isElement(target)) return { kind: "canvas" };
 
-    const nodeEl = target.closest?.("[data-node-id]");
+    const nodeEl = target.closest?.(NODE_SELECTOR);
     if (!nodeEl) return { kind: "canvas" };
 
     const nodeIdAttr = nodeEl.getAttribute("data-node-id");
     if (!nodeIdAttr) return { kind: "canvas" };
 
-    return { kind: "node", nodeId: nodeIdAttr as NodeId };
+    const nodeId = nodeIdAttr as NodeId;
+
+    if (target.closest(NO_DRAG_SELECTOR)) {
+        return { kind: "node", nodeId, dragHandle: false };
+    }
+
+    const handleEl = target.closest(DRAG_HANDLE_SELECTOR);
+    const dragHandle = !!handleEl && handleEl.closest(NODE_SELECTOR) === nodeEl;
+
+    return { kind: "node", nodeId, dragHandle };
 }
 
 export function createMindmapController(opts: MindmapOptions): MindmapController {
@@ -653,7 +657,7 @@ export class MindmapController implements IMindmapController {
                 }
             }
             if (hit.kind === "node") {
-                this.interaction.pointerDown({ kind: "node", nodeId: hit.nodeId }, e);
+                this.interaction.pointerDown(hit, e);
                 return;
             }
 
