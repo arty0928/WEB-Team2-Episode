@@ -4,7 +4,8 @@ import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
 import ControllerSideBar from "@/features/mindmap/components/bar/ControllerSideBar";
-import { TeamMindmapShareModal } from "@/features/mindmap/components/TeamMindmapShareModal";
+import { guideModal } from "@/features/mindmap/components/modal/constants/guideModal";
+import { TeamMindmapShareModal } from "@/features/mindmap/components/modal/TeamMindmapShareModal";
 import CollaborationList from "@/features/mindmap/core/CollaborationList";
 import CursorChatLayer from "@/features/mindmap/core/CursorChatLayer";
 import { MindmapProvider } from "@/features/mindmap/core/MindmapProvider";
@@ -15,6 +16,7 @@ import StarEpisodePanelOverlay from "@/features/mindmap/star/StarEpisodePanelOve
 import { StarEpisodePanelProvider, useStarEpisodePanelActions } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import StarEpisodeTargetSync from "@/features/mindmap/star/StarEpisodeTargetSync";
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
+import GifModal from "@/shared/components/gifModal/GifModal";
 import HeaderToolBar from "@/shared/components/headerToolBar/HeaderToolBar";
 import { BaseError } from "@/shared/utils/errors";
 
@@ -64,6 +66,10 @@ const MindmapContent = ({
                     rightSlot={
                         <>
                             <StarEpisodeHeaderIndicator />
+                            <GifModal
+                                size="lg"
+                                items={mindmapData?.isShared ? guideModal.shared : guideModal.unshared}
+                            />
                             {mindmapData.isShared && <TeamMindmapShareModal collaborators={mindmapData.participants} />}
                         </>
                     }

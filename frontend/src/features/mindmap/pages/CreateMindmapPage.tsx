@@ -1,8 +1,8 @@
 import { useParams } from "react-router";
 
-import { MindmapCategoryStep } from "@/features/mindmap/components/MindmapCategoryStep";
-import { MindmapTypeStep } from "@/features/mindmap/components/MindmapTypeStep";
-import { TeamDetailStep } from "@/features/mindmap/components/TeamDetailStep";
+import { MindmapCategoryStep } from "@/features/mindmap/components/step/MindmapCategoryStep";
+import { MindmapTypeStep } from "@/features/mindmap/components/step/MindmapTypeStep";
+import { TeamDetailStep } from "@/features/mindmap/components/step/TeamDetailStep";
 import { CreateMindmapFunnel } from "@/features/mindmap/types/mindmapFunnelType";
 import { MindmapType } from "@/features/mindmap/types/mindmapType";
 import Icon from "@/shared/components/icon/Icon";

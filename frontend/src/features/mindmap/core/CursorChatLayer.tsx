@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { ChatBubbleStack } from "@/features/mindmap/components/ChatBubbleStack";
+import { ChatBubbleStack } from "@/features/mindmap/components/chat/ChatBubbleStack";
 import { CURSOR_CHAT_STRING_MAX_LEN, CURSOR_CHAT_TTL_MS } from "@/features/mindmap/constants/cursorChat";
 import { useMindmapControllerContext } from "@/features/mindmap/core/MindmapProvider";
 import { useCursorChatStacks } from "@/features/mindmap/hooks/useCursorChatStack";
