@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { DEFAULT_NODE_HEIGHT, DEFAULT_NODE_WIDTH } from "@/features/mindmap/constants/node";
@@ -13,6 +13,7 @@ import { Node } from "@/features/mindmap/node/components/node/Node";
 import NodeCenter from "@/features/mindmap/node/components/nodeCenter/NodeCenter";
 import { useIsStarTargetNode } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import type { NodeId } from "@/features/mindmap/types/node";
+import { moveCursorToEnd } from "@/shared/utils/moveCursorToEnd";
 import { cn } from "@/utils/cn";
 
 const MAX_CONTENTS_LENGTH = 200;
@@ -80,23 +81,21 @@ function NodeItem({ nodeId, measure = true }: Props) {
     const isStarTarget = useIsStarTargetNode(nodeId);
 
     useEffect(() => {
-        if (lockedByMe) {
-            setDraft(contents ?? "");
-        }
+        if (lockedByMe) return;
+        setDraft(contents ?? "");
     }, [contents, lockedByMe]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!lockedByMe) return;
-        textareaRef.current?.focus();
-    }, [lockedByMe]);
 
-    useEffect(() => {
-        if (lockedByMe && textareaRef.current) {
-            textareaRef.current.focus();
-            // [추가] 진입 시점에 텍스트 양에 따라 높이 즉시 계산
-            textareaRef.current.style.height = "auto";
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-        }
+        const el = textareaRef.current;
+        if (!el) return;
+
+        // 포커스 + 커서 끝으로
+        moveCursorToEnd(el);
+
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
     }, [lockedByMe]);
 
     const lockLabel = locked && lock.info ? `🔒 ${lock.info?.user.name}` : null;

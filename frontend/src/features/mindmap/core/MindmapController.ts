@@ -1,4 +1,9 @@
-import { DRAG_HANDLE_SELECTOR, NO_DRAG_SELECTOR, NODE_SELECTOR } from "@/features/mindmap/constants/interaction";
+import {
+    DRAG_HANDLE_SELECTOR,
+    NO_DRAG_SELECTOR,
+    NODE_EDIT,
+    NODE_SELECTOR,
+} from "@/features/mindmap/constants/interaction";
 import { MAX_NODE_COUNT } from "@/features/mindmap/constants/node";
 import { normalizeRootContents } from "@/features/mindmap/constants/rootNode";
 import {
@@ -741,14 +746,25 @@ export class MindmapController implements IMindmapController {
         doubleClick: (e: PointerLikeEvent) => {
             this.assertNotDestroyed();
 
-            const hit = resolveHit(e.target);
+            const target = e.target;
+            if (!(target instanceof Element)) return;
+
+            // 에디터(input/textarea/contenteditable)에서 발생한 더블클릭은 텍스트 선택 등 UX를 위해 무시
+            if (target instanceof HTMLElement) {
+                const tagName = target.tagName;
+                const isTextEditing = tagName === "INPUT" || tagName === "TEXTAREA" || target.isContentEditable;
+                if (isTextEditing) return;
+            }
+
+            const editSurface = target.closest(NODE_EDIT);
+            if (!editSurface) return;
+
+            const hit = resolveHit(editSurface);
             if (hit.kind !== "node") return;
 
             const node = this.tree.safeGetNode(hit.nodeId);
             if (!node) return;
-
             if (!this.presenceManager) return;
-
             if (this.isNodeLockedByOther(hit.nodeId)) return;
 
             const curSelfLocked = this.store.getState().locks.selfLockedNodeId;

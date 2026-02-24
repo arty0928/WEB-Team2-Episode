@@ -1,4 +1,5 @@
 import { Bounds, Rect } from "@/shared/types/spatial";
+import { clientToWorld } from "@/shared/utils/worldScreenTransform";
 
 const BASE_MIN_ZOOM = 0.1;
 const BASE_MAX_ZOOM = 5;
@@ -146,16 +147,13 @@ export class ViewportController {
     screenToWorld(clientX: number, clientY: number) {
         const rect = this.canvas.getBoundingClientRect();
 
-        const viewWidth = rect.width / this.zoom;
-        const viewHeight = rect.height / this.zoom;
+        const world = clientToWorld(
+            { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+            { x: clientX, y: clientY },
+            { x: this.panX, y: this.panY, scale: this.zoom },
+        );
 
-        const minX = this.panX - viewWidth / 2;
-        const minY = this.panY - viewHeight / 2;
-
-        const x = ((clientX - rect.left) / rect.width) * viewWidth + minX;
-        const y = ((clientY - rect.top) / rect.height) * viewHeight + minY;
-
-        return { x, y };
+        return world ?? { x: this.panX, y: this.panY };
     }
 
     panningHandler(dx: number, dy: number): void {

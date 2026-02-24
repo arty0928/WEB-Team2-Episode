@@ -29,7 +29,10 @@ export default function NodeCenter({ username = "", baseId = DEFAULT_BASE_ID, cl
             />
 
             {/* 중앙 원형 콘텐츠: children을 여기로 */}
-            <div className="text-center cursor-pointer w-40 bg-node-violet-op-100 rounded-full h-40 flex items-center justify-center text-white typo-body-16-semibold px-3 whitespace-pre-line">
+            <div
+                data-node-edit
+                className="text-center cursor-pointer w-40 bg-node-violet-op-100 rounded-full h-40 flex items-center justify-center text-white typo-body-16-semibold px-3 whitespace-pre-line"
+            >
                 {children ?? fallbackLabel}
             </div>
 

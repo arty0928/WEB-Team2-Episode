@@ -118,7 +118,7 @@ function NodeContent({
             onPointerLeave={() => setIsHover(false)}
         >
             {/* 드래그는 이 “카드 표면”에서만 시작 */}
-            <div data-node-drag-handle="true" className={surfaceClassName} {...rest}>
+            <div data-node-edit data-node-drag-handle="true" className={surfaceClassName} {...rest}>
                 {isEditing ? (
                     renderEditor()
                 ) : (

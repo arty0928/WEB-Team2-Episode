@@ -13,7 +13,7 @@ import {
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import useMousePos from "@/shared/hooks/useMousePos";
 import useSingleKeyDown from "@/shared/hooks/useSingleKeyDown";
-import { worldToScreen } from "@/shared/utils/worldToScreen";
+import { worldToScreen } from "@/shared/utils/worldScreenTransform";
 import { cn } from "@/utils/cn";
 
 function fallbackUser(): CollaboratorInfo {
