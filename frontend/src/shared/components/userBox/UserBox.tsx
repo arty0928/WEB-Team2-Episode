@@ -8,7 +8,7 @@ type Props = ComponentPropsWithoutRef<"div"> & {
 
 export default function UserBox({ name, ...rest }: Props) {
     return (
-        <div className="flex items-center gap-4 cursor-pointer" {...rest}>
+        <div className="flex items-center gap-4 cursor-pointer select-none" {...rest}>
             <Icon name="ic_profile" color="var(--color-primary)" size={35} />
             <span className="typo-body-16-medium pr-3">{name}님</span>
         </div>

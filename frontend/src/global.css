@@ -156,10 +156,14 @@
 */
 @layer base {
     button:not(:disabled) {
-        @apply cursor-pointer;
+        @apply cursor-pointer select-none;
     }
     button:disabled {
-        @apply cursor-not-allowed;
+        @apply cursor-not-allowed select-none;
+    }
+
+    img {
+        @apply select-none pointer-events-none;
     }
 }
 

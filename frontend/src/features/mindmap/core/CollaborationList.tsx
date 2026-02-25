@@ -11,7 +11,7 @@ export default function CollaborationList() {
 
     return (
         <>
-            <List className="absolute top-4 right-4 z-50 p-4 gap-4" hasDivider={false}>
+            <List className="absolute top-4 right-4 z-50 p-4 gap-4 select-none" hasDivider={false}>
                 <ListRow
                     contents={"참여자 목록"}
                     className="typo-caption-12-semibold p-0"

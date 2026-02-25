@@ -74,9 +74,9 @@ const Dropdown = ({ children, placeholder = "선택해주세요", value, color, 
                 rightSlot={
                     <Icon name="ic_dropdown" rotate={isOpen ? 180 : 0} color={color || "currentColor"} width={16} />
                 }
-                className={cn(isPlaceholder ? "text-gray-400" : "text-black", className)}
+                className={cn(isPlaceholder ? "text-gray-400" : "text-black", className, "overflow-hidden")}
             >
-                <span className={cn("truncate", className)}>{displayText}</span>
+                <span className={cn("overflow-hidden truncate", className, "")}>{displayText}</span>
             </Button>
 
             {isOpen &&
