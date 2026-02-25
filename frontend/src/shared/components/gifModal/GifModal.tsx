@@ -82,7 +82,7 @@ const navButtonVariants = cva("w-14", {
 
 const DefaultTrigger = memo(function DefaultTrigger() {
     return (
-        <Button leftSlot={<Icon name="ic_info" />} borderRadius="lg" variant="alert" size="xs">
+        <Button leftSlot={<Icon name="ic_info" />} borderRadius="lg" variant="ghost" size="xs">
             가이드
         </Button>
     );
@@ -94,8 +94,8 @@ type MediaProps = VariantProps<typeof mediaVariants> & {
 
 const Media = memo(function Media({ gifSrc, size }: MediaProps) {
     return (
-        <div className={cn(mediaVariants({ size }))}>
-            <img src={gifSrc} alt="" className="h-full w-full object-contain" />
+        <div className={cn(mediaVariants({ size }), "max-h-80 min-h-80 overflow-hidden relative")}>
+            <img src={gifSrc} alt="" className="w-auto h-[101%] object-cover block my-0 mx-auto" />
             <Modal.CloseIcon className="absolute right-2 top-2" />
         </div>
     );
@@ -228,7 +228,7 @@ export default function GifModal({ items = [], size = "lg", defaultOpen, trigger
                 <Modal.Content
                     size="sm"
                     padding="none"
-                    className={cn("w-fit max-w-none inline-flex rounded-xl bg-white p-4", className)}
+                    className={cn("w-fit max-w-none inline-flex rounded-xl p-4", className)}
                 >
                     <div className={cn(frameVariants({ size }))}>
                         <Media gifSrc={current.gifSrc} size={size} />
