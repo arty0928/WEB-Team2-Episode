@@ -23,6 +23,7 @@ export const useMindmapList = ({ type = "ALL" }: Props) => {
     return useSuspenseQuery<MindmapItem[], ApiError>({
         queryKey: mindmapKeys.list({ type }),
         queryFn: () => fetchGetMindmapList(type),
-        staleTime: 1000 * 60,
+        refetchOnMount: "always",
+        refetchOnWindowFocus: true,
     });
 };

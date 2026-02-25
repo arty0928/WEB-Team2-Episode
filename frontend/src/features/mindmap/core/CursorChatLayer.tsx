@@ -33,7 +33,7 @@ export default function CursorChatOverlay() {
 
     const { stacks, pushMessage } = useCursorChatStacks();
 
-    const { containerRect, containerRef, isInside, mousePos } = useMousePos<HTMLDivElement>();
+    const { containerRect, containerRef, mousePos } = useMousePos<HTMLDivElement>();
 
     const lastSeenChatIdRef = useRef(new Map<number, string>());
     const [open, setOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function CursorChatOverlay() {
     useSingleKeyDown(
         "Slash",
         () => setOpen(true),
-        () => isInside,
+        () => true,
     );
 
     useEffect(() => {

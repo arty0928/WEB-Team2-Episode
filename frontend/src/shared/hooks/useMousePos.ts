@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 
 const useMousePos = <E extends HTMLElement>() => {
     const containerRef = useRef<E>(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const initialX = typeof window !== "undefined" ? window.innerWidth / 2 : 0;
+    const initialY = typeof window !== "undefined" ? window.innerHeight / 2 : 0;
+
+    const [mousePos, setMousePos] = useState({ x: initialX, y: initialY });
+
     const [isInside, setIsInside] = useState(false);
 
     const [containerRect, setContainerRect] = useState<{

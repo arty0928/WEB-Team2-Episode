@@ -92,7 +92,7 @@ const MindmapContent = ({
                         <div className="flex-1 relative min-h-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[20px_20px]">
                             <StarEpisodeTargetSync />
                             <svg ref={canvasRef} className="w-full h-full block">
-                                <MindmapRenderer isShared={mindmapData.isShared} />
+                                <MindmapRenderer />
                             </svg>
                             <CursorChatLayer />
                             <StarEpisodePanelOverlay />
