@@ -22,7 +22,7 @@ export default function EpisodeInfoSection({ className }: EpisodeInfoSectionProp
                 <label className="typo-body-16-semibold text-text-main1">에피소드 제목</label>
 
                 {hasContent ? (
-                    <div className="flex w-full h-fit px-5 pt-4 pb-3.5 rounded-xl bg-white text-text-main2 whitespace-pre-wrap break-all border border-transparent transition-colors focus-within:border-primary">
+                    <div className="flex w-full h-fit text-text-sub1 whitespace-pre-wrap break-all border border-transparent transition-colors focus-within:border-primary">
                         {content}
                     </div>
                 ) : (
