@@ -1,0 +1,5 @@
+export const MAX_COLLABORATORS = 10;
+
+export const CURSOR_PRESENCE_FPS_MIN = 100;
+
+export const CURSOR_CHAT_THROTTLE_MS = 100;

@@ -13,12 +13,12 @@ export default function CollaborationList() {
         <>
             <List className="absolute top-4 right-4 z-50 p-4 gap-4" hasDivider={false}>
                 <ListRow
-                    contents={"공동작업자"}
+                    contents={"참여자 목록"}
                     className="typo-caption-12-semibold p-0"
                     leftSlot={<Icon name="ic_team" size="16" />}
                 />
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 max-h-40 overflow-y-scroll">
                     {users.map((u) => (
                         <ListRow
                             className="typo-caption-12-medium min-w-50 p-0"

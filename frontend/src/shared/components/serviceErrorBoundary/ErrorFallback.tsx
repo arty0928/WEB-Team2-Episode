@@ -1,5 +1,5 @@
 import Button from "@/shared/components/button/Button";
-import { BaseError } from "@/shared/utils/errors";
+import { BaseError } from "@/utils/errors";
 
 export default function GlobalErrorFallback({
     error,

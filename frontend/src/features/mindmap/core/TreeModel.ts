@@ -10,7 +10,7 @@ import type {
     NodeSize,
     NodeType,
 } from "@/features/mindmap/types/node";
-import { NodeLimitExceededError } from "@/shared/utils/errors";
+import { NodeLimitExceededError } from "@/utils/errors";
 import { exhaustiveCheck } from "@/utils/exhaustiveCheck";
 import generateId from "@/utils/generateId";
 

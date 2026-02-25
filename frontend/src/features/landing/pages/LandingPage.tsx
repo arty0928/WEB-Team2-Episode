@@ -5,8 +5,8 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import LandingInfo from "@/features/landing/components/LandingInfo";
 import CallToActionButton from "@/shared/components/callToActionButton/CallToActionButton";
 import Icon from "@/shared/components/icon/Icon";
-import { linkTo } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
+import { linkTo } from "@/utils/route";
 
 type FocusKey = "mindmap" | "episode_archive";
 

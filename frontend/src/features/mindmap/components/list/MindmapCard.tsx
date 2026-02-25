@@ -14,9 +14,9 @@ import List from "@/shared/components/list/List";
 import ListRow from "@/shared/components/list/ListRow";
 import Popover from "@/shared/components/popover/Popover";
 import useClickOutside from "@/shared/hooks/useClickOutside";
-import { linkTo } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
 import { getRelativeTime } from "@/utils/getRelativeTime";
+import { linkTo } from "@/utils/route";
 
 type Props = {
     data: MindmapItem;
@@ -52,9 +52,7 @@ const MindmapCard = ({ data, interaction = "navigate", selected, onSelect, class
 
     const handleDelete = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (window.confirm("정말 이 마인드맵을 삭제하시겠습니까?")) {
-            deleteMindmap(data.mindmapId);
-        }
+        deleteMindmap(data.mindmapId);
     };
 
     const handleToggleFavorite = (e: React.MouseEvent) => {

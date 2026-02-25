@@ -8,7 +8,7 @@ import Button from "@/shared/components/button/Button";
 import Input from "@/shared/components/Input/Input";
 import Top from "@/shared/components/top/Top";
 import { FunnelInstance } from "@/shared/hooks/useFunnel";
-import { linkTo } from "@/shared/utils/route";
+import { linkTo } from "@/utils/route";
 
 const MAX_INPUT_LENGTH = 20;
 const MAX_EPISODE_COUNT = 8;

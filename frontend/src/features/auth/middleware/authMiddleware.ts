@@ -3,7 +3,7 @@ import { redirect } from "react-router";
 import { authQueryOptions } from "@/features/auth/api/auth";
 import { queryClient } from "@/shared/api/queryClient";
 import { AUTH_MESSAGES } from "@/shared/constants/authMessage";
-import { linkTo } from "@/shared/utils/route";
+import { linkTo } from "@/utils/route";
 
 export async function authMiddleWare() {
     // ensureQueryData를 통해 새로고침 시에도 응답이 올 때까지 기다리기

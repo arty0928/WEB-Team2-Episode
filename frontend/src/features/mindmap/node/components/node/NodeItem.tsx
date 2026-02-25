@@ -13,8 +13,8 @@ import { Node } from "@/features/mindmap/node/components/node/Node";
 import NodeCenter from "@/features/mindmap/node/components/nodeCenter/NodeCenter";
 import { useIsStarTargetNode } from "@/features/mindmap/star/StarEpisodePanelProvider";
 import type { NodeId } from "@/features/mindmap/types/node";
-import { moveCursorToEnd } from "@/shared/utils/moveCursorToEnd";
 import { cn } from "@/utils/cn";
+import { moveCursorToEnd } from "@/utils/moveCursorToEnd";
 
 const MAX_CONTENTS_LENGTH = 200;
 

@@ -5,7 +5,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import Mindmap from "@/features/mindmap/core/Mindmap";
 import { useMindmapSession } from "@/features/mindmap/hooks/useMindmapSession";
 import Spinner from "@/shared/components/spinner/Spinner";
-import { BadRequestError } from "@/shared/utils/errors";
+import { BadRequestError } from "@/utils/errors";
 
 // TODO: 커서 테스트용 컬러
 const COLORS = ["#34a7ff", "#fd69b9", "#0ed038", "#7749ff", "#ff913c"];

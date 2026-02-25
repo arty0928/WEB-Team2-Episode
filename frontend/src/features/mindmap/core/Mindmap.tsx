@@ -18,7 +18,7 @@ import StarEpisodeTargetSync from "@/features/mindmap/star/StarEpisodeTargetSync
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import GifModal from "@/shared/components/gifModal/GifModal";
 import HeaderToolBar from "@/shared/components/headerToolBar/HeaderToolBar";
-import { BaseError } from "@/shared/utils/errors";
+import { BaseError } from "@/utils/errors";
 
 export type MindmapConfig = {
     layout?: { xGap?: number; yGap?: number };
@@ -28,7 +28,7 @@ export type MindmapConfig = {
 type Props = {
     doc?: Y.Doc;
     mindmapId?: string;
-    provider?: WebsocketProvider;
+    provider: WebsocketProvider | null;
     config?: MindmapConfig;
     user?: CollaboratorInfo;
 };

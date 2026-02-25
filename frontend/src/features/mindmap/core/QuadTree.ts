@@ -1,5 +1,5 @@
 import { Point, Rect } from "@/shared/types/spatial";
-import { isIntersected, isPointInRect } from "@/shared/utils/rectHelper";
+import { isIntersected, isPointInRect } from "@/utils/rectHelper";
 
 /**
  * QuadTree

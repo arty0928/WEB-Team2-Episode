@@ -6,8 +6,8 @@ import Button from "@/shared/components/button/Button";
 import Icon from "@/shared/components/icon/Icon";
 import Popover from "@/shared/components/popover/Popover";
 import UserBox from "@/shared/components/userBox/UserBox";
-import { linkTo } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
+import { linkTo } from "@/utils/route";
 
 type Props = {
     variant?: "white" | "transparent";

@@ -5,7 +5,7 @@ import { useCreateMindmap } from "@/features/mindmap/hooks/useCreateMindmap";
 import { useUpdateEpisodes } from "@/features/mindmap/hooks/useUpdateEpisodes";
 import { MindmapId } from "@/features/mindmap/types/mindmapType";
 import { makeDocWithArr } from "@/features/mindmap/utils/createDocWithArr";
-import { uploadToS3 } from "@/shared/utils/uploadToS3";
+import { uploadToS3 } from "@/utils/uploadToS3";
 
 interface InitializeOptions {
     title: string;

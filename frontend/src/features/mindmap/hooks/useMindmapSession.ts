@@ -1,18 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
 
 import { ENV } from "@/constants/env";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ApiError } from "@/features/auth/types/api";
+import { MAX_COLLABORATORS } from "@/features/mindmap/constants/collaboration";
 import { mindmapEndpoints } from "@/shared/api/api";
 import { post } from "@/shared/api/method";
-import { BadRequestError, InternalServerError } from "@/shared/utils/errors";
+import { BadRequestError, InternalServerError } from "@/utils/errors";
 
 export type JoinSessionResponse = {
     token: string;
-
     presignedUrl: string;
 };
 
@@ -22,9 +21,7 @@ const postParticipants = (mindmapId: string) => {
 
 export const fetchJoinSession = async (
     mindmapId: string,
-
     maxRetryCount: number = 3,
-
     curRetryCount: number = 0,
 ): Promise<JoinSessionResponse> => {
     try {
@@ -34,7 +31,7 @@ export const fetchJoinSession = async (
     } catch (e) {
         if (!(e instanceof ApiError)) {
             throw new InternalServerError({
-                message: "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
+                message: "서버에서 마인드맵 데이터를 불러오지 못했습니다.",
             });
         }
 
@@ -54,7 +51,6 @@ export const fetchJoinSession = async (
                     return await fetchJoinSession(mindmapId, maxRetryCount, curRetryCount + 1);
                 } catch (participantError) {
                     console.error("❌ 참여자 등록 실패:", participantError);
-
                     throw participantError;
                 }
             }
@@ -64,188 +60,204 @@ export const fetchJoinSession = async (
     }
 };
 
+export async function prepareMindmapSession(
+    mindmapId: string,
+    doc: Y.Doc,
+): Promise<{ token: string; lastEntryId: string }> {
+    const { token, presignedUrl } = await fetchJoinSession(mindmapId);
+
+    const res = await fetch(presignedUrl);
+    if (!res.ok) {
+        throw new InternalServerError({ message: `Snapshot fetch failed: ${res.status}` });
+    }
+
+    const buffer = await res.arrayBuffer();
+    const lastEntryId = res.headers.get("X-Amz-Meta-Last-Entry-Id") ?? "0-0";
+
+    Y.applyUpdate(doc, new Uint8Array(buffer));
+
+    return { token, lastEntryId };
+}
+
+const MAX_RETRY_COUNT = 5;
+const RETRY_BASE_DELAY = 2000;
+
+const WS_MAX_PARTICIPANTS_CODE = 4001;
+
 type ConnectionStatus = "disconnected" | "connecting" | "connected";
 
-type Props = {
-    mindmapId: string;
-};
-
-export function useMindmapSession({ mindmapId }: Props) {
-    const { logout } = useAuth();
+export function useMindmapSession({ mindmapId }: { mindmapId: string }) {
     const doc = useMemo(() => new Y.Doc(), [mindmapId]);
-    const [provider, setProvider] = useState<WebsocketProvider | undefined>(undefined);
-    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
+
+    const [provider, setProvider] = useState<WebsocketProvider | null>(null);
+    const [status, setStatus] = useState<ConnectionStatus>("disconnected");
     const [isSynced, setIsSynced] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
+    const retryCountRef = useRef(0);
     const isUnmountedRef = useRef(false);
-    const isInitialLoadRef = useRef(true);
-    const isConnectingRef = useRef(false);
+    const fatalErrorRef = useRef<boolean>(false);
+    const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
-        isUnmountedRef.current = false;
-
-        let wsProvider: WebsocketProvider | null = null;
-        let retryTimeout: NodeJS.Timeout;
-        let retryCount = 0;
-        const MAX_RETRY = 5;
-
-        const destroyCurrentProvider = () => {
-            if (wsProvider) {
-                wsProvider.disconnect();
-                wsProvider.destroy();
-                wsProvider = null;
+    const cleanupProvider = useCallback(() => {
+        setProvider((prev) => {
+            if (prev) {
+                prev.disconnect();
+                prev.destroy();
             }
-        };
+            return null;
+        });
+        setIsSynced(false);
+    }, []);
 
-        const connectWebSocket = async () => {
-            if (!mindmapId || isUnmountedRef.current) return;
+    const stopSession = useCallback(
+        (err: Error, isFatal: boolean = false) => {
+            cleanupProvider();
+            setStatus("disconnected");
+            setError(err);
 
-            if (isConnectingRef.current) return;
+            if (isFatal) {
+                fatalErrorRef.current = true;
+                if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+            }
+        },
+        [cleanupProvider],
+    );
 
-            setError(null);
+    const connect = useCallback(async () => {
+        if (isUnmountedRef.current || fatalErrorRef.current) return;
+        if (!navigator.onLine) {
+            toast.error("인터넷 연결을 확인해주세요.");
+            return;
+        }
 
-            if (!navigator.onLine) {
-                toast.error("네트워크 상태를 확인해주세요.");
-                setConnectionStatus("disconnected");
-                if (isInitialLoadRef.current) {
-                    setError(
+        setStatus("connecting");
+        setError(null);
+
+        try {
+            const { token, lastEntryId } = await prepareMindmapSession(mindmapId, doc);
+
+            if (isUnmountedRef.current) return;
+
+            cleanupProvider();
+
+            const wsProvider = new WebsocketProvider(`${ENV.WS_BASE_URL}/mindmap/`, mindmapId, doc, {
+                connect: false,
+                params: { token, lastEntryId },
+                resyncInterval: 20000,
+            });
+
+            wsProvider.on("connection-close", (event: CloseEvent | null, _: WebsocketProvider) => {
+                if (event?.code === WS_MAX_PARTICIPANTS_CODE) {
+                    stopSession(
                         new BadRequestError({
-                            message: "네트워크에 연결되어 있지 않습니다. 연결 확인 후 새로고침 해주세요.",
+                            message: `최대 인원(${MAX_COLLABORATORS}명) 초과로 접속할 수 없습니다.`,
                         }),
+                        true,
                     );
-                } else {
-                    toast.error("네트워크 상태를 확인해주세요.");
                 }
+            });
 
+            wsProvider.on("status", ({ status }: { status: ConnectionStatus }) => {
+                if (isUnmountedRef.current || fatalErrorRef.current) return;
+
+                setStatus(status);
+
+                if (status === "disconnected") {
+                    console.warn("🔌 Websocket disconnected. Attempting reconnect...");
+                    scheduleRetry();
+                } else if (status === "connected") {
+                    retryCountRef.current = 0;
+                }
+            });
+
+            wsProvider.on("sync", (synced: boolean) => {
+                setIsSynced(synced);
+            });
+
+            wsProvider.connect();
+            setProvider(wsProvider);
+        } catch (e) {
+            if (!(e instanceof ApiError)) {
+                stopSession(
+                    new BadRequestError({
+                        message: String(e),
+                    }),
+                    true,
+                );
+
+                console.error("❌ Connection failed:", e);
                 return;
             }
 
-            try {
-                isConnectingRef.current = true;
-                setConnectionStatus("connecting");
-
-                const { token, presignedUrl } = await fetchJoinSession(mindmapId);
-                if (isUnmountedRef.current) return;
-
-                const res = await fetch(presignedUrl);
-                if (!res.ok) throw new InternalServerError({ message: `Snapshot fetch failed: ${res.status}` });
-
-                const buffer = await res.arrayBuffer();
-                if (isUnmountedRef.current) return;
-
-                const lastEntryId = res.headers.get("X-Amz-Meta-Last-Entry-Id") ?? "0-0";
-
-                Y.applyUpdate(doc, new Uint8Array(buffer));
-
-                destroyCurrentProvider();
-
-                wsProvider = new WebsocketProvider(`${ENV.WS_BASE_URL}/mindmap/`, mindmapId, doc, {
-                    connect: true,
-                    params: { token, lastEntryId },
-                    resyncInterval: 20000,
-                });
-
-                wsProvider.on("status", (event: { status: ConnectionStatus }) => {
-                    if (isUnmountedRef.current) return;
-                    setConnectionStatus(event.status);
-
-                    if (event.status === "disconnected") {
-                        console.warn("🔌 웹소켓 끊김 감지. 새 토큰과 스냅샷으로 재연결을 준비합니다.");
-
-                        setIsSynced(false);
-                        destroyCurrentProvider();
-
-                        clearTimeout(retryTimeout);
-                        retryTimeout = setTimeout(() => {
-                            if (navigator.onLine) {
-                                console.warn("🔄 재연결 시도 중...");
-                                connectWebSocket();
-                            }
-                        }, 2000);
-                    }
-                });
-
-                wsProvider.on("sync", (synced: boolean) => {
-                    if (isUnmountedRef.current) return;
-                    setIsSynced(synced);
-                    if (synced) {
-                        console.log("🎉 서버와 데이터 동기화 완료!");
-                        isInitialLoadRef.current = false;
-                        retryCount = 0;
-                    }
-                });
-
-                setProvider(wsProvider);
-            } catch (err) {
-                console.error("❌ 세션 연결 실패:", err);
-
-                if (err instanceof ApiError && err.status === 401) {
-                    toast.error("세션이 만료되었습니다. 다시 로그인해주세요.");
-
-                    await logout();
-                    return;
-                }
-                if (isUnmountedRef.current) return;
-
-                if (retryCount < MAX_RETRY) {
-                    retryCount++;
-                    const delay = Math.pow(2, retryCount) * 1000;
-                    console.warn(`🔄 ${delay}ms 후 재연결 시도 중... (${retryCount}/${MAX_RETRY})`);
-                    clearTimeout(retryTimeout);
-                    retryTimeout = setTimeout(connectWebSocket, delay);
-                } else {
-                    setConnectionStatus("disconnected");
-
-                    if (isInitialLoadRef.current) {
-                        setError(
-                            new BadRequestError({
-                                message:
-                                    "네트워크가 불안정하여 마인드맵 데이터를 불러오지 못했습니다. 새로고침 해주세요.",
-                            }),
-                        );
-                    } else {
-                        toast.error("세션이 만료되었거나 네트워크가 끊어졌습니다.");
-                    }
-                }
-            } finally {
-                isConnectingRef.current = false;
+            if (e.status === 403 || e.code === "MINDMAP_ACCESS_FORBIDDEN") {
+                stopSession(e, true);
+                return;
             }
-        };
 
-        connectWebSocket();
+            scheduleRetry();
+        }
+    }, [mindmapId, doc, cleanupProvider, stopSession]);
 
-        const handleEnvironmentChange = () => {
-            if (navigator.onLine && (!wsProvider || !wsProvider.wsconnected)) {
-                console.log("🔄 환경 변화 감지. 스냅샷 및 토큰을 새로 갱신합니다.");
-                retryCount = 0;
-                connectWebSocket();
-            }
-        };
+    const scheduleRetry = useCallback(() => {
+        if (fatalErrorRef.current || isUnmountedRef.current) return;
 
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") handleEnvironmentChange();
-        };
+        cleanupProvider();
 
-        window.addEventListener("online", handleEnvironmentChange);
-        document.addEventListener("visibilitychange", handleVisibilityChange);
-        window.addEventListener("focus", handleEnvironmentChange);
+        if (retryCountRef.current >= MAX_RETRY_COUNT) {
+            stopSession(new Error("네트워크 상태가 불안정하여 연결할 수 없습니다."), true);
+            return;
+        }
+
+        const nextRetryCount = retryCountRef.current + 1;
+        const delay = RETRY_BASE_DELAY;
+
+        console.log(`🔄 Retrying in ${delay}ms... (${nextRetryCount}/${MAX_RETRY_COUNT})`);
+
+        retryCountRef.current = nextRetryCount;
+
+        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = setTimeout(() => {
+            connect();
+        }, delay);
+    }, [connect, cleanupProvider, stopSession]);
+
+    useEffect(() => {
+        isUnmountedRef.current = false;
+        fatalErrorRef.current = false;
+        retryCountRef.current = 0;
+
+        connect();
 
         return () => {
             isUnmountedRef.current = true;
-            clearTimeout(retryTimeout);
-            window.removeEventListener("online", handleEnvironmentChange);
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-            window.removeEventListener("focus", handleEnvironmentChange);
-            destroyCurrentProvider();
+            if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+            cleanupProvider();
         };
-    }, [mindmapId, doc]);
+    }, [connect, cleanupProvider]);
 
-    return {
-        doc,
-        provider,
-        connectionStatus,
-        isSynced,
-        error,
-    };
+    useEffect(() => {
+        const handleReconnection = () => {
+            if (document.visibilityState === "visible" && navigator.onLine) {
+                if (status === "disconnected" && !fatalErrorRef.current) {
+                    console.log("👀 App visible/online. Reconnecting immediately.");
+                    retryCountRef.current = 0;
+                    if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+                    connect();
+                }
+            }
+        };
+
+        window.addEventListener("online", handleReconnection);
+        document.addEventListener("visibilitychange", handleReconnection);
+        window.addEventListener("focus", handleReconnection);
+
+        return () => {
+            window.removeEventListener("online", handleReconnection);
+            document.removeEventListener("visibilitychange", handleReconnection);
+            window.removeEventListener("focus", handleReconnection);
+        };
+    }, [connect, status]);
+
+    return { doc, provider, connectionStatus: status, isSynced, error };
 }

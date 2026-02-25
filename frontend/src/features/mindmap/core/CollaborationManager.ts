@@ -1,19 +1,16 @@
-import { CURSOR_CHAT_TTL_MS } from "@/features/mindmap/constants/cursorChat";
+import { CursorModule } from "@/features/mindmap/core/CursorModule";
 import {
     AwarenessLike,
     Collaborator,
-    CollaboratorCursor,
     CollaboratorCursorsInfo,
     CollaboratorInfo,
     Collaborators,
-    CursorChat,
     CursorPos,
     LockInfo,
     LocksInfo,
     LockState,
 } from "@/features/mindmap/types/mindmapCollaborationType";
 import type { NodeId } from "@/features/mindmap/types/node";
-import generateId from "@/utils/generateId";
 
 type Deps = {
     awareness: AwarenessLike;
@@ -25,9 +22,6 @@ type Deps = {
     commitCursors: (next: CollaboratorCursorsInfo) => void;
     commitLocks: (next: LocksInfo) => void;
 };
-function isInsideRect(rect: DOMRect, x: number, y: number) {
-    return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-}
 
 function shallowEqualParticipants(a: Collaborator[], b: Collaborator[]) {
     if (a === b) return true;
@@ -41,33 +35,6 @@ function shallowEqualParticipants(a: Collaborator[], b: Collaborator[]) {
             A.user.id !== B.user.id ||
             A.user.name !== B.user.name ||
             A.user.color !== B.user.color
-        ) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function sameChat(a?: CursorChat | null, b?: CursorChat | null) {
-    if (!a && !b) return true;
-    if (!a || !b) return false;
-    return a.id === b.id && a.message === b.message && a.at === b.at;
-}
-
-function shallowEqualCursors(a: CollaboratorCursor[], b: CollaboratorCursor[]) {
-    if (a === b) return true;
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-        const A = a[i]!;
-        const B = b[i]!;
-        if (
-            A.clientId !== B.clientId ||
-            A.cursor.x !== B.cursor.x ||
-            A.cursor.y !== B.cursor.y ||
-            A.user.id !== B.user.id ||
-            A.user.name !== B.user.name ||
-            A.user.color !== B.user.color ||
-            !sameChat(A.chat ?? null, B.chat ?? null)
         ) {
             return false;
         }
@@ -101,18 +68,6 @@ function shallowEqualLocks(a: LocksInfo, b: LocksInfo) {
     return true;
 }
 
-function isObject(x: unknown): x is Record<string, unknown> {
-    return typeof x === "object" && x !== null;
-}
-
-function normalizeChat(x: unknown): CursorChat | null {
-    if (!isObject(x)) return null;
-    if (typeof x.id !== "string") return null;
-    if (typeof x.message !== "string") return null;
-    if (typeof x.at !== "number") return null;
-    return { id: x.id, message: x.message, at: x.at };
-}
-
 /**
  * - awareness에 local user + cursor + lock 상태를 세팅
  * - remote states 변화 감지 -> participants/cursors/locks를 분리해서 store에 반영
@@ -122,6 +77,7 @@ export class CollaborationManager {
     private deps: Deps;
     private localUser: CollaboratorInfo;
 
+    private cursorModule: CursorModule;
     private disposed = false;
 
     private lastPresence: Collaborators = { enabled: true, selfClientId: null, participants: [] };
@@ -148,9 +104,8 @@ export class CollaborationManager {
 
         this.ensureLocalState();
         this.deps.awareness.setLocalStateField("user", this.localUser);
-        this.deps.awareness.setLocalStateField("cursor", null);
+        this.cursorModule = new CursorModule({ ...this.deps }, this.localUser);
         this.deps.awareness.setLocalStateField("lock", null);
-        this.deps.awareness.setLocalStateField("chat", null);
 
         this.deps.awareness.on("change", this.onAwarenessChange);
 
@@ -160,6 +115,7 @@ export class CollaborationManager {
     destroy() {
         if (this.disposed) return;
         this.disposed = true;
+        this.cursorModule.destroy();
 
         try {
             this.deps.awareness.setLocalStateField("chat", null);
@@ -181,65 +137,8 @@ export class CollaborationManager {
         }
     }
 
-    sendChat(message: string) {
-        if (this.disposed) return;
-
-        const text = message.trim().slice(0, 50);
-        if (!text) return;
-
-        this.ensureLocalState();
-
-        const chat: CursorChat = { id: generateId(), message: text, at: Date.now() };
-        this.deps.awareness.setLocalStateField("chat", chat);
-
-        if (this.chatClearTimeout) clearTimeout(this.chatClearTimeout);
-        this.chatClearTimeout = setTimeout(() => {
-            if (this.disposed) return;
-            try {
-                const st = this.deps.awareness.getLocalState();
-                if (st?.chat && st.chat.id === chat.id) {
-                    this.deps.awareness.setLocalStateField("chat", null);
-                }
-            } catch {
-                // ignore
-            }
-        }, CURSOR_CHAT_TTL_MS);
-    }
-
-    handlePointerMove(clientX: number, clientY: number) {
-        const rect = this.deps.getCanvasRect();
-        if (!rect) return;
-
-        if (!isInsideRect(rect, clientX, clientY)) {
-            this.clearCursor();
-            return;
-        }
-
-        const world = this.deps.screenToWorld(clientX, clientY);
-        this.setCursor(world);
-    }
-
-    clearCursor() {
-        this.pendingCursor = null;
-        this.scheduleCursorFlush();
-    }
-
-    setCursor(cursor: CursorPos) {
-        this.pendingCursor = cursor;
-        this.scheduleCursorFlush();
-    }
-
-    private scheduleCursorFlush() {
-        if (this.cursorRaf) return;
-        this.cursorRaf = requestAnimationFrame(() => {
-            this.cursorRaf = null;
-            this.flushCursor();
-        });
-    }
-
-    private flushCursor() {
-        this.ensureLocalState();
-        this.deps.awareness.setLocalStateField("cursor", this.pendingCursor);
+    sendCursorChat(message: string) {
+        this.cursorModule.sendCursorChat(message);
     }
 
     setLock(nodeId: NodeId | null): boolean {
@@ -276,6 +175,10 @@ export class CollaborationManager {
         }
     }
 
+    handlePointerMove(cursor: CursorPos) {
+        this.cursorModule.handlePointerMove(cursor);
+    }
+
     private syncFromAwareness() {
         if (this.disposed) return;
 
@@ -284,7 +187,6 @@ export class CollaborationManager {
         const states = awareness.getStates();
 
         const participants: Collaborator[] = [];
-        const cursors: CollaboratorCursor[] = [];
 
         const locksByNodeId = new Map<NodeId, LockInfo>();
         let desiredSelfLockNodeId: NodeId | null = null;
@@ -297,13 +199,6 @@ export class CollaborationManager {
             const isSelf = clientId === selfId;
 
             participants.push({ clientId, user, isSelf });
-
-            const cursor = state?.cursor;
-            const chat = normalizeChat(state?.chat ?? null);
-
-            if (!isSelf && cursor && typeof cursor.x === "number" && typeof cursor.y === "number") {
-                cursors.push({ clientId, user, cursor, chat });
-            }
 
             const lock = state?.lock;
             if (lock && lock.nodeId) {
@@ -348,10 +243,7 @@ export class CollaborationManager {
             return a.user.name.localeCompare(b.user.name);
         });
 
-        cursors.sort((a, b) => a.user.name.localeCompare(b.user.name));
-
         const nextPresence: Collaborators = { enabled: true, selfClientId: selfId, participants };
-        const nextCursors: CollaboratorCursorsInfo = { enabled: true, selfClientId: selfId, cursors };
 
         const nextLocks: LocksInfo = {
             enabled: true,
@@ -366,14 +258,6 @@ export class CollaborationManager {
         ) {
             this.lastPresence = nextPresence;
             this.deps.commitPresence(nextPresence);
-        }
-
-        if (
-            this.lastCursors.selfClientId !== nextCursors.selfClientId ||
-            !shallowEqualCursors(this.lastCursors.cursors, nextCursors.cursors)
-        ) {
-            this.lastCursors = nextCursors;
-            this.deps.commitCursors(nextCursors);
         }
 
         if (!shallowEqualLocks(this.lastLocks, nextLocks)) {

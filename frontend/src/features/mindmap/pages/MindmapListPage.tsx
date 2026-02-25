@@ -11,7 +11,7 @@ import Tab from "@/shared/components/tabs/Tab";
 import TabItem from "@/shared/components/tabs/TabItem";
 import Top from "@/shared/components/top/Top";
 import { useTabs } from "@/shared/hooks/useTabs";
-import { linkTo } from "@/shared/utils/route";
+import { linkTo } from "@/utils/route";
 
 const MindmapListPage = () => {
     const { selectedValue, onChange } = useTabs<MindmapTabId>("ALL");

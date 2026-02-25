@@ -80,8 +80,8 @@ export function TeamMindmapShareModal({ collaborators }: Props) {
                         </section>
 
                         <section className="flex flex-col gap-4 mt-7.5">
-                            <h3 className="typo-body-18-semibold text-text-main1">공동 작업자</h3>
-                            <ul className="flex flex-col gap-3">
+                            <h3 className="typo-body-18-semibold text-text-main1">참여자 목록</h3>
+                            <ul className="flex flex-col gap-3 max-h-50 overflow-y-scroll">
                                 {collaborators.map((c, i) => (
                                     <li key={i} className="flex items-center justify-between">
                                         <div className="flex items-center gap-3 min-w-0">

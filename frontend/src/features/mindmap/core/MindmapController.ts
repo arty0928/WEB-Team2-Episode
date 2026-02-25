@@ -34,7 +34,7 @@ import { createMindmapStore, MindmapStoreState, StoreChannel } from "@/features/
 import { getOuterSize } from "@/features/mindmap/utils/nodeGeometry";
 import { KeyLikeEvent, PointerLikeEvent, WheelLikeEvent } from "@/shared/types/nativeLikeEvent";
 import type { Bounds, Point, Rect, SpatialPoint, SpatialStats } from "@/shared/types/spatial";
-import { BadRequestError, NodeLimitExceededError } from "@/shared/utils/errors";
+import { BadRequestError, NodeLimitExceededError } from "@/utils/errors";
 
 function cloneNodesMapForLayout(nodes: Map<NodeId, NodeElement>): Map<NodeId, NodeElement> {
     const out = new Map<NodeId, NodeElement>();
@@ -542,7 +542,7 @@ export class MindmapController implements IMindmapController {
 
     actions = {
         sendCursorChat: (message: string) => {
-            this.presenceManager?.sendChat(message);
+            this.presenceManager?.sendCursorChat(message);
         },
 
         lockNode: (nodeId: NodeId) => {
@@ -672,7 +672,7 @@ export class MindmapController implements IMindmapController {
         pointerMove: (e: PointerLikeEvent) => {
             this.assertNotDestroyed();
             this.interaction?.pointerMove(e);
-            this.presenceManager?.handlePointerMove(e.clientX, e.clientY);
+            this.presenceManager?.handlePointerMove({ x: e.clientX, y: e.clientY });
         },
 
         pointerUp: (e: PointerLikeEvent) => {

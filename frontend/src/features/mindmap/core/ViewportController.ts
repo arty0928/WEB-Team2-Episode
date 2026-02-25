@@ -1,5 +1,5 @@
 import { Bounds, Rect } from "@/shared/types/spatial";
-import { clientToWorld } from "@/shared/utils/worldScreenTransform";
+import { clientToWorld } from "@/utils/worldScreenTransform";
 
 const BASE_MIN_ZOOM = 0.1;
 const BASE_MAX_ZOOM = 5;

@@ -7,7 +7,7 @@ import Button from "@/shared/components/button/Button";
 import { EmojiCard } from "@/shared/components/emojiCard/EmojiCard";
 import Top from "@/shared/components/top/Top";
 import { FunnelInstance } from "@/shared/hooks/useFunnel";
-import { linkTo } from "@/shared/utils/route";
+import { linkTo } from "@/utils/route";
 
 type CategoryStepFunnel = Extract<FunnelInstance<CreateMindmapFunnel>, { step: "CATEGORY" }>;
 

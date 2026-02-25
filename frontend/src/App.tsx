@@ -14,8 +14,8 @@ import ServiceErrorBoundary from "@/shared/components/serviceErrorBoundary/Servi
 import Spinner from "@/shared/components/spinner/Spinner";
 import { Toaster } from "@/shared/components/ui/sonner";
 import { useAuthToast } from "@/shared/hooks/useAuthToast";
-import { PATHS } from "@/shared/utils/route";
 import { cn } from "@/utils/cn";
+import { PATHS } from "@/utils/route";
 
 function RootLayout() {
     const location = useLocation();

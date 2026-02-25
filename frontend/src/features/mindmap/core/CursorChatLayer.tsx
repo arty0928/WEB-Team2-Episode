@@ -13,8 +13,8 @@ import {
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import useMousePos from "@/shared/hooks/useMousePos";
 import useSingleKeyDown from "@/shared/hooks/useSingleKeyDown";
-import { worldToScreen } from "@/shared/utils/worldScreenTransform";
 import { cn } from "@/utils/cn";
+import { worldToScreen } from "@/utils/worldScreenTransform";
 
 function fallbackUser(): CollaboratorInfo {
     return { id: "local", name: "나", color: "rgba(17,24,39,0.92)" };
@@ -123,7 +123,7 @@ export default function CursorChatOverlay() {
                     placeholder="채팅 입력..."
                     className={cn(
                         "absolute w-64 px-3.5 py-2.5 z-50",
-                        "bg-white rounded-xl shadow-xl border border-gray-400",
+                        "bg-white rounded-2xl shadow-xl border border-gray-400",
                         "typo-caption-12-medium text-text-main1 placeholder:text-gray-400",
                         "outline-none focus:ring-2 focus:ring-blue-500/20",
                         "pointer-events-auto transition-all duration-200 ease-out origin-top-left",
@@ -131,7 +131,7 @@ export default function CursorChatOverlay() {
                     style={{
                         left: mousePos.x,
                         top: mousePos.y,
-                        transform: "translate(16px, -16px)",
+                        transform: "translate(0px, -38px)",
                     }}
                 />
             )}

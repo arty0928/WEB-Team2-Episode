@@ -7,7 +7,7 @@ import { AUTH_QUERY_KEYS } from "@/features/auth/constants/query_key";
 import { AuthContext } from "@/features/auth/hooks/useAuth";
 import type { User } from "@/features/auth/types/user";
 import { AUTH_MESSAGES } from "@/shared/constants/authMessage";
-import { linkTo } from "@/shared/utils/route";
+import { linkTo } from "@/utils/route";
 
 type AuthProviderProps = {
     children: React.ReactNode;
