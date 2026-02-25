@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { WebsocketProvider } from "y-websocket";
 import * as Y from "yjs";
@@ -19,6 +20,7 @@ import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationT
 import GifModal from "@/shared/components/gifModal/GifModal";
 import HeaderToolBar from "@/shared/components/headerToolBar/HeaderToolBar";
 import { BaseError } from "@/utils/errors";
+import { linkTo } from "@/utils/route";
 
 export type MindmapConfig = {
     layout?: { xGap?: number; yGap?: number };
@@ -58,10 +60,13 @@ const MindmapContent = ({
         }
     }, [mindmapData?.isShared, setIsShared]);
 
+    const navigate = useNavigate();
+
     return (
         <div className="flex flex-col w-full h-full min-h-0">
             <div className="shrink-0">
                 <HeaderToolBar
+                    onBack={() => navigate(linkTo.mindmap.list(), { replace: true })}
                     title={mindmapData.mindmapName}
                     rightSlot={
                         <>
