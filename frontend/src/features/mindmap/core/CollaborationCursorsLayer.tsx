@@ -12,12 +12,27 @@ export default function CollaborationCursorsLayer() {
                     <circle r={6} fill={c.user.color} opacity={0.9} />
                     <circle r={10} fill="transparent" stroke={c.user.color} strokeWidth={2} opacity={0.6} />
 
-                    <g transform="translate(12,-12)">
-                        <rect x={0} y={0} width={90} height={20} rx={6} ry={6} fill={c.user.color} opacity={0.85} />
-                        <text x={8} y={14} fontSize={12} fill="#fff">
+                    <foreignObject x={12} y={10} width={200} height={40}>
+                        <div
+                            style={{
+                                maxWidth: "100px",
+                                display: "inline-block",
+                                backgroundColor: c.user.color,
+                                color: "#fff",
+                                fontSize: "12px",
+                                padding: "2px 8px",
+                                borderRadius: "6px",
+                                opacity: 0.85,
+
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                verticalAlign: "middle",
+                            }}
+                        >
                             {c.user.name}
-                        </text>
-                    </g>
+                        </div>
+                    </foreignObject>
                 </g>
             ))}
         </g>

@@ -4,7 +4,6 @@ import { ChatBubble } from "@/features/mindmap/constants/cursorChat";
 import { CollaboratorInfo } from "@/features/mindmap/types/mindmapCollaborationType";
 import { cn } from "@/utils/cn";
 
-const STACK_GAP = 42;
 const INPUT_SPACE = 60;
 
 interface ChatBubbleStackProps {
@@ -14,7 +13,6 @@ interface ChatBubbleStackProps {
     user: CollaboratorInfo;
     needSlide?: boolean;
 }
-
 export const ChatBubbleStack = memo(function ChatBubbleStack({
     x,
     y,
@@ -27,32 +25,32 @@ export const ChatBubbleStack = memo(function ChatBubbleStack({
     return (
         <div
             className={cn(
-                "absolute z-30 pointer-events-none will-change-transform",
+                "absolute z-30 pointer-events-none flex flex-col-reverse items-start gap-1.5", // 역순 정렬 및 간격 설정
                 "transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1)",
             )}
             style={{
                 left: x,
+                // 커서 위치에서 위로 쌓이도록 transform 조정
                 top: y,
-                transform: needSlide ? `translateY(-${INPUT_SPACE}px)` : "translateY(0)",
+                transform: `translate(0, ${needSlide ? -INPUT_SPACE : 0}px) translateY(-100%)`,
             }}
         >
             {messages.map((m, idx) => (
                 <div
                     key={m.id}
-                    className="absolute left-0 bottom-0 w-max transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
+                    className="relative w-max transition-all duration-300 cubic-bezier(0.16, 1, 0.3, 1)"
                     style={{
-                        transform: `translateY(-${idx * STACK_GAP}px)`,
                         zIndex: messages.length - idx,
                         opacity: m.leaving ? 0 : 1,
+                        transform: m.leaving ? "scale(0.95)" : "scale(1)",
                     }}
                 >
                     <div
                         className={cn(
                             "px-3.5 py-2 rounded-2xl shadow-sm border border-white/10",
                             "text-13 font-medium text-white leading-tight",
-                            "max-w-60",
-                            "transition-transform duration-200 ease-out",
-                            m.leaving ? "scale-95 blur-[2px]" : "scale-100 blur-0",
+                            "max-w-60 wrap-break-word", // 단어가 길면 자동 줄바꿈
+                            "transition-all duration-200 ease-out",
                         )}
                         style={{ backgroundColor: user.color }}
                     >
