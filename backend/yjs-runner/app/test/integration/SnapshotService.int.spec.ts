@@ -56,6 +56,9 @@ describe("SnapshotService Integration Test (Redis + InMemory Storage)", () => {
             yjs: new DefaultYjsProcessor(),
             syncClient,
             lastEntryIdRepo,
+            jobPublisher: {
+                publishSync: async () => {},
+            },
         });
     }, 60000);
 

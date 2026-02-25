@@ -4,6 +4,7 @@ import type { YjsProcessor } from "../domain/YjsProcessor";
 import { Job, JobType } from "../contracts/Job";
 import { WebsocketSyncClient } from "../infrastructure/WebsocketSyncClient";
 import { LastEntryIdRepository } from "../infrastructure/redis/LastEntryIdRepository";
+import { RedisStreamJobPublisher } from "../infrastructure/redis/JobPublisher";
 
 export class SnapshotService {
     constructor(
@@ -13,6 +14,7 @@ export class SnapshotService {
             storage: SnapshotStorage;
             syncClient: WebsocketSyncClient;
             lastEntryIdRepo: LastEntryIdRepository;
+            jobPublisher: { publishSync(roomId: string): Promise<void> };
         },
     ) {}
 
@@ -24,7 +26,16 @@ export class SnapshotService {
             if (!updates.updateFrameList.length) {
                 return;
             }
-            const newSnapshot = this.deps.yjs.buildUpdatedSnapshot(baseSnapshot, updates.updateFrameList);
+            let newSnapshot: Uint8Array;
+            try {
+                newSnapshot = this.deps.yjs.buildUpdatedSnapshot(baseSnapshot, updates.updateFrameList);
+            } catch (e) {
+                try {
+                    await this.deps.updateRepo.trim(job.roomId, updates.lastEntryId);
+                    await this.deps.jobPublisher.publishSync(job.roomId);
+                } catch (ignored) {}
+                return;
+            }
             await this.commit(job.roomId, updates.lastEntryId, newSnapshot);
             await this.deps.updateRepo.trim(job.roomId, updates.lastEntryId);
         } else if (job.type === JobType.SYNC) {

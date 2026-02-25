@@ -8,7 +8,7 @@ export class SnapshotWorker {
 
     constructor(
         private readonly deps: {
-            consumer: JobConsumer;
+            jobConsumer: JobConsumer;
             service: SnapshotService;
             blockMs: number;
             count?: number;
@@ -16,7 +16,7 @@ export class SnapshotWorker {
     ) {}
 
     async init(): Promise<void> {
-        await this.deps.consumer.init();
+        await this.deps.jobConsumer.init();
     }
 
     async start(): Promise<void> {
@@ -24,7 +24,7 @@ export class SnapshotWorker {
 
         while (this.running) {
             try {
-                const jobs = await this.deps.consumer.read(this.deps.blockMs, this.deps.count);
+                const jobs = await this.deps.jobConsumer.read(this.deps.blockMs, this.deps.count);
                 if (!jobs || jobs.length === 0) continue;
 
                 const successIds: string[] = [];
@@ -47,9 +47,9 @@ export class SnapshotWorker {
                 }
 
                 if (successIds.length) {
-                    await this.deps.consumer.ack(successIds);
-                    await this.deps.consumer.del(successIds);
-                    await this.deps.consumer.clearInflight(successJobs);
+                    await this.deps.jobConsumer.ack(successIds);
+                    await this.deps.jobConsumer.del(successIds);
+                    await this.deps.jobConsumer.clearInflight(successJobs);
                 }
             } catch (e) {
                 console.error("[Worker] 전역 Error:", e);

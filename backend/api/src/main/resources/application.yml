@@ -145,7 +145,7 @@ collaboration:
       key-prefix: "collab:room:"
       ttl: "P30D"
       field-update: "u"
-      snapshot-threshold: 1500
+      snapshot-threshold: 1000
     job-stream:
       key: "collab:jobs"
       fields:

@@ -9,6 +9,7 @@ import { SnapshotWorker } from "./worker/SnapshotWorker";
 import { MindmapTicketIssuer } from "./infrastructure/MindmapTicketIssuer";
 import { WebsocketSyncClient } from "./infrastructure/WebsocketSyncClient";
 import { LastEntryIdRepository } from "./infrastructure/redis/LastEntryIdRepository";
+import { RedisStreamJobPublisher } from "./infrastructure/redis/JobPublisher";
 
 const redis = new Redis({
     host: process.env.REDIS_HOST!,
@@ -41,24 +42,20 @@ const ticketIssuer = new MindmapTicketIssuer(
 
 const syncClient = new WebsocketSyncClient(ticketIssuer, process.env.WS_BASE_URL!);
 
+const jobConsumer = new RedisStreamJobConsumer(redis);
+const jobPublisher = new RedisStreamJobPublisher(redis);
+
 const service = new SnapshotService({
     updateRepo,
     yjs,
     storage,
     syncClient,
     lastEntryIdRepo,
-});
-
-const consumer = new RedisStreamJobConsumer(redis, {
-    groupName: process.env.JOB_GROUP_NAME!,
-    consumerName: process.env.JOB_CONSUMER_NAME!,
-    roomIdField: process.env.JOB_ROOM_FIELD ? process.env.JOB_ROOM_FIELD : "rid",
-    typeField: process.env.JOB_TYPE_FIELD ? process.env.JOB_TYPE_FIELD : "t",
-    maxRetries: Number(process.env.JOB_MAX_TRY ?? 5),
+    jobPublisher,
 });
 
 const worker = new SnapshotWorker({
-    consumer,
+    jobConsumer,
     service,
     blockMs: Number(process.env.JOB_BLOCK_MS ?? 10000),
     count: Number(process.env.JOB_COUNT ?? 1),

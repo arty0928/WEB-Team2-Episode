@@ -5,6 +5,7 @@ import { SnapshotStorage } from "../../../src/infrastructure/S3SnapshotStorage";
 import { JobType } from "../../../src/contracts/Job";
 import { WebsocketSyncClient } from "../../../src/infrastructure/WebsocketSyncClient";
 import { LastEntryIdRepository } from "../../../src/infrastructure/redis/LastEntryIdRepository";
+import { RedisStreamJobPublisher } from "../../../src/infrastructure/redis/JobPublisher";
 
 describe("SnapshotService", () => {
     let service: SnapshotService;
@@ -33,6 +34,10 @@ describe("SnapshotService", () => {
         set: jest.fn(),
     } as unknown as jest.Mocked<LastEntryIdRepository>;
 
+    const mockJobPublisher = {
+        publishSync: jest.fn<Promise<void>, [string]>(),
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         service = new SnapshotService({
@@ -41,6 +46,7 @@ describe("SnapshotService", () => {
             storage: mockStorage,
             syncClient: mockSyncClient,
             lastEntryIdRepo: mockLastEntryIdRepo,
+            jobPublisher: mockJobPublisher,
         });
     });
 

@@ -27,11 +27,6 @@ function logPending(doc: Y.Doc) {
     if (!store?.pendingStructs) return;
 
     console.warn(`[YjsProcessor] ⚠ Pending Structs detected`);
-
-    const clients = Array.from(store.pendingStructs.clients.keys());
-    console.warn("Pending clientIds:", clients);
-
-    console.warn("Missing state vector:", store.pendingStructs.missing);
 }
 
 export class DefaultYjsProcessor implements YjsProcessor {
@@ -42,18 +37,18 @@ export class DefaultYjsProcessor implements YjsProcessor {
             logPending(doc);
         }
 
-        return Y.encodeStateAsUpdate(doc);
+        return this.getSnapshotFromDoc(doc);
     }
 
     getUpdatedYDocFromSnapshot(baseSnapshot: Uint8Array, updates: Uint8Array[]): Y.Doc {
-        let doc = new Y.Doc();
+        const doc = new Y.Doc();
 
         if (baseSnapshot && baseSnapshot.length > 0) {
             try {
                 Y.applyUpdate(doc, baseSnapshot);
             } catch (e) {
                 console.error("[YjsProcessor] 기존 base snapshot 데이터가 유효하지 않습니다.", e);
-                doc = new Y.Doc();
+                throw e;
             }
         }
 
@@ -62,6 +57,7 @@ export class DefaultYjsProcessor implements YjsProcessor {
                 Y.applyUpdate(doc, update);
             } catch (e) {
                 console.error("[YjsProcessor] 업데이트 패킷이 유효하지 않습니다.", e);
+                throw e;
             }
         }
 
@@ -71,7 +67,6 @@ export class DefaultYjsProcessor implements YjsProcessor {
     getSnapshotFromDoc(doc: Y.Doc): Uint8Array {
         if (hasUnresolvedPending(doc)) {
             logPending(doc);
-            // throw new Error("Unresolved pending structs detected before snapshot");
         }
 
         try {
