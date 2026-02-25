@@ -98,14 +98,7 @@ function NodeContent({
     const { deleteNode, selectNode } = useMindmapActions();
     const { openFromMenu } = useStarEpisodePanelActions();
 
-    const nodeText = (contents ?? "").trim();
-    const hasText = nodeText.length > 0;
-    const isRoot = nodeId === "root";
-
     const handleOpenStarFromMenu = () => {
-        if (!hasText) return;
-        if (isRoot) return;
-
         selectNode(nodeId);
         openFromMenu(nodeId);
         setMenuIsOpened(false);
@@ -153,15 +146,12 @@ function NodeContent({
                                         leftSlot={<Icon name="ic_nodemenu_delete" size={16} />}
                                         onClick={() => deleteNode(nodeId)}
                                     />
-                                    {/* 내용이 있을 때만 STAR 작성하기 메뉴 표시 */}
-                                    {hasContent && !isRoot && (
-                                        <ListRow
-                                            contents="STAR 작성하기"
-                                            className="text-text-main2 typo-body-14-medium"
-                                            leftSlot={<Icon name="ic_star" size={16} />}
-                                            onClick={handleOpenStarFromMenu}
-                                        />
-                                    )}
+                                    <ListRow
+                                        contents="STAR 작성하기"
+                                        className="text-text-main2 typo-body-14-medium"
+                                        leftSlot={<Icon name="ic_star" size={16} />}
+                                        onClick={handleOpenStarFromMenu}
+                                    />
                                 </List>
                             </div>
                         }

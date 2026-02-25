@@ -90,7 +90,7 @@ const MindmapContent = ({
                     config={resolvedConfig}
                     onError={handleMindmapError}
                 >
-                    <div className="flex flex-col w-full h-full bg-slate-100 overflow-hidden relative">
+                    <div className="flex flex-col w-full h-full bg-slate-50 overflow-hidden relative">
                         {mindmapData.isShared && <CollaborationList />}
                         <ControllerSideBar />
 
