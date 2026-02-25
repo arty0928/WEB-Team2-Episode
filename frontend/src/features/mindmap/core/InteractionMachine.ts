@@ -29,7 +29,9 @@ type Deps = {
     onMoveNode: (targetId: NodeId, movingId: NodeId, direction: NodeDirection, side?: AddNodeDirection) => void;
     onDeleteNode: (nodeId: NodeId) => void;
     onSelectNode: (nodeId: NodeId | null) => void;
-
+    onDragStart: (nodeId: NodeId) => void;
+    onDragEnd: (nodeId: NodeId) => void;
+    isNodeLocked: (nodeId: NodeId) => boolean;
     emitInteraction: (snap: InteractionSnapshot) => void;
     emitDragSession: (snap: DragSessionSnapshot) => void;
 
@@ -73,6 +75,10 @@ export class InteractionMachine {
 
             const node = this.deps.safeGetNode(hit.nodeId);
             if (!node || node.type === "root") return;
+
+            if (this.deps.isNodeLocked(hit.nodeId)) {
+                return;
+            }
 
             // 드래그는 Content 에서만 시작
             if (!hit.dragHandle) return;
@@ -121,8 +127,8 @@ export class InteractionMachine {
                 const dist = calcDistance(clientX, clientY, this.startMousePos.x, this.startMousePos.y);
                 if (dist > this.dragThreshold) {
                     this.mode = "dragging";
-
                     if (this.draggingNodeId) {
+                        this.deps.onDragStart(this.draggingNodeId);
                         this.dragSubtreeIds = this.deps.getAllDescendantIds(this.draggingNodeId);
                     }
 
@@ -167,7 +173,10 @@ export class InteractionMachine {
             const direction = this.baseNode.direction;
 
             const movingId: NodeId | null = isDragging ? this.draggingNodeId : TEMP_NEW_NODE_ID;
+
             if (movingId) {
+                if (isDragging) this.deps.onDragEnd(movingId);
+
                 const droppingOnDescendant = isDragging ? !!this.dragSubtreeIds?.has(targetId) : false;
                 if (!droppingOnDescendant) {
                     const targetNode = this.deps.safeGetNode(targetId);

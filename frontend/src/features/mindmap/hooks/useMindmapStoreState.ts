@@ -75,7 +75,7 @@ export function useMindmapRemoteCursors() {
 }
 
 export function useMindmapSelfLockedNodeId() {
-    return useMindmapChannel("locks", (s) => s.locks.selfLockedNodeId);
+    return useMindmapChannel("locks", (s) => s.locks.selfLockedNodeIds);
 }
 
 export function useMindmapNodeLockInfo(nodeId: NodeId): LockInfo | null {

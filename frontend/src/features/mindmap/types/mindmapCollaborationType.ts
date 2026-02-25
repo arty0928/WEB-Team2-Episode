@@ -37,13 +37,13 @@ export type CollaboratorCursorsInfo = {
     cursors: CollaboratorCursor[];
 };
 
-export type LockState = { nodeId: NodeId; at: number } | null;
+export type LockState = { nodeIds: NodeId[]; at: number } | null;
 
-export type LockInfo = { nodeId: NodeId; clientId: number; user: CollaboratorInfo; timestamp: number };
+export type LockInfo = { nodeIds: NodeId[]; clientId: number; user: CollaboratorInfo; timestamp: number };
 export type LocksInfo = {
     enabled: boolean;
     selfClientId: number | null;
-    selfLockedNodeId: NodeId | null;
+    selfLockedNodeIds: NodeId[] | null; // 내가 잠군거
     byNodeId: Map<NodeId, LockInfo>;
 };
 

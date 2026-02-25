@@ -43,8 +43,12 @@ function shallowEqualParticipants(a: Collaborator[], b: Collaborator[]) {
 }
 
 function sameLockInfo(a: LockInfo, b: LockInfo) {
+    const isNodeIdsEqual =
+        a.nodeIds === b.nodeIds ||
+        (a.nodeIds.length === b.nodeIds.length && a.nodeIds.every((id, index) => id === b.nodeIds[index]));
+
     return (
-        a.nodeId === b.nodeId &&
+        isNodeIdsEqual &&
         a.clientId === b.clientId &&
         a.timestamp === b.timestamp &&
         a.user.id === b.user.id &&
@@ -57,9 +61,9 @@ function shallowEqualLocks(a: LocksInfo, b: LocksInfo) {
     if (a === b) return true;
     if (a.enabled !== b.enabled) return false;
     if (a.selfClientId !== b.selfClientId) return false;
-    if (a.selfLockedNodeId !== b.selfLockedNodeId) return false;
 
     if (a.byNodeId.size !== b.byNodeId.size) return false;
+
     for (const [nodeId, infoA] of a.byNodeId.entries()) {
         const infoB = b.byNodeId.get(nodeId);
         if (!infoB) return false;
@@ -67,7 +71,6 @@ function shallowEqualLocks(a: LocksInfo, b: LocksInfo) {
     }
     return true;
 }
-
 /**
  * - awareness에 local user + cursor + lock 상태를 세팅
  * - remote states 변화 감지 -> participants/cursors/locks를 분리해서 store에 반영
@@ -85,7 +88,7 @@ export class CollaborationManager {
     private lastLocks: LocksInfo = {
         enabled: true,
         selfClientId: null,
-        selfLockedNodeId: null,
+        selfLockedNodeIds: [],
         byNodeId: new Map(),
     };
 
@@ -141,6 +144,40 @@ export class CollaborationManager {
         this.cursorModule.sendCursorChat(message);
     }
 
+    setLocks(nodeIds: NodeId[] | []) {
+        this.ensureLocalState();
+
+        const awareness = this.deps.awareness;
+        const selfId = awareness.clientID;
+
+        if (nodeIds.length === 0) {
+            awareness.setLocalStateField("lock", null);
+
+            return true;
+        }
+
+        const states = awareness.getStates();
+        for (const [clientId, st] of states.entries()) {
+            if (clientId === selfId) continue;
+
+            const lock = st?.lock;
+            if (lock) {
+                for (const nodeId of nodeIds) {
+                    if (lock.nodeIds.includes(nodeId)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        awareness.setLocalStateField("lock", { nodeIds: [...nodeIds], at: Date.now() } satisfies Exclude<
+            LockState,
+            null
+        >);
+
+        return true;
+    }
+
     setLock(nodeId: NodeId | null): boolean {
         this.ensureLocalState();
 
@@ -153,12 +190,16 @@ export class CollaborationManager {
                 if (clientId === selfId) continue;
 
                 const lock = st?.lock;
-                if (lock && lock.nodeId === nodeId) {
+
+                if (lock && lock.nodeIds.some((id) => id === nodeId)) {
                     return false;
                 }
             }
 
-            awareness.setLocalStateField("lock", { nodeId, at: Date.now() } satisfies Exclude<LockState, null>);
+            awareness.setLocalStateField("lock", { nodeIds: [nodeId], at: Date.now() } satisfies Exclude<
+                LockState,
+                null
+            >);
 
             return true;
         }
@@ -189,7 +230,8 @@ export class CollaborationManager {
         const participants: Collaborator[] = [];
 
         const locksByNodeId = new Map<NodeId, LockInfo>();
-        let desiredSelfLockNodeId: NodeId | null = null;
+
+        let desiredSelfLockNodeIds: NodeId[] = [];
         let desiredSelfLockAt = 0;
 
         states.forEach((state, clientId) => {
@@ -201,38 +243,51 @@ export class CollaborationManager {
             participants.push({ clientId, user, isSelf });
 
             const lock = state?.lock;
-            if (lock && lock.nodeId) {
+
+            if (lock && lock.nodeIds.length > 0) {
                 const ts = lock.at;
+
                 if (isSelf) {
-                    desiredSelfLockNodeId = lock.nodeId;
+                    desiredSelfLockNodeIds = lock.nodeIds;
                     desiredSelfLockAt = ts;
                 }
 
-                const candidate: LockInfo = { nodeId: lock.nodeId, clientId, user, timestamp: ts };
+                lock.nodeIds.forEach((nodeId: NodeId) => {
+                    const candidate: LockInfo = {
+                        nodeIds: lock.nodeIds,
+                        clientId,
+                        user,
+                        timestamp: ts,
+                    };
 
-                const prev = locksByNodeId.get(lock.nodeId);
-                if (!prev) {
-                    locksByNodeId.set(lock.nodeId, candidate);
-                } else {
-                    if (candidate.timestamp < prev.timestamp) locksByNodeId.set(lock.nodeId, candidate);
-                    else if (candidate.timestamp === prev.timestamp && candidate.clientId < prev.clientId)
-                        locksByNodeId.set(lock.nodeId, candidate);
-                }
+                    const prev = locksByNodeId.get(nodeId);
+
+                    if (!prev) {
+                        locksByNodeId.set(nodeId, candidate);
+                    } else {
+                        if (candidate.timestamp < prev.timestamp) {
+                            locksByNodeId.set(nodeId, candidate);
+                        } else if (candidate.timestamp === prev.timestamp && candidate.clientId < prev.clientId) {
+                            locksByNodeId.set(nodeId, candidate);
+                        }
+                    }
+                });
             }
         });
 
-        let selfLockedNodeId: NodeId | null = null;
-        if (desiredSelfLockNodeId) {
-            const winner = locksByNodeId.get(desiredSelfLockNodeId);
-            if (winner?.clientId === selfId) {
-                selfLockedNodeId = desiredSelfLockNodeId;
-            } else {
-                if (desiredSelfLockAt > 0) {
-                    try {
-                        awareness.setLocalStateField("lock", null);
-                    } catch {
-                        // ignore
-                    }
+        let selfLockedNodeIds: NodeId[] = [];
+
+        if (desiredSelfLockNodeIds.length > 0) {
+            selfLockedNodeIds = desiredSelfLockNodeIds.filter((id) => {
+                const winner = locksByNodeId.get(id);
+                return winner?.clientId === selfId;
+            });
+
+            if (selfLockedNodeIds.length === 0 && desiredSelfLockAt > 0) {
+                try {
+                    awareness.setLocalStateField("lock", null);
+                } catch {
+                    // ignore
                 }
             }
         }
@@ -248,7 +303,7 @@ export class CollaborationManager {
         const nextLocks: LocksInfo = {
             enabled: true,
             selfClientId: selfId,
-            selfLockedNodeId,
+            selfLockedNodeIds,
             byNodeId: locksByNodeId,
         };
 

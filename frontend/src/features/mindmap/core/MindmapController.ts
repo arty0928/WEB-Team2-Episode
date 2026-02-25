@@ -162,7 +162,7 @@ export class MindmapController implements IMindmapController {
                     ...prev.locks,
                     enabled: true,
                     selfClientId: awareness.clientID,
-                    selfLockedNodeId: null,
+                    selfLockedNodeIds: null,
                     byNodeId: new Map(),
                 },
             }),
@@ -218,11 +218,15 @@ export class MindmapController implements IMindmapController {
                     const channels: StoreChannel[] = ["locks"];
                     for (const id of changedIds) channels.push(`lock:${id}`);
 
-                    if (prev.selfLockedNodeId && prev.selfLockedNodeId !== next.selfLockedNodeId) {
-                        channels.push(`lock:${prev.selfLockedNodeId}`);
+                    if (prev.selfLockedNodeIds && prev.selfLockedNodeIds !== next.selfLockedNodeIds) {
+                        for (const id of prev.selfLockedNodeIds) {
+                            channels.push(`lock:${id}`);
+                        }
                     }
-                    if (next.selfLockedNodeId) {
-                        channels.push(`lock:${next.selfLockedNodeId}`);
+                    if (next.selfLockedNodeIds) {
+                        for (const id of next.selfLockedNodeIds) {
+                            channels.push(`lock:${id}`);
+                        }
                     }
 
                     this.store.setState((p) => ({ ...p, locks: next }), { channels });
@@ -248,7 +252,7 @@ export class MindmapController implements IMindmapController {
                 collaborators: { enabled: false, selfClientId: null, participants: [] },
                 cursors: { enabled: false, selfClientId: null, cursors: [] },
 
-                locks: { enabled: false, selfClientId: null, selfLockedNodeId: null, byNodeId: new Map() },
+                locks: { enabled: false, selfClientId: null, selfLockedNodeIds: null, byNodeId: new Map() },
             }),
             { channels: ["collaborators", "cursors", "locks"] },
         );
@@ -271,6 +275,17 @@ export class MindmapController implements IMindmapController {
             safeGetNode: (id) => this.tree.safeGetNode(id),
             getChildNodes: (id) => this.tree.getChildNodes(id),
             getAllDescendantIds: (id) => this.tree.getAllDescendantIds(id),
+            isNodeLocked: (id) => this.isNodeLockedByOther(id),
+            onDragStart: (id) => {
+                const descendantIds = [...this.tree.getAllDescendantIds(id)];
+                const ancestorIds = this.tree.getAllAncestorIds(id);
+
+                this.presenceManager?.setLocks([...descendantIds, ...ancestorIds]);
+            },
+
+            onDragEnd: () => {
+                this.presenceManager?.setLocks([]);
+            },
 
             screenToWorld: (x, y) => this.viewport!.screenToWorld(x, y),
 
@@ -556,6 +571,7 @@ export class MindmapController implements IMindmapController {
         unlockNode: () => {
             this.presenceManager?.setLock(null);
         },
+
         addNode: (baseId: NodeId, direction: NodeDirection, side: AddNodeDirection, contents?: string) => {
             if (this.tree.getNodeCount() >= MAX_NODE_COUNT) {
                 this.opts.onError?.(new NodeLimitExceededError(MAX_NODE_COUNT));
@@ -653,12 +669,15 @@ export class MindmapController implements IMindmapController {
 
             const hit = resolveHit(e.target);
 
-            const selfLocked = this.store.getState().locks.selfLockedNodeId;
-            if (selfLocked) {
+            const selfLockedNodeIds = this.store.getState().locks.selfLockedNodeIds;
+
+            if (selfLockedNodeIds) {
                 if (hit.kind === "canvas") {
                     this.presenceManager?.setLock(null);
-                } else if (hit.kind === "node" && hit.nodeId !== selfLocked) {
-                    this.presenceManager?.setLock(null);
+                } else if (hit.kind === "node") {
+                    const isNotLockedNode = selfLockedNodeIds?.every((id) => hit.nodeId !== id);
+
+                    if (isNotLockedNode) this.presenceManager?.setLock(null);
                 }
             }
             if (hit.kind === "node") {
@@ -679,15 +698,17 @@ export class MindmapController implements IMindmapController {
             this.assertNotDestroyed();
             this.interaction?.pointerUp();
 
-            const selfLocked = this.store.getState().locks.selfLockedNodeId;
-            if (!selfLocked) return;
+            const selfLockedNodeIds = this.store.getState().locks.selfLockedNodeIds;
+            if (!selfLockedNodeIds) return;
             if (!this.presenceManager) return;
             const hit = resolveHit(e.target);
             if (hit.kind === "canvas") {
                 this.presenceManager.setLock(null);
                 return;
             }
-            if (hit.kind === "node" && hit.nodeId !== selfLocked) {
+
+            const isNotLockedNode = selfLockedNodeIds?.every((id) => hit.nodeId !== id);
+            if (hit.kind === "node" && isNotLockedNode) {
                 this.presenceManager.setLock(null);
             }
         },
@@ -767,9 +788,10 @@ export class MindmapController implements IMindmapController {
             if (!this.presenceManager) return;
             if (this.isNodeLockedByOther(hit.nodeId)) return;
 
-            const curSelfLocked = this.store.getState().locks.selfLockedNodeId;
+            const curSelfLockedNodeIds = this.store.getState().locks.selfLockedNodeIds;
 
-            if (curSelfLocked === hit.nodeId) {
+            const isAlreadyLocked = curSelfLockedNodeIds?.some((id) => hit.nodeId === id);
+            if (isAlreadyLocked) {
                 this.presenceManager.setLock(null);
             } else {
                 this.presenceManager.setLock(hit.nodeId);
@@ -800,7 +822,7 @@ export class MindmapController implements IMindmapController {
             locks: {
                 enabled: false,
                 selfClientId: null,
-                selfLockedNodeId: null,
+                selfLockedNodeIds: null,
                 byNodeId: new Map(),
             },
 

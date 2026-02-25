@@ -235,7 +235,8 @@ function NodeItem({ nodeId, measure = true }: Props) {
 
                                             commitDraft();
                                             flushBroadcast(normalized);
-                                            exitEdit(); // 여기서 잠금 해제
+
+                                            // exitEdit();
                                         }}
                                     />
 
@@ -354,7 +355,9 @@ function NodeItem({ nodeId, measure = true }: Props) {
                                     onBlur={() => {
                                         commitDraft();
                                         flushBroadcast();
-                                        exitEdit();
+
+                                        // 외부에서 캔버스 pointerdown일 시 lock을 풀기 때문에 이곳에서는 제거
+                                        // exitEdit();
                                     }}
                                 />
                             )}

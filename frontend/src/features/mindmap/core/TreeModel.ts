@@ -638,4 +638,23 @@ export class TreeModel {
         walk(nodeId);
         return out;
     }
+
+    getAllAncestorIds(nodeId: NodeId): NodeId[] {
+        const ancestors: NodeId[] = [];
+        let current = this.safeGetNode(nodeId);
+        let guard = 0;
+
+        while (current && guard++ < 1000) {
+            const parent = this.safeGetNode(current.parentId);
+
+            if (!parent || parent.id === ROOT_NODE_ID) {
+                break;
+            }
+
+            ancestors.push(parent.id);
+            current = parent;
+        }
+
+        return ancestors;
+    }
 }

@@ -15,8 +15,7 @@ export function useMindmapServerSideEffects(args: {
     const unlockMut = useUpdateEpisodes();
     const deleteMut = useDeleteEpisodes();
 
-    //n노드의 락 시작 시점
-    const editingNodeRef = useRef<{ id: string; content: string } | null>(null);
+    const editingNodesRef = useRef<Map<string, string>>(new Map());
 
     const canSendApi = !!mindmapId && mindmapId !== "local";
 
@@ -27,48 +26,53 @@ export function useMindmapServerSideEffects(args: {
 
         return store.subscribe("locks", () => {
             const state = store.getState();
-            const currentLockedId = state.locks.selfLockedNodeId;
-            const prevEditing = editingNodeRef.current;
 
-            if (prevEditing?.id === currentLockedId) return;
+            const currentLockedIds = state.locks.selfLockedNodeIds || [];
+            const prevLockedNodesMap = editingNodesRef.current;
 
-            if (prevEditing) {
-                const node = state.graph.nodes.get(prevEditing.id);
-                const currentContent = node?.contents ?? "";
+            const itemsToUpdate: { nodeId: string; content: string }[] = [];
 
-                const isNotRoot = prevEditing.id !== ROOT_NODE_ID;
-                const isContentChanged = prevEditing.content !== currentContent;
+            const nextLockedNodesMap = new Map<string, string>();
 
-                if (isNotRoot && isContentChanged) {
-                    unlockMut.mutate({
-                        mindmapId: mindmapId,
-                        body: {
-                            items: [
-                                {
-                                    nodeId: prevEditing.id,
-                                    content: currentContent,
-                                },
-                            ],
-                        },
-                    });
+            for (const [id, initialContent] of prevLockedNodesMap) {
+                if (!currentLockedIds.includes(id)) {
+                    const node = state.graph.nodes.get(id);
+                    const currentContent = node?.contents ?? "";
+
+                    const isNotRoot = id !== ROOT_NODE_ID;
+                    const isContentChanged = initialContent !== currentContent;
+
+                    if (isNotRoot && isContentChanged) {
+                        itemsToUpdate.push({
+                            nodeId: id,
+                            content: currentContent,
+                        });
+                    }
+                } else {
+                    nextLockedNodesMap.set(id, initialContent);
                 }
             }
 
-            // 2. 새로운 편집 노드 정보로 Ref 갱신 (항상 실행)
-            if (currentLockedId) {
-                const newNode = state.graph.nodes.get(currentLockedId);
-                editingNodeRef.current = {
-                    id: currentLockedId,
-                    content: newNode?.contents ?? "",
-                };
-            } else {
-                editingNodeRef.current = null;
+            currentLockedIds.forEach((id) => {
+                if (!prevLockedNodesMap.has(id)) {
+                    const node = state.graph.nodes.get(id);
+                    nextLockedNodesMap.set(id, node?.contents ?? "");
+                }
+            });
+
+            if (itemsToUpdate.length > 0) {
+                unlockMut.mutate({
+                    mindmapId: mindmapId,
+                    body: {
+                        items: itemsToUpdate,
+                    },
+                });
             }
+
+            editingNodesRef.current = nextLockedNodesMap;
         });
     }, [engine, canSendApi, mindmapId, unlockMut]);
 
-    // ... (하단 생략)
-    // deletw
     useEffect(() => {
         if (!engine || !canSendApi) return;
         const store = engine.getStore();
