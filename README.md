@@ -1,5 +1,7 @@
 <div align="center">
+  <a href="https://episode.io.kr">
   <img alt="Episode Logo" src="https://github.com/user-attachments/assets/f0dc6923-5076-4981-b9cd-ba671313d250" width="600" />
+  </a>
   <h1>Episode</h1>
   <p><strong>Softeer 7th Team 2</strong></p>
   <p>✨ <em>흩어진 경험을 한 편의 이야기로 잇다</em> ✨</p>
@@ -8,6 +10,8 @@
     <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/wiki"><strong>📚 Wiki</strong></a> | 트러블 슈팅과 프로젝트 과정을 기록합니다.<br/>
     <a href="https://github.com/softeerbootcamp-7th/WEB-Team2-Episode/discussions?discussions_q="><strong>💬 Discussion</strong></a> | 협업 방식과 치열한 고민 과정을 공유합니다.
   </p>
+
+  <a href="https://episode.io.kr"><strong>🎬서비스 바로가기</strong></a>
 </div>
 
 <br/>
