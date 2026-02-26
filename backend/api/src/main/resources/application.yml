@@ -132,6 +132,7 @@ management:
 collaboration:
   ws:
     send-timeout: 1000
+    heartbeat-timeout: 180s
     buffer-size: 1048576
     max-message-size: 524288
     path-prefix: /ws/mindmap

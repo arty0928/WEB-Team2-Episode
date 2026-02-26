@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.yat2.episode.collaboration.config.WebSocketProperties;
 
 import static com.yat2.episode.global.constant.AttributeKeys.CONNECTED_AT;
+import static com.yat2.episode.global.constant.AttributeKeys.LAST_SEEN;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -167,7 +168,7 @@ public class SessionRegistry {
         WebSocketSession session = sessions.get(sessionId);
         if (session == null) return null;
 
-        if (!session.isOpen()) {
+        if (!session.isOpen() || isStale(session)) {
             removeSession(roomId, sessionId);
             return null;
         }
@@ -177,15 +178,26 @@ public class SessionRegistry {
 
     public List<WebSocketSession> findAllAlivePeers(UUID roomId, String excludeId) {
         ConcurrentHashMap<String, WebSocketSession> sessions = rooms.get(roomId);
-        if (sessions == null) return List.of();
+        if (sessions == null || sessions.isEmpty()) return List.of();
 
         List<WebSocketSession> result = new ArrayList<>(sessions.size());
-        for (WebSocketSession s : sessions.values()) {
-            if (s.isOpen() && !excludeId.equals(s.getId())) {
-                result.add(s);
+
+        for (WebSocketSession session : sessions.values()) {
+            if (session == null) continue;
+            if (excludeId.equals(session.getId())) continue;
+
+            if (!session.isOpen() || isStale(session)) {
+                removeSession(roomId, session);
+                continue;
             }
+            result.add(session);
         }
         return result;
+    }
+
+    private boolean isStale(WebSocketSession s) {
+        if (!(s.getAttributes().get(LAST_SEEN) instanceof Long last)) return false;
+        return System.nanoTime() - last > wsProperties.heartbeatTimeout().toNanos();
     }
 
     public long getConnectedAt(WebSocketSession session) {

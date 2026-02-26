@@ -13,6 +13,8 @@ import com.yat2.episode.collaboration.worker.JobPublisher;
 import com.yat2.episode.collaboration.yjs.YjsMessageRouter;
 import com.yat2.episode.global.constant.AttributeKeys;
 
+import static com.yat2.episode.global.constant.AttributeKeys.LAST_SEEN;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -32,6 +34,8 @@ public class CollaborationService {
             log.error("Mindmap Id is null.");
             return;
         }
+
+        sender.getAttributes().put(LAST_SEEN, System.nanoTime());
 
         byte[] payload = toByteArray(message.getPayload());
 

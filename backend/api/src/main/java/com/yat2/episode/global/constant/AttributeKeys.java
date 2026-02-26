@@ -6,6 +6,7 @@ public final class AttributeKeys {
     public static final String CONNECTED_AT = "connectedAt";
     public static final String LAST_ENTRY_ID = "lastEntryId";
     public static final String IS_SYNCED = "isSynced";
+    public static final String LAST_SEEN = "lastSeen";
 
 
     private AttributeKeys() {}
