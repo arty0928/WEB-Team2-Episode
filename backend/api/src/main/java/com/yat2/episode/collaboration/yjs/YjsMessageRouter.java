@@ -115,14 +115,14 @@ public class YjsMessageRouter {
                 runnerLastEntry = lastEntryIdStore.get(roomId).orElse("0-0");
             } catch (Exception e) {
                 log.error("Error reading lastEntryId for room {}", roomId, e);
-                closeSessionQuietly(requester, CloseStatus.SERVER_ERROR);
+                closeSessionQuietly(requester, roomId, CloseStatus.SERVER_ERROR);
                 return false;
             }
 
             String clientLastEntry = String.valueOf(requester.getAttributes().getOrDefault(LAST_ENTRY_ID, "0-0"));
 
             if (!clientLastEntry.equals(runnerLastEntry)) {
-                closeSessionQuietly(requester, new CloseStatus(4000, "LAST_ENTRY_MISMATCH"));
+                closeSessionQuietly(requester, roomId, new CloseStatus(4000, "LAST_ENTRY_MISMATCH"));
                 return false;
             }
 
@@ -130,7 +130,7 @@ public class YjsMessageRouter {
             boolean ok = sessionRegistry.unicastAll(roomId, requester.getId(), updates);
 
             if (!ok) {
-                closeSessionQuietly(requester, CloseStatus.SERVER_ERROR);
+                closeSessionQuietly(requester, roomId, CloseStatus.SERVER_ERROR);
                 return false;
             }
         }
@@ -164,11 +164,14 @@ public class YjsMessageRouter {
         }
     }
 
-    private void closeSessionQuietly(WebSocketSession session, CloseStatus status) {
+    private void closeSessionQuietly(WebSocketSession session, UUID roomId, CloseStatus status) {
+        try {
+            sessionRegistry.removeSession(roomId, session);
+        } catch (Exception ignored) {}
+
         try {
             session.close(status);
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     public void onDisconnect(UUID roomId, String sessionId) {

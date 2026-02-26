@@ -66,11 +66,14 @@ public class SessionRegistry {
     }
 
     public void broadcast(UUID mindmapId, WebSocketSession sender, byte[] payload) {
+        if (payload == null) {
+            return;
+        }
         ConcurrentHashMap<String, WebSocketSession> sessions = rooms.get(mindmapId);
         if (sessions == null || sessions.isEmpty()) return;
 
         final String senderId = (sender == null) ? null : sender.getId();
-        final int len = (payload == null) ? 0 : payload.length;
+        final int len = payload.length;
 
         List<String> deadSessionIds = null;
 
@@ -87,9 +90,6 @@ public class SessionRegistry {
             }
 
             try {
-                if (payload == null) {
-                    return;
-                }
                 session.sendMessage(new BinaryMessage(payload));
 
             } catch (SessionLimitExceededException e) {
@@ -103,13 +103,19 @@ public class SessionRegistry {
                 if (deadSessionIds == null) deadSessionIds = new ArrayList<>();
                 deadSessionIds.add(sessionId);
 
-                log.debug("[WS][SEND_FAIL] mindmapId={} sessionId={} senderId={} payloadBytes={} ex={}", mindmapId,
-                          sessionId, senderId, len, e.toString());
+                log.warn("[WS][SEND_FAIL] mindmapId={} sessionId={} senderId={} payloadBytes={} ex={}", mindmapId,
+                         sessionId, senderId, len, e.toString());
             }
         }
 
         if (deadSessionIds != null) {
             for (String deadId : deadSessionIds) {
+                WebSocketSession s = sessions.get(deadId);
+                try {
+                    if (s != null && s.isOpen()) {
+                        s.close();
+                    }
+                } catch (Exception ignored) {}
                 removeSession(mindmapId, deadId);
             }
         }
@@ -122,7 +128,12 @@ public class SessionRegistry {
         try {
             session.sendMessage(new BinaryMessage(payload));
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            removeSession(mindmapId, receiverSessionId);
+            log.warn("[WS][SEND_FAIL] mindmapId={} sessionId={} ex={}", mindmapId, receiverSessionId, e.toString());
+            try {
+                session.close();
+            } catch (Exception ignored) {}
             return false;
         }
     }
@@ -139,7 +150,12 @@ public class SessionRegistry {
                 session.sendMessage(new BinaryMessage(payload));
             }
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            removeSession(mindmapId, receiverSessionId);
+            log.warn("[WS][SEND_FAIL] mindmapId={} sessionId={} ex={}", mindmapId, receiverSessionId, e.toString());
+            try {
+                session.close();
+            } catch (Exception ignored) {}
             return false;
         }
     }

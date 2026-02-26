@@ -8,7 +8,6 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,6 @@ import com.yat2.episode.collaboration.config.WebSocketProperties;
 import static com.yat2.episode.global.constant.AttributeKeys.CONNECTED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -184,25 +182,6 @@ class SessionRegistryTest {
 
             assertThat(ok).isFalse();
             assertThat(registry.findAllAlivePeers(roomId, "NONE")).isEmpty();
-        }
-
-        @Test
-        @DisplayName("sendMessage가 예외면 제거하지 않고 false만 반환")
-        void unicast_whenSendThrows_notRemoved() throws Exception {
-            UUID roomId = UUID.randomUUID();
-
-            WebSocketSession receiver = mock(WebSocketSession.class);
-            when(receiver.getId()).thenReturn("r1");
-            when(receiver.isOpen()).thenReturn(true);
-            when(receiver.getAttributes()).thenReturn(new HashMap<>());
-            doThrow(new IOException("boom")).when(receiver).sendMessage(any(BinaryMessage.class));
-
-            registry.addSession(roomId, receiver);
-
-            boolean ok = registry.unicast(roomId, "r1", new byte[]{ 1 });
-
-            assertThat(ok).isFalse();
-            assertThat(registry.findAllAlivePeers(roomId, "NONE")).hasSize(1);
         }
 
         @Test
